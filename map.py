@@ -97,7 +97,7 @@ class NumKeys(ttk.Frame):
         caption.pack(side="top", fill="x")
 
         self.text = tk.StringVar()
-        entry = tk.Text(self, height=1)
+        entry = ttk.Entry(self, textvariable=self.text, font=default_font)
         entry.pack(side="top", fill="x")
 
         numkeys = ttk.Frame(self)
@@ -107,21 +107,29 @@ class NumKeys(ttk.Frame):
         numkeys.columnconfigure(1, weight=1)
         numkeys.columnconfigure(2, weight=1)
 
-        button_7 = ttk.Button(numkeys, text="7").grid(column=0, row=0, sticky="nswe")
-        button_8 = ttk.Button(numkeys, text="8").grid(column=1, row=0, sticky="nswe")
-        button_9 = ttk.Button(numkeys, text="9").grid(column=2, row=0, sticky="nswe")
+        button_7 = ttk.Button(numkeys, text="7", command=lambda: self.addNum("7")).grid(column=0, row=0, sticky="nswe")
+        button_8 = ttk.Button(numkeys, text="8", command=lambda: self.addNum("8")).grid(column=1, row=0, sticky="nswe")
+        button_9 = ttk.Button(numkeys, text="9", command=lambda: self.addNum("9")).grid(column=2, row=0, sticky="nswe")
 
-        button_4 = ttk.Button(numkeys, text="4").grid(column=0, row=1, sticky="nswe")
-        button_5 = ttk.Button(numkeys, text="5").grid(column=1, row=1, sticky="nswe")
-        button_6 = ttk.Button(numkeys, text="6").grid(column=2, row=1, sticky="nswe")
+        button_4 = ttk.Button(numkeys, text="4", command=lambda: self.addNum("4")).grid(column=0, row=1, sticky="nswe")
+        button_5 = ttk.Button(numkeys, text="5", command=lambda: self.addNum("5")).grid(column=1, row=1, sticky="nswe")
+        button_6 = ttk.Button(numkeys, text="6", command=lambda: self.addNum("6")).grid(column=2, row=1, sticky="nswe")
 
-        button_1 = ttk.Button(numkeys, text="1").grid(column=0, row=2, sticky="nswe")
-        button_2 = ttk.Button(numkeys, text="2").grid(column=1, row=2, sticky="nswe")
-        button_3 = ttk.Button(numkeys, text="3").grid(column=2, row=2, sticky="nswe")
+        button_1 = ttk.Button(numkeys, text="1", command=lambda: self.addNum("1")).grid(column=0, row=2, sticky="nswe")
+        button_2 = ttk.Button(numkeys, text="2", command=lambda: self.addNum("2")).grid(column=1, row=2, sticky="nswe")
+        button_3 = ttk.Button(numkeys, text="3", command=lambda: self.addNum("3")).grid(column=2, row=2, sticky="nswe")
 
-        button_del = ttk.Button(numkeys, text="Del").grid(column=0, row=3, sticky="nswe")
-        button_0   = ttk.Button(numkeys, text="0").grid(column=1, row=3, sticky="nswe")
+        button_del = ttk.Button(numkeys, text="Del", command=lambda: self.delNum()).grid(column=0, row=3, sticky="nswe")
+        button_0   = ttk.Button(numkeys, text="0", command=lambda: self.addNum("0")).grid(column=1, row=3, sticky="nswe")
         button_ok  = ttk.Button(numkeys, text="OK").grid(column=2, row=3, sticky="nswe")
+
+
+    def addNum(self, num):
+        self.text.set(self.text.get() + num)
+
+
+    def delNum(self):
+        self.text.set(self.text.get()[:-1])
 
 
 class MapApp(tk.Tk):
@@ -142,6 +150,7 @@ class MapApp(tk.Tk):
         style = ttk.Style()
 #         print(style.theme_names()) # ('aqua', 'clam', 'alt', 'default', 'classic')
 #         style.theme_use("clam") # デフォルトは'aqua'
+        global default_font
         default_font = font.nametofont("TkDefaultFont")
         default_font.configure(size=24)
         style.configure("TButton", padding=12)
