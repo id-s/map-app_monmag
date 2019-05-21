@@ -4,6 +4,9 @@ from tkinter import ttk
 
 from pprint import pprint
 
+#ENV = "MAC" # 開発用
+ENV = "Monmag"
+
 WINDOW_WIDTH = 480
 WINDOW_HEIGHT = 320
 PADDING = 4
@@ -145,12 +148,12 @@ class MapApp(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.title("MAP")
-        self.geometry("{}x{}".format(WINDOW_WIDTH, WINDOW_HEIGHT))
+
         self.attributes('-topmost', True) # NG:タイトルバー非表示
-        try:
-            self.attributes('-type', 'splash') # タイトルバー非表示
-        except tk.TclError as e:
-            print(e) # '-type'はLinuxのみ有効なオプションなので、他で出ても問題なし
+        if ENV == "Monmag":
+            self.attributes('-fullscreen', True) # 全画面・タイトルバー非表示
+        else:
+            self.geometry("{}x{}".format(WINDOW_WIDTH, WINDOW_HEIGHT))
 
         style = ttk.Style()
 #         print(style.theme_names()) # ('aqua', 'clam', 'alt', 'default', 'classic')
