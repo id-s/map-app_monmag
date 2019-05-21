@@ -62,8 +62,6 @@ class TelEntry(ttk.Frame):
         ttk.Frame.__init__(self, parent)
         self.controller = controller
 
-        self.tel = tk.StringVar()
-
         caption = tk.Label(self, text="初めてのご利用の方は進呈ポイントをショートメールでお知らせします。",
                            wraplength=(WINDOW_WIDTH - PADDING * 2), justify="left", height=2, padx=PADDING)
         caption.pack(side="top", fill="x")
@@ -71,7 +69,7 @@ class TelEntry(ttk.Frame):
         label = ttk.Label(self, text="電話番号入力")
         label.pack(side="top", fill="x")
 
-        tel_entry = tk.Text(self, height=1)
+        tel_entry = ttk.Entry(self, textvariable=self.controller.entry_text, font=default_font)
         tel_entry.pack(side="top", fill="x")
 
         button = ttk.Button(self, text="確定",
@@ -96,8 +94,7 @@ class NumKeys(ttk.Frame):
         caption = ttk.Label(self, text="電話番号入力")
         caption.pack(side="top", fill="x")
 
-        self.text = tk.StringVar()
-        entry = ttk.Entry(self, textvariable=self.text, font=default_font)
+        entry = ttk.Entry(self, textvariable=self.controller.entry_text, font=default_font)
         entry.pack(side="top", fill="x")
 
         numkeys = ttk.Frame(self)
@@ -121,15 +118,18 @@ class NumKeys(ttk.Frame):
 
         button_del = ttk.Button(numkeys, text="Del", command=lambda: self.delNum()).grid(column=0, row=3, sticky="nswe")
         button_0   = ttk.Button(numkeys, text="0", command=lambda: self.addNum("0")).grid(column=1, row=3, sticky="nswe")
-        button_ok  = ttk.Button(numkeys, text="OK").grid(column=2, row=3, sticky="nswe")
+        button_ok  = ttk.Button(numkeys, text="OK", command=lambda: self.enterTel()).grid(column=2, row=3, sticky="nswe")
 
 
     def addNum(self, num):
-        self.text.set(self.text.get() + num)
+        self.controller.entry_text.set(self.controller.entry_text.get() + num)
 
 
     def delNum(self):
-        self.text.set(self.text.get()[:-1])
+        self.controller.entry_text.set(self.controller.entry_text.get()[:-1])
+
+    def enterTel(self):
+        self.controller.show_frame("TelEntry")
 
 
 class MapApp(tk.Tk):
@@ -155,6 +155,8 @@ class MapApp(tk.Tk):
         default_font.configure(size=24)
         style.configure("TButton", padding=12)
 #         pprint(style.layout("TButton"))
+
+        self.entry_text = tk.StringVar()
 
         # container に画面(frame)を積んでおき、表示する画面を一番上に持ってくる
         container = ttk.Frame(self)
