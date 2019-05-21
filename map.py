@@ -17,7 +17,7 @@ class Menu(ttk.Frame):
         self.controller = controller
 
         menu1 = ttk.Button(self, text="MyShopクーポイントをスキャンする",
-                          command=lambda: controller.show_frame("CoupointScan"))
+                          command=lambda: controller.quit())
         menu2 = ttk.Button(self, text="流通会員カードをスキャンする",
                           command=lambda: controller.show_frame("CmdSelect"))
 
@@ -73,7 +73,7 @@ class TelEntry(ttk.Frame):
         tel_entry.pack(side="top", fill="x")
 
         button = ttk.Button(self, text="確定",
-                            command=lambda: controller.show_frame("Menu"))
+                            command=lambda: controller.quit())
         button.pack(side="top")
         button.focus_set()
 
