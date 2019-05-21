@@ -4,12 +4,17 @@ from tkinter import ttk
 
 from pprint import pprint
 
-#ENV = "MAC" # 開発用
 ENV = "Monmag"
+#ENV = "MAC" # 開発用(MAC)
 
 WINDOW_WIDTH = 480
 WINDOW_HEIGHT = 320
 PADDING = 4
+
+if ENV == "Monmag":
+    FONT_SIZE = 19
+else:
+    FONT_SIZE = 24
 
 class Menu(ttk.Frame):
     """メニュー画面
@@ -160,9 +165,9 @@ class MapApp(tk.Tk):
 #         style.theme_use("clam") # デフォルトは'aqua'
         global default_font
         default_font = font.nametofont("TkDefaultFont")
-        default_font.configure(family="Droid Sans Japanese", size=24)
+        default_font.configure(family="Droid Sans Japanese", size=FONT_SIZE)
 #         print(font.families()) ###
-        style.configure("TButton", padding=12)
+        style.configure("TButton", padding=FONT_SIZE/2)
 #         pprint(style.layout("TButton"))
 
         self.entry_text = tk.StringVar()
