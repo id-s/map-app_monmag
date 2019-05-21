@@ -154,6 +154,7 @@ class MapApp(tk.Tk):
         global default_font
         default_font = font.nametofont("TkDefaultFont")
         default_font.configure(size=24)
+        print(font.families()) ###
         style.configure("TButton", padding=12)
 #         pprint(style.layout("TButton"))
 
