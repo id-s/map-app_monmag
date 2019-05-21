@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import font
 from tkinter import ttk
 
+import urllib.request, json
 from pprint import pprint
 
 ENV = "Monmag"
@@ -54,12 +55,34 @@ class CmdSelect(ttk.Frame):
         self.controller = controller
 
         button1 = ttk.Button(self, text="付与",
-                          command=lambda: controller.show_frame("TelEntry"))
+                          command=lambda: self.getCards())
         button2 = ttk.Button(self, text="取消",
                           command=lambda: controller.show_frame("Menu"))
 
         button1.pack()
         button2.pack()
+
+    def getCards(self):
+        """利用できるカードを取得する
+        """
+        url = "https://card-dot-my-shop-magee-stg.appspot.com/v1/check"
+        method = "POST"
+        headers = {"Content-Type": "application/json"}
+        data = {
+            "terminal": { # TODO:端末情報取得
+                "macaddr": "00:00:00:00:00:00",
+                "serial_no": "YP000000000000",
+                "device_id": "000000000000000",
+                "version": "1.0.0",
+            }
+        }
+        request = urllib.request.Request(url, method="POST", data=json.dumps(data).encode("utf-8"), headers=headers)
+        print(request) ###
+        with urllib.request.urlopen(request) as response:
+            response_body = response.read().decode("utf-8")
+            print(response_body) ###
+
+        self.controller.show_frame("TelEntry")
 
 
 class TelEntry(ttk.Frame):
