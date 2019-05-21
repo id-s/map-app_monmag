@@ -13,3 +13,14 @@ $ pyenv install 3.4.2
 $ virtualenv -p ~/.pyenv/versions/3.4.2/bin/python3.4 env
 $ source env/bin/activate
 ```
+
+
+## 実行環境構築
+
+Monmagのターミナルにて以下を実行する。
+
+```
+$ sudo apt-get install python3-tk
+$ cd ~/Git
+$ git clone https://github.com/id-s/map-app_monmag.git
+```
