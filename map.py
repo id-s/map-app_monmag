@@ -157,8 +157,8 @@ class MapApp(tk.Tk):
 #         style.theme_use("clam") # デフォルトは'aqua'
         global default_font
         default_font = font.nametofont("TkDefaultFont")
-        default_font.configure(size=24)
-        print(font.families()) ###
+        default_font.configure(family="Droid Sans Japanese", size=24)
+#         print(font.families()) ###
         style.configure("TButton", padding=12)
 #         pprint(style.layout("TButton"))
 
