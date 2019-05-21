@@ -146,6 +146,7 @@ class MapApp(tk.Tk):
         tk.Tk.__init__(self, *args, **kwargs)
         self.title("MAP")
         self.geometry("{}x{}".format(WINDOW_WIDTH, WINDOW_HEIGHT))
+        self.overrideredirect(True) # タイトルバー非表示
 
         style = ttk.Style()
 #         print(style.theme_names()) # ('aqua', 'clam', 'alt', 'default', 'classic')
