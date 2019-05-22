@@ -12,6 +12,7 @@ $ cd map-app_monmag
 $ pyenv install 3.4.2
 $ virtualenv -p ~/.pyenv/versions/3.4.2/bin/python3.4 env
 $ source env/bin/activate
+$ pip install -r requirements.txt
 ```
 
 現在、Monmagで使われているフォントは"Droid Sans Japanese"。
@@ -27,4 +28,7 @@ Monmagのターミナルにて以下を実行する。
 $ sudo apt-get install python3-tk
 $ cd ~/Git
 $ git clone https://github.com/id-s/map-app_monmag.git
+$ cd map-app_monmag
+$ pip3 install -r requirements.txt
 ```
+
