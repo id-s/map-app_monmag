@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import font
 from tkinter import ttk
 
+import os
 import requests
 import xml.etree.ElementTree as ET
 from PIL import Image, ImageTk
@@ -19,6 +20,7 @@ if ENV == "Monmag":
 else:
     FONT_SIZE = 24
 
+IMAGE_DIR = "images"
 SELECT_CARD_LIMIT = 5 # FIXME:delete 選択できるカードの種類数(上限)
 
 
@@ -114,7 +116,19 @@ class CardSelect(ttk.Frame):
 
     def add_buttons(self, clients):
         for client in clients:
-            button = ttk.Button(self, text=client["card_name"],
+            resp = requests.get(client["img_url"], stream=True)
+            if resp.status_code != 200:
+                continue
+            file_path = os.path.join(IMAGE_DIR, "{}.png".format(client["client_cd"]))
+            with open(file_path, "wb") as f:
+                f.write(resp.content)
+                print("Download image: {}".format(file_path))
+
+            image = Image.open(file_path)
+            image = ImageTk.PhotoImage(image.resize((48, 48)))
+            self.controller.client_images.append(image)
+            button = ttk.Button(self, compound="left", text=client["card_name"], image=image,
+                                width=WINDOW_WIDTH - PADDING * 2,
                                 command=self.select_card(client["client_cd"]))
             button.pack()
             #controller.card_select_buttons.append(button) # FIXME:delete
@@ -240,6 +254,7 @@ class MapApp(tk.Tk):
 #         pprint(style.layout("TButton"))
 
         self.entry_text = tk.StringVar()
+        self.client_images = [] # 画像への参照をキープするために必須
 #         self.card_select_buttons = [] # FIXME:delete
 
         # container に画面(frame)を積んでおき、表示する画面を一番上に持ってくる
