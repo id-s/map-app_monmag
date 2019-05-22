@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import font
 from tkinter import ttk
 
-import urllib.request, json
+import requests
 import xml.etree.ElementTree as ET
 from PIL import Image, ImageTk
 from pprint import pprint
@@ -85,7 +85,6 @@ class CardSelect(ttk.Frame):
         """利用できるカードを取得する
         """
         url = "https://card-dot-my-shop-magee-stg.appspot.com/v1/check"
-        method = "POST"
         headers = {"Content-Type": "application/json"}
 
         macaddress = self.controller.get_macaddress()
@@ -100,17 +99,16 @@ class CardSelect(ttk.Frame):
                 "version": "1.0.0",
             }
         }
-        request = urllib.request.Request(url, method="POST", data=json.dumps(data).encode("utf-8"), headers=headers)
-        print("{} {}".format(method, url)) ###
 
-        try:
-            with urllib.request.urlopen(request) as response:
-                response_body = response.read().decode("utf-8")
-                print(response_body) ###
-                result = json.loads(response_body)
-                return result["clients"]
-        except Exception as e:
-            print(e)
+        print("POST {}".format(url)) ###
+        resp = requests.post(url, data=data, headers=headers)
+
+        if resp.status_code == 200:
+            print(resp.text) ###
+            result = resp.json()
+            return result["clients"]
+        else:
+            print(resp.status_code)
             return None
 
 
