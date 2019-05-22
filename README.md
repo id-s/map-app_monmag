@@ -14,6 +14,10 @@ $ virtualenv -p ~/.pyenv/versions/3.4.2/bin/python3.4 env
 $ source env/bin/activate
 ```
 
+現在、Monmagで使われているフォントは"Droid Sans Japanese"。
+これが開発PCにインストールされていない場合は以下よりダウンロードしてインストールしてください。
+https://github.com/jenskutilek/free-fonts/blob/master/Droid/Droid%20Sans%20Japanese/DroidSansJapanese.ttf
+
 
 ## 実行環境構築
 
