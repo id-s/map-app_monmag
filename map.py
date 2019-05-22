@@ -19,7 +19,7 @@ if ENV == "Monmag":
 else:
     FONT_SIZE = 24
 
-SELECT_CARD_LIMIT = 5 # 選択できるカードの種類数(上限)
+SELECT_CARD_LIMIT = 5 # FIXME:delete 選択できるカードの種類数(上限)
 
 
 class Menu(ttk.Frame):
@@ -60,19 +60,30 @@ class CmdSelect(ttk.Frame):
         self.controller = controller
 
         button1 = ttk.Button(self, text="付与",
-                          command=lambda: self.get_cards())
+                          command=lambda: controller.show_frame("CardSelect"))
         button2 = ttk.Button(self, text="取消",
                           command=lambda: controller.show_frame("Menu"))
 
         button1.pack()
         button2.pack()
 
-    def get_cards(self):
+
+class CardSelect(ttk.Frame):
+    """カード選択
+    """
+
+    def __init__(self, parent, controller):
+        ttk.Frame.__init__(self, parent)
+        self.controller = controller
+
+        clients = self.get_clients()
+        if (clients):
+            self.add_buttons(clients)
+
+
+    def get_clients(self):
         """利用できるカードを取得する
         """
-        if (self.controller.card_select_buttons[0]["text"]):
-            return # 取得済み
-
         url = "https://card-dot-my-shop-magee-stg.appspot.com/v1/check"
         method = "POST"
         headers = {"Content-Type": "application/json"}
@@ -91,47 +102,32 @@ class CmdSelect(ttk.Frame):
         }
         request = urllib.request.Request(url, method="POST", data=json.dumps(data).encode("utf-8"), headers=headers)
         print("{} {}".format(method, url)) ###
-        with urllib.request.urlopen(request) as response:
-            response_body = response.read().decode("utf-8")
-            print(response_body) ###
-            data = json.loads(response_body)
-            self.set_card_select_buttons(data["clients"])
 
-        self.controller.show_frame("CardSelect")
-
-
-    def set_card_select_buttons(self, clients):
-        for i in range(SELECT_CARD_LIMIT):
-            button = self.controller.card_select_buttons[i]
-            card = None
-            if (i < len(clients)):
-                card = clients[i]
-                button["text"] = card["card_name"]
-                image = Image.open(card["img_url"])
-            else:
-                button.pack_forget()
+        try:
+            with urllib.request.urlopen(request) as response:
+                response_body = response.read().decode("utf-8")
+                print(response_body) ###
+                result = json.loads(response_body)
+                return result["clients"]
+        except Exception as e:
+            print(e)
+            return None
 
 
-class CardSelect(ttk.Frame):
-    """カード選択
-    """
-
-    def __init__(self, parent, controller):
-        ttk.Frame.__init__(self, parent)
-        self.controller = controller
-
-        for i in range(SELECT_CARD_LIMIT):
-            button = ttk.Button(self, command=self.select_card(i))
+    def add_buttons(self, clients):
+        for client in clients:
+            button = ttk.Button(self, text=client["card_name"],
+                                command=self.select_card(client["client_cd"]))
             button.pack()
-            controller.card_select_buttons.append(button)
+            #controller.card_select_buttons.append(button) # FIXME:delete
 
 
-    def select_card(self, idx):
+    def select_card(self, client_cd):
         """カード選択時の処理
         http://memopy.hatenadiary.jp/entry/2017/06/11/220452 を参考に実装した。
         """
         def func():
-            print("Select card:{}".format(idx)) ###
+            print("Select card:{}".format(client_cd)) ###
             self.controller.show_frame("TelEntry")
         return func
 
@@ -246,7 +242,7 @@ class MapApp(tk.Tk):
 #         pprint(style.layout("TButton"))
 
         self.entry_text = tk.StringVar()
-        self.card_select_buttons = []
+#         self.card_select_buttons = [] # FIXME:delete
 
         # container に画面(frame)を積んでおき、表示する画面を一番上に持ってくる
         container = ttk.Frame(self)
