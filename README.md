@@ -26,6 +26,7 @@ Monmagのターミナルにて以下を実行する。
 
 ```
 $ sudo apt-get install python3-tk
+$ sudo apt-get install python3-pil.imagetk
 $ cd ~/Git
 $ git clone https://github.com/id-s/map-app_monmag.git
 $ cd map-app_monmag
