@@ -4,10 +4,11 @@ from tkinter import ttk
 
 import urllib.request, json
 import xml.etree.ElementTree as ET
+from PIL import Image, ImageTk
 from pprint import pprint
 
-ENV = "Monmag"
-#ENV = "MAC" # 開発用(MAC)
+#ENV = "Monmag"
+ENV = "MAC" # 開発用(MAC)
 
 WINDOW_WIDTH = 480
 WINDOW_HEIGHT = 320
@@ -17,6 +18,9 @@ if ENV == "Monmag":
     FONT_SIZE = 19
 else:
     FONT_SIZE = 24
+
+SELECT_CARD_LIMIT = 5 # 選択できるカードの種類数(上限)
+
 
 class Menu(ttk.Frame):
     """メニュー画面
@@ -66,6 +70,9 @@ class CmdSelect(ttk.Frame):
     def get_cards(self):
         """利用できるカードを取得する
         """
+        if (self.controller.card_select_buttons[0]["text"]):
+            return # 取得済み
+
         url = "https://card-dot-my-shop-magee-stg.appspot.com/v1/check"
         method = "POST"
         headers = {"Content-Type": "application/json"}
@@ -87,8 +94,46 @@ class CmdSelect(ttk.Frame):
         with urllib.request.urlopen(request) as response:
             response_body = response.read().decode("utf-8")
             print(response_body) ###
+            data = json.loads(response_body)
+            self.set_card_select_buttons(data["clients"])
 
-        self.controller.show_frame("TelEntry")
+        self.controller.show_frame("CardSelect")
+
+
+    def set_card_select_buttons(self, clients):
+        for i in range(SELECT_CARD_LIMIT):
+            button = self.controller.card_select_buttons[i]
+            card = None
+            if (i < len(clients)):
+                card = clients[i]
+                button["text"] = card["card_name"]
+                image = Image.open(card["img_url"])
+            else:
+                button.pack_forget()
+
+
+class CardSelect(ttk.Frame):
+    """カード選択
+    """
+
+    def __init__(self, parent, controller):
+        ttk.Frame.__init__(self, parent)
+        self.controller = controller
+
+        for i in range(SELECT_CARD_LIMIT):
+            button = ttk.Button(self, command=self.select_card(i))
+            button.pack()
+            controller.card_select_buttons.append(button)
+
+
+    def select_card(self, idx):
+        """カード選択時の処理
+        http://memopy.hatenadiary.jp/entry/2017/06/11/220452 を参考に実装した。
+        """
+        def func():
+            print("Select card:{}".format(idx)) ###
+            self.controller.show_frame("TelEntry")
+        return func
 
 
 class TelEntry(ttk.Frame):
@@ -175,6 +220,7 @@ class MapApp(tk.Tk):
     SCREENS = (Menu, # メニュー
                CoupointScan, # クーポイントスキャン
                CmdSelect, # 流通ポイント処理選択
+               CardSelect, # カード選択
                TelEntry, # 電話番号入力
                NumKeys, # ソフトキーボード
                )
@@ -200,6 +246,7 @@ class MapApp(tk.Tk):
 #         pprint(style.layout("TButton"))
 
         self.entry_text = tk.StringVar()
+        self.card_select_buttons = []
 
         # container に画面(frame)を積んでおき、表示する画面を一番上に持ってくる
         container = ttk.Frame(self)
