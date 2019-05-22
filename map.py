@@ -3,6 +3,7 @@ from tkinter import font
 from tkinter import ttk
 
 import urllib.request, json
+import xml.etree.ElementTree as ET
 from pprint import pprint
 
 ENV = "Monmag"
@@ -68,6 +69,11 @@ class CmdSelect(ttk.Frame):
         url = "https://card-dot-my-shop-magee-stg.appspot.com/v1/check"
         method = "POST"
         headers = {"Content-Type": "application/json"}
+
+        macaddress = self.controller.get_macaddress()
+        print(macaddress) ###
+        serialno = self.controller.get_serialno()
+        print(serialno) ###
         data = {
             "terminal": { # TODO:端末情報取得
                 "macaddr": "00:00:00:00:00:00",
@@ -77,7 +83,7 @@ class CmdSelect(ttk.Frame):
             }
         }
         request = urllib.request.Request(url, method="POST", data=json.dumps(data).encode("utf-8"), headers=headers)
-        print(request) ###
+        print("{} {}".format(method, url)) ###
         with urllib.request.urlopen(request) as response:
             response_body = response.read().decode("utf-8")
             print(response_body) ###
@@ -215,6 +221,32 @@ class MapApp(tk.Tk):
     def show_frame(self, scr_name):
         frame = self.frames[scr_name]
         frame.tkraise()
+
+
+    def get_serialno(self):
+        serialno = None
+        try:
+            xml = ET.parse("/home/pi/Git/monmag-rpi/qrcode_reader/mqtt.xml")
+        except FileNotFoundError:
+            xml = ET.parse("mqtt.xml")
+
+        serialno = xml.find('deviceid').text
+
+        return serialno
+
+
+    def get_macaddress(self):
+        macaddress = None
+        try:
+            file = open("/sys/class/net/wlan0/address", "r") # Monmag
+        except FileNotFoundError:
+            file = open("macaddress", "r") # 開発用
+
+        macaddress = str.strip(file.readline())
+        file.close()
+
+        return macaddress
+
 
     def debug(self, content):
         print(content)
