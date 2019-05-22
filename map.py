@@ -56,14 +56,14 @@ class CmdSelect(ttk.Frame):
         self.controller = controller
 
         button1 = ttk.Button(self, text="付与",
-                          command=lambda: self.getCards())
+                          command=lambda: self.get_cards())
         button2 = ttk.Button(self, text="取消",
                           command=lambda: controller.show_frame("Menu"))
 
         button1.pack()
         button2.pack()
 
-    def getCards(self):
+    def get_cards(self):
         """利用できるカードを取得する
         """
         url = "https://card-dot-my-shop-magee-stg.appspot.com/v1/check"
@@ -114,9 +114,9 @@ class TelEntry(ttk.Frame):
         button.pack(side="top")
         button.focus_set()
 
-        tel_entry.bind("<FocusIn>", self.showNumKeys)
+        tel_entry.bind("<FocusIn>", self.show_num_keys)
 
-    def showNumKeys(self, event):
+    def show_num_keys(self, event):
         self.controller.show_frame("NumKeys")
 
 
@@ -141,31 +141,31 @@ class NumKeys(ttk.Frame):
         numkeys.columnconfigure(1, weight=1)
         numkeys.columnconfigure(2, weight=1)
 
-        button_7 = ttk.Button(numkeys, text="7", command=lambda: self.addNum("7")).grid(column=0, row=0, sticky="nswe")
-        button_8 = ttk.Button(numkeys, text="8", command=lambda: self.addNum("8")).grid(column=1, row=0, sticky="nswe")
-        button_9 = ttk.Button(numkeys, text="9", command=lambda: self.addNum("9")).grid(column=2, row=0, sticky="nswe")
+        button_7 = ttk.Button(numkeys, text="7", command=lambda: self.add_num("7")).grid(column=0, row=0, sticky="nswe")
+        button_8 = ttk.Button(numkeys, text="8", command=lambda: self.add_num("8")).grid(column=1, row=0, sticky="nswe")
+        button_9 = ttk.Button(numkeys, text="9", command=lambda: self.add_num("9")).grid(column=2, row=0, sticky="nswe")
 
-        button_4 = ttk.Button(numkeys, text="4", command=lambda: self.addNum("4")).grid(column=0, row=1, sticky="nswe")
-        button_5 = ttk.Button(numkeys, text="5", command=lambda: self.addNum("5")).grid(column=1, row=1, sticky="nswe")
-        button_6 = ttk.Button(numkeys, text="6", command=lambda: self.addNum("6")).grid(column=2, row=1, sticky="nswe")
+        button_4 = ttk.Button(numkeys, text="4", command=lambda: self.add_num("4")).grid(column=0, row=1, sticky="nswe")
+        button_5 = ttk.Button(numkeys, text="5", command=lambda: self.add_num("5")).grid(column=1, row=1, sticky="nswe")
+        button_6 = ttk.Button(numkeys, text="6", command=lambda: self.add_num("6")).grid(column=2, row=1, sticky="nswe")
 
-        button_1 = ttk.Button(numkeys, text="1", command=lambda: self.addNum("1")).grid(column=0, row=2, sticky="nswe")
-        button_2 = ttk.Button(numkeys, text="2", command=lambda: self.addNum("2")).grid(column=1, row=2, sticky="nswe")
-        button_3 = ttk.Button(numkeys, text="3", command=lambda: self.addNum("3")).grid(column=2, row=2, sticky="nswe")
+        button_1 = ttk.Button(numkeys, text="1", command=lambda: self.add_num("1")).grid(column=0, row=2, sticky="nswe")
+        button_2 = ttk.Button(numkeys, text="2", command=lambda: self.add_num("2")).grid(column=1, row=2, sticky="nswe")
+        button_3 = ttk.Button(numkeys, text="3", command=lambda: self.add_num("3")).grid(column=2, row=2, sticky="nswe")
 
-        button_del = ttk.Button(numkeys, text="Del", command=lambda: self.delNum()).grid(column=0, row=3, sticky="nswe")
-        button_0   = ttk.Button(numkeys, text="0", command=lambda: self.addNum("0")).grid(column=1, row=3, sticky="nswe")
-        button_ok  = ttk.Button(numkeys, text="OK", command=lambda: self.enterTel()).grid(column=2, row=3, sticky="nswe")
+        button_del = ttk.Button(numkeys, text="Del", command=lambda: self.del_num()).grid(column=0, row=3, sticky="nswe")
+        button_0   = ttk.Button(numkeys, text="0", command=lambda: self.add_num("0")).grid(column=1, row=3, sticky="nswe")
+        button_ok  = ttk.Button(numkeys, text="OK", command=lambda: self.enter_tel()).grid(column=2, row=3, sticky="nswe")
 
 
-    def addNum(self, num):
+    def add_num(self, num):
         self.controller.entry_text.set(self.controller.entry_text.get() + num)
 
 
-    def delNum(self):
+    def del_num(self):
         self.controller.entry_text.set(self.controller.entry_text.get()[:-1])
 
-    def enterTel(self):
+    def enter_tel(self):
         self.controller.show_frame("TelEntry")
 
 
