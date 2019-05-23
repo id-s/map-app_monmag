@@ -2,8 +2,11 @@ import tkinter as tk
 from tkinter import font
 from tkinter import ttk
 
+import cv2
 import os
+import pyzbar
 import requests
+import time
 import xml.etree.ElementTree as ET
 from PIL import Image, ImageTk
 from pprint import pprint
@@ -32,7 +35,7 @@ class Menu(ttk.Frame):
         self.controller = controller
 
         menu1 = ttk.Button(self, text="MyShopクーポイントをスキャンする",
-                          command=lambda: controller.quit())
+                          command=lambda: controller.show_frame("CoupointScan"))
         menu2 = ttk.Button(self, text="流通会員カードをスキャンする",
                           command=lambda: controller.show_frame("CmdSelect"))
 
@@ -50,6 +53,43 @@ class CoupointScan(ttk.Frame):
 
         label = ttk.Label(self, text="クーポイントをスキャンしてください")
         label.pack(side="top", fill="x")
+
+        self.preview = preview = tk.Label(self, height="6")
+        preview.pack(side="top")
+
+        button = ttk.Button(self, text="戻る",
+                            command=self.end_scan)
+        button.pack()
+
+        self.bind("<Activate>", self.start_scan)
+#         self.bind("<Deactivate>", self.end_scan) ###
+
+
+    def start_scan(self, event):
+        print("start_scan") ###
+        self.on_scan = True
+        self.capture = cv2.VideoCapture(0)
+        self.update_preview()
+
+
+    def update_preview(self):
+        if not self.on_scan:
+            return
+        ret, frame = self.capture.read()
+        image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        image = Image.fromarray(image)
+        image = ImageTk.PhotoImage(image)
+        self.preview["image"] = image
+        print("Update preview") ###
+
+        self.after(500, self.update_preview)
+
+
+    def end_scan(self):
+        print("end_scan") ###
+        self.on_scan = False
+        self.capture.release()
+        self.controller.show_frame("Menu")
 
 
 class CmdSelect(ttk.Frame):

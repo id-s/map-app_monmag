@@ -13,7 +13,10 @@ $ pyenv install 3.4.2
 $ virtualenv -p ~/.pyenv/versions/3.4.2/bin/python3.4 env
 $ source env/bin/activate
 $ pip install -r requirements.txt
+$ pip install opencv-python
 ```
+
+opencvをrequirements.txtに入れていないのは、Monmag側ではすでに(?)入っていたため。
 
 現在、Monmagで使われているフォントは"Droid Sans Japanese"。
 これが開発PCにインストールされていない場合は以下よりダウンロードしてインストールしてください。
@@ -30,6 +33,6 @@ $ sudo apt-get install python3-pil.imagetk
 $ cd ~/Git
 $ git clone https://github.com/id-s/map-app_monmag.git
 $ cd map-app_monmag
-$ pip3 install -r requirements.txt
+$ sudo pip3 install -r requirements.txt
 ```
 
