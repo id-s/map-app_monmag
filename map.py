@@ -8,14 +8,13 @@ import xml.etree.ElementTree as ET
 from PIL import Image, ImageTk
 from pprint import pprint
 
-#ENV = "Monmag"
-ENV = "MAC" # 開発用(MAC)
+APP_ENV = os.getenv("APP_ENV", "Monmag")
 
 WINDOW_WIDTH = 480
 WINDOW_HEIGHT = 320
 PADDING = 4
 
-if ENV == "Monmag":
+if APP_ENV == "Monmag":
     FONT_SIZE = 19
 else:
     FONT_SIZE = 24
@@ -238,7 +237,7 @@ class MapApp(tk.Tk):
         self.title("MAP")
 
         self.attributes('-topmost', True) # NG:タイトルバー非表示
-        if ENV == "Monmag":
+        if APP_ENV == "Monmag":
             self.attributes('-fullscreen', True) # 全画面・タイトルバー非表示
         else:
             self.geometry("{}x{}".format(WINDOW_WIDTH, WINDOW_HEIGHT))
