@@ -21,8 +21,8 @@ PADDING = 4
 
 PREVIEW_WIDTH = 320
 PREVIEW_HEIGHT = 200
-PREVIEW_OFFSET_X = PREVIEW_WIDTH / 2
-PREVIEW_OFFSET_Y = PREVIEW_HEIGHT / 2
+PREVIEW_OFFSET_X = PREVIEW_WIDTH / 2 + 64
+PREVIEW_OFFSET_Y = PREVIEW_HEIGHT / 2 + 64
 
 if APP_ENV == "Monmag":
     FONT_SIZE = 19
@@ -89,6 +89,7 @@ class CoupointScan(tk.Frame):
         if not ret:
             print("No capture")
             return
+
         self.image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         if APP_ENV == "Monmag":
             self.image = self.image.transpose(1,0,2)[::-1] # -90度回転、詳細は https://qiita.com/matsu_mh/items/54b09273aef79ae027bc 参照
