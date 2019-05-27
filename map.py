@@ -90,6 +90,8 @@ class CoupointScan(tk.Frame):
             print("No capture")
             return
         self.image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        if APP_ENV == "Monmag":
+            self.image = self.image.transpose(1,0,2)[::-1] # -90度回転、詳細は https://qiita.com/matsu_mh/items/54b09273aef79ae027bc 参照
         self.image = Image.fromarray(self.image)
         self.image = ImageTk.PhotoImage(self.image)
 #         print("w:{} x h:{}".format(self.image.width(), self.image.height())) ###
