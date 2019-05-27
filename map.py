@@ -13,6 +13,7 @@ from PIL import Image, ImageTk
 from pprint import pprint
 
 APP_ENV = os.getenv("APP_ENV", "Monmag")
+ON_DEBUG = os.getenv("ON_DEBUG", False)
 
 WINDOW_WIDTH = 480
 WINDOW_HEIGHT = 320
@@ -280,7 +281,8 @@ class MapApp(tk.Tk):
         self.title("MAP")
 
         if APP_ENV == "Monmag":
-            self.attributes('-fullscreen', True) # 全画面・タイトルバー非表示
+            if not ON_DEBUG:
+                self.attributes('-fullscreen', True) # 全画面・タイトルバー非表示
         else:
             self.geometry("{}x{}".format(WINDOW_WIDTH, WINDOW_HEIGHT))
 
