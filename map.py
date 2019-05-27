@@ -36,12 +36,17 @@ class Menu(tk.Frame):
         self.controller = controller
 
         menu1 = tk.Button(self, text="MyShopクーポイントをスキャンする",
-                          command=lambda: controller.show_frame("CoupointScan"))
+                          command=self.show_coupoint_scan)
         menu2 = tk.Button(self, text="流通会員カードをスキャンする",
                           command=lambda: controller.show_frame("CmdSelect"))
 
         menu1.pack()
         menu2.pack()
+
+
+    def show_coupoint_scan(self):
+        self.controller.frames["CoupointScan"].start_scan()
+        self.controller.show_frame("CoupointScan")
 
 
 class CoupointScan(tk.Frame):
@@ -59,14 +64,13 @@ class CoupointScan(tk.Frame):
         preview.pack(side="top")
 
         button = tk.Button(self, text="戻る",
-                            command=self.end_scan)
+                           command=self.end_scan)
         button.pack()
 
-        self.bind("<Activate>", self.start_scan)
-#         self.bind("<Deactivate>", self.end_scan) ###
+#         self.bind("<Activate>", self.start_scan) # Monmagではこのイベントが発生しない
 
 
-    def start_scan(self, event):
+    def start_scan(self, event = None):
         print("start_scan") ###
         self.on_scan = True
         self.capture = cv2.VideoCapture(0)
