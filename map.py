@@ -5,12 +5,12 @@ import tkFont as font
 
 import cv2
 import os
-import pyzbar
 import requests
 import time
 import xml.etree.ElementTree as ET
 from PIL import Image, ImageTk
 from pprint import pprint
+from pyzbar.pyzbar import decode
 
 APP_ENV = os.getenv("APP_ENV", "Monmag")
 ON_DEBUG = os.getenv("ON_DEBUG", False)
@@ -93,6 +93,13 @@ class CoupointScan(tk.Frame):
         self.image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         if APP_ENV == "Monmag":
             self.image = self.image.transpose(1,0,2)[::-1] # -90度回転、詳細は https://qiita.com/matsu_mh/items/54b09273aef79ae027bc 参照
+        self.decoded = decode(self.image) ###
+        if self.decoded:
+            for code in self.decoded:
+                print(code)
+                self.preview.create_text(PREVIEW_OFFSET_X, PREVIEW_OFFSET_Y, text=code.data, tag="code")
+                return
+
         self.image = Image.fromarray(self.image)
         self.image = ImageTk.PhotoImage(self.image)
 #         print("w:{} x h:{}".format(self.image.width(), self.image.height())) ###
@@ -105,6 +112,7 @@ class CoupointScan(tk.Frame):
     def end_scan(self):
         print("end_scan")
         self.on_scan = False
+        self.preview.delete("code")
         self.capture.release()
         self.controller.show_frame("Menu")
 

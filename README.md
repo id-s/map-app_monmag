@@ -7,6 +7,12 @@
 [前提]
 * pyenv, virtualenvがインストールされていること
 
+Macの場合(Windowsでも同様の手順が必要かもしれません。未確認)
+
+```
+$ brew install zbar
+```
+
 ```
 $ cd map-app_monmag
 $ pyenv install 2.7.9
@@ -34,8 +40,8 @@ https://github.com/jenskutilek/free-fonts/blob/master/Droid/Droid%20Sans%20Japan
 Monmagのターミナルにて以下を実行する。
 
 ```
-$ sudo apt-get install python-tk
-$ sudo apt-get install python-pil.imagetk
+$ sudo apt-get install python-tk python-pil.imagetk
+$ sudo apt-get install libzbar0
 $ cd ~/Git
 $ git clone https://github.com/id-s/map-app_monmag.git
 $ cd map-app_monmag
