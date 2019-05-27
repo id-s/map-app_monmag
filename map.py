@@ -24,7 +24,6 @@ else:
     FONT_SIZE = 24
 
 IMAGE_DIR = "images"
-SELECT_CARD_LIMIT = 5 # FIXME:delete 選択できるカードの種類数(上限)
 
 
 class Menu(tk.Frame):
@@ -71,7 +70,7 @@ class CoupointScan(tk.Frame):
 
 
     def start_scan(self, event = None):
-        print("start_scan") ###
+        print("start_scan")
         self.on_scan = True
         self.capture = cv2.VideoCapture(0)
         self.update_preview()
@@ -85,13 +84,13 @@ class CoupointScan(tk.Frame):
         image = Image.fromarray(image)
         image = ImageTk.PhotoImage(image)
         self.preview["image"] = image
-        print("Update preview") ###
+        print("Update preview")
 
         self.after(500, self.update_preview)
 
 
     def end_scan(self):
-        print("end_scan") ###
+        print("end_scan")
         self.on_scan = False
         self.capture.release()
         self.controller.show_frame("Menu")
@@ -106,9 +105,9 @@ class CmdSelect(tk.Frame):
         self.controller = controller
 
         button1 = tk.Button(self, text="付与",
-                          command=lambda: controller.show_frame("CardSelect"))
+                            command=lambda: controller.show_frame("CardSelect"))
         button2 = tk.Button(self, text="取消",
-                          command=lambda: controller.show_frame("Menu"))
+                            command=lambda: controller.show_frame("Menu"))
 
         button1.pack()
         button2.pack()
@@ -134,9 +133,9 @@ class CardSelect(tk.Frame):
         headers = {"Content-Type": "application/json"}
 
         macaddress = self.controller.get_macaddress()
-        print(macaddress) ###
+        print("macaddress:{}".format(macaddress))
         serialno = self.controller.get_serialno()
-        print(serialno) ###
+        print("serialno:{}".format(serialno))
         data = {
             "terminal": { # TODO:端末情報取得
                 "macaddr": "00:00:00:00:00:00",
@@ -172,10 +171,9 @@ class CardSelect(tk.Frame):
             image = ImageTk.PhotoImage(image.resize((48, 48)))
             self.controller.client_images.append(image)
             button = tk.Button(self, compound="left", text=client["card_name"], image=image,
-                                width=WINDOW_WIDTH - PADDING * 2,
-                                command=self.select_card(client["client_cd"]))
+                               width=WINDOW_WIDTH - PADDING * 2,
+                               command=self.select_card(client["client_cd"]))
             button.pack()
-            #controller.card_select_buttons.append(button) # FIXME:delete
 
 
     def select_card(self, client_cd):
@@ -183,7 +181,7 @@ class CardSelect(tk.Frame):
         http://memopy.hatenadiary.jp/entry/2017/06/11/220452 を参考に実装した。
         """
         def func():
-            print("Select card:{}".format(client_cd)) ###
+            print("Select card:{}".format(client_cd))
             self.controller.show_frame("TelEntry")
         return func
 
@@ -207,7 +205,7 @@ class TelEntry(tk.Frame):
         tel_entry.pack(side="top", fill="x")
 
         button = tk.Button(self, text="確定",
-                            command=lambda: controller.quit())
+                           command=lambda: controller.quit())
         button.pack(side="top")
         button.focus_set()
 
@@ -281,7 +279,6 @@ class MapApp(tk.Tk):
         tk.Tk.__init__(self, *args, **kwargs)
         self.title("MAP")
 
-        self.attributes('-topmost', True) # NG:タイトルバー非表示
         if APP_ENV == "Monmag":
             self.attributes('-fullscreen', True) # 全画面・タイトルバー非表示
         else:
@@ -294,7 +291,6 @@ class MapApp(tk.Tk):
 
         self.entry_text = tk.StringVar()
         self.client_images = [] # 画像への参照をキープするために必須
-#         self.card_select_buttons = [] # FIXME:delete
 
         # container に画面(frame)を積んでおき、表示する画面を一番上に持ってくる
         container = tk.Frame(self)
