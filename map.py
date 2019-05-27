@@ -19,6 +19,11 @@ WINDOW_WIDTH = 480
 WINDOW_HEIGHT = 320
 PADDING = 4
 
+PREVIEW_WIDTH = 320
+PREVIEW_HEIGHT = 200
+PREVIEW_OFFSET_X = PREVIEW_WIDTH / 2
+PREVIEW_OFFSET_Y = PREVIEW_HEIGHT / 2
+
 if APP_ENV == "Monmag":
     FONT_SIZE = 19
 else:
@@ -60,7 +65,7 @@ class CoupointScan(tk.Frame):
         label = tk.Label(self, text="クーポイントをスキャンしてください")
         label.pack(side="top", fill="x")
 
-        self.preview = preview = tk.Canvas(self, width = WINDOW_WIDTH/2, height = WINDOW_HEIGHT/2, bg="blue")
+        self.preview = preview = tk.Canvas(self, width = PREVIEW_WIDTH, height = PREVIEW_HEIGHT, bg="blue")
         self.preview.pack(side="top")
 
         button = tk.Button(self, text="戻る",
@@ -87,8 +92,8 @@ class CoupointScan(tk.Frame):
         self.image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         self.image = Image.fromarray(self.image)
         self.image = ImageTk.PhotoImage(self.image)
-        print("w:{} x h:{}".format(self.image.width(), self.image.height())) ###
-        self.preview.create_image(WINDOW_WIDTH/4, WINDOW_HEIGHT/4, image=self.image)
+#         print("w:{} x h:{}".format(self.image.width(), self.image.height())) ###
+        self.preview.create_image(PREVIEW_OFFSET_X, PREVIEW_OFFSET_Y, image=self.image)
         print("Update preview")
 
         self.after(500, self.update_preview)
