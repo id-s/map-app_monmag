@@ -9,11 +9,11 @@
 
 ```
 $ cd map-app_monmag
-$ pyenv install 3.4.2
-$ virtualenv -p ~/.pyenv/versions/3.4.2/bin/python3.4 env
+$ pyenv install 2.7.9
+$ virtualenv -p ~/.pyenv/versions/2.7.9/bin/python2.7 env
 $ source env/bin/activate
-$ pip install -r requirements.txt
-$ pip install opencv-python
+(env) $ pip install -r requirements.txt
+(env) $ pip install opencv-python
 ```
 
 opencvをrequirements.txtに入れていないのは、Monmag側ではすでに(?)入っていたため。
@@ -22,17 +22,23 @@ opencvをrequirements.txtに入れていないのは、Monmag側ではすでに(
 これが開発PCにインストールされていない場合は以下よりダウンロードしてインストールしてください。
 https://github.com/jenskutilek/free-fonts/blob/master/Droid/Droid%20Sans%20Japanese/DroidSansJapanese.ttf
 
+アプリの起動は下記コマンドにて(APP_ENVの値は"Monmag"以外なら何でもOK)。
+
+```
+(env) $ APP_ENV=Mac python map.py
+```
+
 
 ## 実行環境構築
 
 Monmagのターミナルにて以下を実行する。
 
 ```
-$ sudo apt-get install python3-tk
-$ sudo apt-get install python3-pil.imagetk
+$ sudo apt-get install python-tk
+$ sudo apt-get install python-pil.imagetk
 $ cd ~/Git
 $ git clone https://github.com/id-s/map-app_monmag.git
 $ cd map-app_monmag
-$ sudo pip3 install -r requirements.txt
+$ sudo pip install -r requirements.txt
 ```
 

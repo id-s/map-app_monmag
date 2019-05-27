@@ -1,6 +1,7 @@
-import tkinter as tk
-from tkinter import font
-from tkinter import ttk
+# -*- coding:utf-8 -*-
+
+import Tkinter as tk
+import tkFont as font
 
 import cv2
 import os
@@ -26,38 +27,38 @@ IMAGE_DIR = "images"
 SELECT_CARD_LIMIT = 5 # FIXME:delete 選択できるカードの種類数(上限)
 
 
-class Menu(ttk.Frame):
+class Menu(tk.Frame):
     """メニュー画面
     """
 
     def __init__(self, parent, controller):
-        ttk.Frame.__init__(self, parent)
+        tk.Frame.__init__(self, parent)
         self.controller = controller
 
-        menu1 = ttk.Button(self, text="MyShopクーポイントをスキャンする",
+        menu1 = tk.Button(self, text="MyShopクーポイントをスキャンする",
                           command=lambda: controller.show_frame("CoupointScan"))
-        menu2 = ttk.Button(self, text="流通会員カードをスキャンする",
+        menu2 = tk.Button(self, text="流通会員カードをスキャンする",
                           command=lambda: controller.show_frame("CmdSelect"))
 
         menu1.pack()
         menu2.pack()
 
 
-class CoupointScan(ttk.Frame):
+class CoupointScan(tk.Frame):
     """クーポイントスキャン
     """
 
     def __init__(self, parent, controller):
-        ttk.Frame.__init__(self, parent)
+        tk.Frame.__init__(self, parent)
         self.controller = controller
 
-        label = ttk.Label(self, text="クーポイントをスキャンしてください")
+        label = tk.Label(self, text="クーポイントをスキャンしてください")
         label.pack(side="top", fill="x")
 
         self.preview = preview = tk.Label(self, height="6")
         preview.pack(side="top")
 
-        button = ttk.Button(self, text="戻る",
+        button = tk.Button(self, text="戻る",
                             command=self.end_scan)
         button.pack()
 
@@ -92,29 +93,29 @@ class CoupointScan(ttk.Frame):
         self.controller.show_frame("Menu")
 
 
-class CmdSelect(ttk.Frame):
+class CmdSelect(tk.Frame):
     """流通ポイント処理選択
     """
 
     def __init__(self, parent, controller):
-        ttk.Frame.__init__(self, parent)
+        tk.Frame.__init__(self, parent)
         self.controller = controller
 
-        button1 = ttk.Button(self, text="付与",
+        button1 = tk.Button(self, text="付与",
                           command=lambda: controller.show_frame("CardSelect"))
-        button2 = ttk.Button(self, text="取消",
+        button2 = tk.Button(self, text="取消",
                           command=lambda: controller.show_frame("Menu"))
 
         button1.pack()
         button2.pack()
 
 
-class CardSelect(ttk.Frame):
+class CardSelect(tk.Frame):
     """カード選択
     """
 
     def __init__(self, parent, controller):
-        ttk.Frame.__init__(self, parent)
+        tk.Frame.__init__(self, parent)
         self.controller = controller
 
         clients = self.get_clients()
@@ -166,7 +167,7 @@ class CardSelect(ttk.Frame):
             image = Image.open(file_path)
             image = ImageTk.PhotoImage(image.resize((48, 48)))
             self.controller.client_images.append(image)
-            button = ttk.Button(self, compound="left", text=client["card_name"], image=image,
+            button = tk.Button(self, compound="left", text=client["card_name"], image=image,
                                 width=WINDOW_WIDTH - PADDING * 2,
                                 command=self.select_card(client["client_cd"]))
             button.pack()
@@ -183,25 +184,25 @@ class CardSelect(ttk.Frame):
         return func
 
 
-class TelEntry(ttk.Frame):
+class TelEntry(tk.Frame):
     """電話番号入力
     """
 
     def __init__(self, parent, controller):
-        ttk.Frame.__init__(self, parent)
+        tk.Frame.__init__(self, parent)
         self.controller = controller
 
         caption = tk.Label(self, text="初めてのご利用の方は進呈ポイントをショートメールでお知らせします。",
                            wraplength=(WINDOW_WIDTH - PADDING * 2), justify="left", height=2, padx=PADDING)
         caption.pack(side="top", fill="x")
 
-        label = ttk.Label(self, text="電話番号入力")
+        label = tk.Label(self, text="電話番号入力")
         label.pack(side="top", fill="x")
 
-        tel_entry = ttk.Entry(self, textvariable=self.controller.entry_text, font=default_font)
+        tel_entry = tk.Entry(self, textvariable=self.controller.entry_text, font=default_font)
         tel_entry.pack(side="top", fill="x")
 
-        button = ttk.Button(self, text="確定",
+        button = tk.Button(self, text="確定",
                             command=lambda: controller.quit())
         button.pack(side="top")
         button.focus_set()
@@ -212,42 +213,42 @@ class TelEntry(ttk.Frame):
         self.controller.show_frame("NumKeys")
 
 
-class NumKeys(ttk.Frame):
+class NumKeys(tk.Frame):
     """ソフトキーボード
     """
 
     def __init__(self, parent, controller):
-        ttk.Frame.__init__(self, parent)
+        tk.Frame.__init__(self, parent)
         self.controller = controller
 
-        caption = ttk.Label(self, text="電話番号入力")
+        caption = tk.Label(self, text="電話番号入力")
         caption.pack(side="top", fill="x")
 
-        entry = ttk.Entry(self, textvariable=self.controller.entry_text, font=default_font)
+        entry = tk.Entry(self, textvariable=self.controller.entry_text, font=default_font)
         entry.pack(side="top", fill="x")
 
-        numkeys = ttk.Frame(self)
+        numkeys = tk.Frame(self)
         numkeys.pack(side="top", fill="x")
 
         numkeys.columnconfigure(0, weight=1)
         numkeys.columnconfigure(1, weight=1)
         numkeys.columnconfigure(2, weight=1)
 
-        button_7 = ttk.Button(numkeys, text="7", command=lambda: self.add_num("7")).grid(column=0, row=0, sticky="nswe")
-        button_8 = ttk.Button(numkeys, text="8", command=lambda: self.add_num("8")).grid(column=1, row=0, sticky="nswe")
-        button_9 = ttk.Button(numkeys, text="9", command=lambda: self.add_num("9")).grid(column=2, row=0, sticky="nswe")
+        button_7 = tk.Button(numkeys, text="7", command=lambda: self.add_num("7")).grid(column=0, row=0, sticky="nswe")
+        button_8 = tk.Button(numkeys, text="8", command=lambda: self.add_num("8")).grid(column=1, row=0, sticky="nswe")
+        button_9 = tk.Button(numkeys, text="9", command=lambda: self.add_num("9")).grid(column=2, row=0, sticky="nswe")
 
-        button_4 = ttk.Button(numkeys, text="4", command=lambda: self.add_num("4")).grid(column=0, row=1, sticky="nswe")
-        button_5 = ttk.Button(numkeys, text="5", command=lambda: self.add_num("5")).grid(column=1, row=1, sticky="nswe")
-        button_6 = ttk.Button(numkeys, text="6", command=lambda: self.add_num("6")).grid(column=2, row=1, sticky="nswe")
+        button_4 = tk.Button(numkeys, text="4", command=lambda: self.add_num("4")).grid(column=0, row=1, sticky="nswe")
+        button_5 = tk.Button(numkeys, text="5", command=lambda: self.add_num("5")).grid(column=1, row=1, sticky="nswe")
+        button_6 = tk.Button(numkeys, text="6", command=lambda: self.add_num("6")).grid(column=2, row=1, sticky="nswe")
 
-        button_1 = ttk.Button(numkeys, text="1", command=lambda: self.add_num("1")).grid(column=0, row=2, sticky="nswe")
-        button_2 = ttk.Button(numkeys, text="2", command=lambda: self.add_num("2")).grid(column=1, row=2, sticky="nswe")
-        button_3 = ttk.Button(numkeys, text="3", command=lambda: self.add_num("3")).grid(column=2, row=2, sticky="nswe")
+        button_1 = tk.Button(numkeys, text="1", command=lambda: self.add_num("1")).grid(column=0, row=2, sticky="nswe")
+        button_2 = tk.Button(numkeys, text="2", command=lambda: self.add_num("2")).grid(column=1, row=2, sticky="nswe")
+        button_3 = tk.Button(numkeys, text="3", command=lambda: self.add_num("3")).grid(column=2, row=2, sticky="nswe")
 
-        button_del = ttk.Button(numkeys, text="Del", command=lambda: self.del_num()).grid(column=0, row=3, sticky="nswe")
-        button_0   = ttk.Button(numkeys, text="0", command=lambda: self.add_num("0")).grid(column=1, row=3, sticky="nswe")
-        button_ok  = ttk.Button(numkeys, text="OK", command=lambda: self.enter_tel()).grid(column=2, row=3, sticky="nswe")
+        button_del = tk.Button(numkeys, text="Del", command=lambda: self.del_num()).grid(column=0, row=3, sticky="nswe")
+        button_0   = tk.Button(numkeys, text="0", command=lambda: self.add_num("0")).grid(column=1, row=3, sticky="nswe")
+        button_ok  = tk.Button(numkeys, text="OK", command=lambda: self.enter_tel()).grid(column=2, row=3, sticky="nswe")
 
 
     def add_num(self, num):
@@ -282,22 +283,17 @@ class MapApp(tk.Tk):
         else:
             self.geometry("{}x{}".format(WINDOW_WIDTH, WINDOW_HEIGHT))
 
-        style = ttk.Style()
-#         print(style.theme_names()) # ('aqua', 'clam', 'alt', 'default', 'classic')
-#         style.theme_use("clam") # デフォルトは'aqua'
         global default_font
         default_font = font.nametofont("TkDefaultFont")
         default_font.configure(family="Droid Sans Japanese", size=FONT_SIZE)
 #         print(font.families()) ###
-        style.configure("TButton", padding=FONT_SIZE/2)
-#         pprint(style.layout("TButton"))
 
         self.entry_text = tk.StringVar()
         self.client_images = [] # 画像への参照をキープするために必須
 #         self.card_select_buttons = [] # FIXME:delete
 
         # container に画面(frame)を積んでおき、表示する画面を一番上に持ってくる
-        container = ttk.Frame(self)
+        container = tk.Frame(self)
         container.config(cursor='none')
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
@@ -323,7 +319,7 @@ class MapApp(tk.Tk):
         serialno = None
         try:
             xml = ET.parse("/home/pi/Git/monmag-rpi/qrcode_reader/mqtt.xml")
-        except FileNotFoundError:
+        except IOError:
             xml = ET.parse("mqtt.xml")
 
         serialno = xml.find('deviceid').text
@@ -335,7 +331,7 @@ class MapApp(tk.Tk):
         macaddress = None
         try:
             file = open("/sys/class/net/wlan0/address", "r") # Monmag
-        except FileNotFoundError:
+        except IOError:
             file = open("macaddress", "r") # 開発用
 
         macaddress = str.strip(file.readline())
