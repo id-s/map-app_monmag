@@ -60,8 +60,8 @@ class CoupointScan(tk.Frame):
         label = tk.Label(self, text="クーポイントをスキャンしてください")
         label.pack(side="top", fill="x")
 
-        self.preview = preview = tk.Label(self, height="6")
-        preview.pack(side="top")
+        self.preview = preview = tk.Canvas(self, width = WINDOW_WIDTH/2, height = WINDOW_HEIGHT/2, bg="blue")
+        self.preview.pack(side="top")
 
         button = tk.Button(self, text="戻る",
                            command=self.end_scan)
@@ -81,10 +81,14 @@ class CoupointScan(tk.Frame):
         if not self.on_scan:
             return
         ret, frame = self.capture.read()
-        image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        image = Image.fromarray(image)
-        image = ImageTk.PhotoImage(image)
-        self.preview["image"] = image
+        if not ret:
+            print("No capture")
+            return
+        self.image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        self.image = Image.fromarray(self.image)
+        self.image = ImageTk.PhotoImage(self.image)
+        print("w:{} x h:{}".format(self.image.width(), self.image.height())) ###
+        self.preview.create_image(WINDOW_WIDTH/4, WINDOW_HEIGHT/4, image=self.image)
         print("Update preview")
 
         self.after(500, self.update_preview)
