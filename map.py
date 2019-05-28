@@ -2,6 +2,7 @@
 
 import Tkinter as tk
 import tkFont as font
+import tkMessageBox as messagebox
 
 import cv2
 import os
@@ -50,8 +51,40 @@ class Menu(tk.Frame):
 
 
     def show_coupoint_scan(self):
-        self.controller.frames["CoupointScan"].start_scan()
-        self.controller.show_frame("CoupointScan")
+        if self.check_coupoint():
+            self.controller.frames["CoupointScan"].start_scan()
+            self.controller.show_frame("CoupointScan")
+        else:
+            messagebox.showerror("クーポイントチェックエラー", "この店舗でご利用できるクーポイントはありません。")
+
+
+    def check_coupoint(self):
+        url = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/check"
+        headers = {"Content-Type": "application/json"}
+
+        macaddress = self.controller.get_macaddress()
+        serialno = self.controller.get_serialno()
+        data = {
+            "terminal": {
+                "macaddr": "00:00:00:00:00:00", # TODO:取得情報に差し替え
+                "serial_no": "0123456789ABCDEF"
+                }
+            }
+
+        print("POST {}".format(url))
+        print(data)
+        resp = requests.post(url, data=data, headers=headers)
+
+        if resp.status_code == 200:
+            print(resp.text)
+            result = resp.json()["result"]
+            if result == "success":
+                return True
+            else:
+                return False
+        else:
+            print(resp.status_code)
+            return False
 
 
 class CoupointScan(tk.Frame):
@@ -154,9 +187,7 @@ class CardSelect(tk.Frame):
         headers = {"Content-Type": "application/json"}
 
         macaddress = self.controller.get_macaddress()
-        print("macaddress:{}".format(macaddress))
         serialno = self.controller.get_serialno()
-        print("serialno:{}".format(serialno))
         data = {
             "terminal": { # TODO:端末情報取得
                 "macaddr": "00:00:00:00:00:00",
@@ -166,11 +197,12 @@ class CardSelect(tk.Frame):
             }
         }
 
-        print("POST {}".format(url)) ###
+        print("POST {}".format(url))
+        print(data)
         resp = requests.post(url, data=data, headers=headers)
 
         if resp.status_code == 200:
-            print(resp.text) ###
+            print(resp.text)
             result = resp.json()
             return result["clients"]
         else:
