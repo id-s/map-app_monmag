@@ -59,6 +59,8 @@ class Menu(tk.Frame):
 
 
     def check_coupoint(self):
+        """クーポイント実施チェック
+        """
         url = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/check"
         headers = {"Content-Type": "application/json"}
 
@@ -66,7 +68,7 @@ class Menu(tk.Frame):
         serialno = self.controller.get_serialno()
         data = {
             "terminal": {
-                "macaddr": "00:00:00:00:00:00", # TODO:取得情報に差し替え
+                "macaddr": "48:a9:e9:dc:e2:65", #"00:00:00:00:00:00", # TODO:取得情報に差し替え
                 "serial_no": "0123456789ABCDEF"
                 }
             }
