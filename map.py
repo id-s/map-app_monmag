@@ -5,6 +5,7 @@ import tkFont as font
 import tkMessageBox as messagebox
 
 import cv2
+import json
 import os
 import requests
 import time
@@ -69,13 +70,13 @@ class Menu(tk.Frame):
         data = {
             "terminal": {
                 "macaddr": "48:a9:e9:dc:e2:65", #"00:00:00:00:00:00", # TODO:取得情報に差し替え
-                "serial_no": "0123456789ABCDEF"
+                "serial_no": "0123456789ABCDEF",
                 }
             }
 
         print("POST {}".format(url))
-        print(data)
-        resp = requests.post(url, data=data, headers=headers)
+        print(json.dumps(data))
+        resp = requests.post(url, data=json.dumps(data), headers=headers)
 
         if resp.status_code == 200:
             print(resp.text)
@@ -192,16 +193,14 @@ class CardSelect(tk.Frame):
         serialno = self.controller.get_serialno()
         data = {
             "terminal": { # TODO:端末情報取得
-                "macaddr": "00:00:00:00:00:00",
-                "serial_no": "YP000000000000",
-                "device_id": "000000000000000",
-                "version": "1.0.0",
+                "macaddr": "48:a9:e9:dc:e2:65", #"00:00:00:00:00:00",
+                "serial_no": "0123456789ABCDEF",
             }
         }
 
         print("POST {}".format(url))
-        print(data)
-        resp = requests.post(url, data=data, headers=headers)
+        print(json.dumps(data))
+        resp = requests.post(url, data=json.dumps(data), headers=headers)
 
         if resp.status_code == 200:
             print(resp.text)
