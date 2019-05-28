@@ -48,3 +48,5 @@ $ cd map-app_monmag
 $ sudo pip install -r requirements.txt
 ```
 
+さらに`sudo raspi-config`から、ロケール(ja_JP.UTF-8)を追加する。
+4 Localisation Options > I1 Change Locale > Ok > "ja_JP.UTF-8 UTF-8"まで移動し、スペースを押す > エンターを押す > Ok > None > Finish
