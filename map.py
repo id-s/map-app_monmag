@@ -6,16 +6,20 @@ import tkMessageBox as messagebox
 
 import cv2
 import json
+import locale
 import os
 import requests
 import time
 import xml.etree.ElementTree as ET
+from datetime import datetime
 from PIL import Image, ImageTk
 from pprint import pprint
 from pyzbar.pyzbar import decode
 
 APP_ENV = os.getenv("APP_ENV", "Monmag")
 ON_DEBUG = os.getenv("ON_DEBUG", False)
+
+locale.setlocale(locale.LC_TIME, 'ja_JP.UTF-8')
 
 WINDOW_WIDTH = 480
 WINDOW_HEIGHT = 320
@@ -69,9 +73,10 @@ class Menu(tk.Frame):
 
         macaddress = self.controller.get_macaddress()
         serialno = self.controller.get_serialno()
+        print("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
         data = {
             "terminal": {
-                "macaddr": "00:00:00:00:00:00", # TODO:取得情報に差し替え"48:a9:e9:dc:e2:65", #
+                "macaddr": "48:a9:e9:dc:e2:65", #"00:00:00:00:00:00", # TODO:取得情報に差し替え
                 "serial_no": "0123456789ABCDEF",
                 }
             }
@@ -82,8 +87,8 @@ class Menu(tk.Frame):
 
         if resp.status_code == 200:
             print(resp.text)
-            result = resp.json()["result"]
-            if result == "success":
+            resp_data = resp.json()
+            if resp_data["result"] == "success":
                 return True
             else:
                 return False
@@ -137,6 +142,11 @@ class CoupointScan(tk.Frame):
                 print(code)
                 self.preview.create_text(PREVIEW_OFFSET_X, PREVIEW_OFFSET_Y, text=code.data, tag="code")
                 return
+                # FIXME: 実装見直し
+#                 decoded_data = self.controller.frames["CoupointShow"].parse_decoded_data(code.data)
+#                 coupoint = self.controller.frames["CoupointShow"].get_coupoint(decoded_data)
+#                 self.controller.frames["CoupointShow"].show_coupoint(coupoint)
+#                 self.controller.show_frame("CoupointShow")
 
         self.image = Image.fromarray(self.image)
         self.image = ImageTk.PhotoImage(self.image)
@@ -153,6 +163,79 @@ class CoupointScan(tk.Frame):
         self.preview.delete("code")
         self.capture.release()
         self.controller.show_frame("Menu")
+
+
+class CoupointShow(tk.Frame):
+    """クーポイント詳細表示
+    """
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+
+
+    def parse_decoded_data(self, decoded_data):
+        """QRコードで読み取った文字列をパースする
+        @see https://redmine.magee.co.jp/projects/myshop/wiki/%E3%82%AF%E3%83%BC%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88QR%E3%82%B3%E3%83%BC%E3%83%89%E3%81%AE%E4%BB%95%E6%A7%98
+        """
+        parsed_data = {}
+        lines = decoded_data.split("¥r¥n")
+        if (len(lines) == 4 and lines[0] == "MyShop"):
+            parsed_data["customer_id"] = lines[1]
+            parsed_data["carousel_id"] = lines[2]
+        return parsed_data
+
+
+    def get_coupoint(self, decoded_data):
+        """クーポイントの詳細を取得する
+        @param decoded_data QRコードから読み込まれたデータ(要parse)
+        """
+        url = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/start"
+        headers = {"Content-Type": "application/json"}
+
+        macaddress = self.controller.get_macaddress()
+        serialno = self.controller.get_serialno()
+        print("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
+        print("customer_id:{}, carousel_id:{}".format(decoded_data["customer_id"], decoded_data["carousel_id"])) ###
+        data = {
+            "terminal": {
+                "macaddr": "48:a9:e9:dc:e2:65", #"00:00:00:00:00:00", # TODO:取得情報に差し替え
+                "serial_no": "0123456789ABCDEF",
+                },
+            "carousel": {
+                "customer_id": "20b097add4aea673e074d77fe1495434", # TODO:取得情報に差し替え
+                "carousel_id": "327765a3ec00962ccc050e91354dcc64",
+                }
+            }
+
+        print("POST {}".format(url))
+        print(json.dumps(data))
+        resp = requests.post(url, data=json.dumps(data), headers=headers)
+
+        if resp.status_code == 200:
+            print(resp.text)
+            resp_data = resp.json()
+            if resp_data["result"] == "regist":
+                return resp_data["carousel"]
+            else:
+                print(resp_data["result"])
+                return None
+        else:
+            print(resp.status_code)
+            return None
+
+
+    def show_coupoint(self, coupoint):
+        title = tk.Label(self, text="来店ポイントプレゼント")
+        title.pack(side="top", fill="x")
+
+        use_term_label = tk.Label(self, text="利用可能期間")
+        use_term_label.pack()
+
+        use_term_from = datetime.strptime(coupoint["use_term_from"], "%Y-%m-%d %H:%M:%S").strftime("%Y年%B%d日(%A)")
+        use_term_to = datetime.strptime(coupoint["use_term_to"], "%Y-%m-%d %H:%M:%S").strftime("%Y年%B%d日(%A)")
+        use_term = tk.Label(self, text="{} 〜 {}".format(use_term_from, use_term_to))
+        use_term.pack()
 
 
 class CmdSelect(tk.Frame):
@@ -193,12 +276,13 @@ class CardSelect(tk.Frame):
 
         macaddress = self.controller.get_macaddress()
         serialno = self.controller.get_serialno()
+        print("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
         data = {
-            "terminal": { # TODO:端末情報取得
-                "macaddr": "48:a9:e9:dc:e2:65", #"00:00:00:00:00:00",
+            "terminal": {
+                "macaddr": "48:a9:e9:dc:e2:65", #"00:00:00:00:00:00", # TODO:取得情報に差し替え
                 "serial_no": "0123456789ABCDEF",
+                }
             }
-        }
 
         print("POST {}".format(url))
         print(json.dumps(data))
@@ -206,8 +290,8 @@ class CardSelect(tk.Frame):
 
         if resp.status_code == 200:
             print(resp.text)
-            result = resp.json()
-            return result["clients"]
+            resp_data = resp.json()
+            return resp_data["clients"]
         else:
             print(resp.status_code)
             return None
@@ -325,6 +409,7 @@ class MapApp(tk.Tk):
     # 画面
     SCREENS = (Menu, # メニュー
                CoupointScan, # クーポイントスキャン
+               CoupointShow, # クーポイント詳細
                CmdSelect, # 流通ポイント処理選択
                CardSelect, # カード選択
                TelEntry, # 電話番号入力
