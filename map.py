@@ -39,6 +39,7 @@ class Menu(tk.Frame):
     """
 
     def __init__(self, parent, controller):
+        # FIXME: 画面の上下を反転させたいが指定不可？　他同様の画面あり
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
@@ -56,7 +57,8 @@ class Menu(tk.Frame):
             self.controller.frames["CoupointScan"].start_scan()
             self.controller.show_frame("CoupointScan")
         else:
-            messagebox.showerror("クーポイントチェックエラー", "この店舗でご利用できるクーポイントはありません。")
+            # FIXME: ダイアログの最大化ボタン他を消したいが、指定不可？　他同様
+            messagebox.showerror("クーポイントエラー", "この店舗でご利用できるクーポイントはありません。")
 
 
     def check_coupoint(self):
@@ -69,7 +71,7 @@ class Menu(tk.Frame):
         serialno = self.controller.get_serialno()
         data = {
             "terminal": {
-                "macaddr": "48:a9:e9:dc:e2:65", #"00:00:00:00:00:00", # TODO:取得情報に差し替え
+                "macaddr": "00:00:00:00:00:00", # TODO:取得情報に差し替え"48:a9:e9:dc:e2:65", #
                 "serial_no": "0123456789ABCDEF",
                 }
             }
