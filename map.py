@@ -112,7 +112,7 @@ class CoupointScan(tk.Frame):
         self.preview.pack(side="top")
 
         button = tk.Button(self, text="戻る",
-                           command=self.end_scan)
+                           command=self.back_menu)
         button.pack()
 
 #         self.bind("<Activate>", self.start_scan) # Monmagではこのイベントが発生しない
@@ -122,7 +122,7 @@ class CoupointScan(tk.Frame):
         print("start_scan")
         self.on_scan = True
         self.capture = cv2.VideoCapture(0)
-        self.update_preview()
+        self.after(100, self.update_preview)
 
 
     def update_preview(self):
@@ -140,13 +140,9 @@ class CoupointScan(tk.Frame):
         if self.decoded:
             for code in self.decoded:
                 print(code)
-                self.preview.create_text(PREVIEW_OFFSET_X, PREVIEW_OFFSET_Y, text=code.data, tag="code")
+                self.after_scan(code.data)
+#                 self.preview.create_text(PREVIEW_OFFSET_X, PREVIEW_OFFSET_Y, text=code.data, tag="code") ###
                 return
-                # FIXME: 実装見直し
-#                 decoded_data = self.controller.frames["CoupointShow"].parse_decoded_data(code.data)
-#                 coupoint = self.controller.frames["CoupointShow"].get_coupoint(decoded_data)
-#                 self.controller.frames["CoupointShow"].show_coupoint(coupoint)
-#                 self.controller.show_frame("CoupointShow")
 
         self.image = Image.fromarray(self.image)
         self.image = ImageTk.PhotoImage(self.image)
@@ -157,8 +153,25 @@ class CoupointScan(tk.Frame):
         self.after(500, self.update_preview)
 
 
-    def end_scan(self):
-        print("end_scan")
+    def after_scan(self, data):
+        print("after_scan")
+        coupoint_show = self.controller.frames["CoupointShow"]
+        decoded_data = coupoint_show.parse_decoded_data(data)
+
+        if decoded_data:
+            coupoint = coupoint_show.get_coupoint(decoded_data)
+            coupoint_show.show_coupoint(coupoint)
+            self.on_scan = False
+            self.capture.release()
+            self.controller.show_frame("CoupointShow")
+        else:
+            messagebox.showerror("クーポイントエラー", "このQRコードはクーポイントではありません。")
+
+            self.after(500, self.update_preview)
+
+
+    def back_menu(self):
+        print("back_menu")
         self.on_scan = False
         self.preview.delete("code")
         self.capture.release()
@@ -179,7 +192,7 @@ class CoupointShow(tk.Frame):
         @see https://redmine.magee.co.jp/projects/myshop/wiki/%E3%82%AF%E3%83%BC%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88QR%E3%82%B3%E3%83%BC%E3%83%89%E3%81%AE%E4%BB%95%E6%A7%98
         """
         parsed_data = {}
-        lines = decoded_data.split("¥r¥n")
+        lines = decoded_data.split("\r\n")
         if (len(lines) == 4 and lines[0] == "MyShop"):
             parsed_data["customer_id"] = lines[1]
             parsed_data["carousel_id"] = lines[2]
@@ -229,13 +242,17 @@ class CoupointShow(tk.Frame):
         title = tk.Label(self, text="来店ポイントプレゼント")
         title.pack(side="top", fill="x")
 
-        use_term_label = tk.Label(self, text="利用可能期間")
-        use_term_label.pack()
+        use_term_label = tk.Label(self, text="利用可能期間", font=header_font, anchor="w")
+        use_term_label.pack(side="top", fill="x")
 
         use_term_from = datetime.strptime(coupoint["use_term_from"], "%Y-%m-%d %H:%M:%S").strftime("%Y年%B%d日(%A)")
         use_term_to = datetime.strptime(coupoint["use_term_to"], "%Y-%m-%d %H:%M:%S").strftime("%Y年%B%d日(%A)")
-        use_term = tk.Label(self, text="{} 〜 {}".format(use_term_from, use_term_to))
-        use_term.pack()
+        use_term = tk.Label(self, text="{} 〜 {}".format(use_term_from, use_term_to), font=body_font, justify="left")
+        use_term.pack(side="top", fill="x")
+
+        button = tk.Button(self, text="利用確定",
+                           command=lambda: self.controller.show_frame("Menu"))
+        button.pack(side="bottom", fill="x")
 
 
 class CmdSelect(tk.Frame):
@@ -426,10 +443,13 @@ class MapApp(tk.Tk):
         else:
             self.geometry("{}x{}".format(WINDOW_WIDTH, WINDOW_HEIGHT))
 
-        global default_font
+        global default_font, header_font, body_font
         default_font = font.nametofont("TkDefaultFont")
         default_font.configure(family="Droid Sans Japanese", size=FONT_SIZE)
-#         print(font.families()) ###
+        # print(font.families()) ###
+
+        header_font = font.Font(self, family="Droid Sans Japanese", size=int(FONT_SIZE*0.8))
+        body_font = font.Font(self, family="Droid Sans Japanese", size=int(FONT_SIZE*0.6))
 
         self.entry_text = tk.StringVar()
         self.client_images = [] # 画像への参照をキープするために必須
