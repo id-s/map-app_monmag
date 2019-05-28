@@ -119,7 +119,7 @@ class CoupointScan(tk.Frame):
 
 
     def start_scan(self, event = None):
-        print("start_scan")
+        print("{}: start_scan".format(datetime.now()))
         self.on_scan = True
         self.capture = cv2.VideoCapture(0)
         self.after(100, self.update_preview)
@@ -133,6 +133,7 @@ class CoupointScan(tk.Frame):
             print("No capture")
             return
 
+        print("{}: Update preview start".format(datetime.now()))
         self.image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         if APP_ENV == "Monmag":
             self.image = self.image.transpose(1,0,2)[::-1] # -90度回転、詳細は https://qiita.com/matsu_mh/items/54b09273aef79ae027bc 参照
@@ -148,9 +149,10 @@ class CoupointScan(tk.Frame):
         self.image = ImageTk.PhotoImage(self.image)
 #         print("w:{} x h:{}".format(self.image.width(), self.image.height())) ###
         self.preview.create_image(PREVIEW_OFFSET_X, PREVIEW_OFFSET_Y, image=self.image)
-        print("Update preview")
+        print("{}: Update preview end".format(datetime.now()))
+#         print("Update preview")
 
-        self.after(500, self.update_preview)
+        self.after(100, self.update_preview)
 
 
     def after_scan(self, data):
