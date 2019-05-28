@@ -349,7 +349,8 @@ class MapApp(tk.Tk):
 
         # container に画面(frame)を積んでおき、表示する画面を一番上に持ってくる
         container = tk.Frame(self)
-        container.config(cursor='none')
+        if APP_ENV == "Monmag":
+            container.config(cursor='none')
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
