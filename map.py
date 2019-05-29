@@ -9,6 +9,7 @@ import json
 import locale
 import os
 import requests
+import subprocess
 import time
 import xml.etree.ElementTree as ET
 from datetime import datetime
@@ -36,6 +37,7 @@ else:
     FONT_SIZE = 24
 
 IMAGE_DIR = "images"
+SOUND_DIR = "sounds"
 
 
 class Menu(tk.Frame):
@@ -161,6 +163,9 @@ class CoupointScan(tk.Frame):
         decoded_data = coupoint_show.parse_decoded_data(data)
 
         if decoded_data:
+            if APP_ENV == "Monmag":
+                sound_file = os.path.join(SOUND_DIR, "button.wav")
+                subprocess.call("aplay {}".format(sound_file))
             coupoint = coupoint_show.get_coupoint(decoded_data)
             coupoint_show.show_coupoint(coupoint)
             self.on_scan = False
