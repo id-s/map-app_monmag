@@ -246,20 +246,32 @@ class CoupointShow(tk.Frame):
 
 
     def show_coupoint(self, coupoint):
-        title = tk.Label(self, text="来店ポイントプレゼント")
-        title.pack(side="top", fill="x")
+        self.title = tk.Label(self, text="来店ポイントプレゼント")
+        self.title.pack(side="top", fill="x")
 
-        use_term_label = tk.Label(self, text="利用可能期間", font=header_font, anchor="w")
-        use_term_label.pack(side="top", fill="x")
+        self.use_term_label = tk.Label(self, text="利用可能期間", font=header_font, anchor="w")
+        self.use_term_label.pack(side="top", fill="x")
 
         use_term_from = datetime.strptime(coupoint["use_term_from"], "%Y-%m-%d %H:%M:%S").strftime("%Y年%B%d日(%A)")
         use_term_to = datetime.strptime(coupoint["use_term_to"], "%Y-%m-%d %H:%M:%S").strftime("%Y年%B%d日(%A)")
-        use_term = tk.Label(self, text="{} 〜 {}".format(use_term_from, use_term_to), font=body_font, justify="left")
-        use_term.pack(side="top", fill="x")
+        self.use_term = tk.Label(self, text="{} 〜 {}".format(use_term_from, use_term_to), font=body_font, justify="left")
+        self.use_term.pack(side="top", fill="x")
 
-        button = tk.Button(self, text="利用確定",
-                           command=lambda: self.controller.show_frame("Menu"))
-        button.pack(side="bottom", fill="x")
+        self.button = tk.Button(self, text="利用確定",
+                                command=self.use_coupoint)
+        self.button.pack(side="bottom", fill="x")
+
+
+    def clear_coupoint(self):
+        self.title.destroy()
+        self.use_term_label.destroy()
+        self.use_term.destroy()
+        self.button.destroy()
+
+
+    def use_coupoint(self):
+        self.clear_coupoint()
+        self.controller.show_frame("Menu")
 
 
 class CmdSelect(tk.Frame):
