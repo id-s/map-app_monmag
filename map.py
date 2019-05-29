@@ -465,7 +465,7 @@ class SalesEntry(tk.Frame):
         point_entry.pack(side="top", fill="x")
 
         button = tk.Button(self, text="付与確定",
-                           command=lambda: controller.quit())
+                           command=lambda: controller.frames["Finish"].show("流通ポイントを付与しました。"))
         button.pack(side="top")
         button.focus_set()
 
@@ -570,6 +570,27 @@ class NumKeys(tk.Frame):
         self.controller.show_frame(self.controller.after_entry)
 
 
+class Finish(tk.Frame):
+    """完了
+    """
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+
+        caption = tk.Label(self, textvariable=self.controller.finish_message)
+        caption.pack(side="top", fill="x")
+
+
+    def show(self, message, duration = 3):
+        """完了画面にメッセージを表示する
+        @param duration 表示時間(単位は秒)
+        """
+        self.controller.finish_message.set(message)
+        self.controller.show_frame("Finish")
+        self.after(duration * 1000, lambda: self.controller.show_frame("Menu"))
+
+
 class MapApp(tk.Tk):
 
     # 画面
@@ -581,6 +602,7 @@ class MapApp(tk.Tk):
                TelEntry, # 電話番号入力
                SalesEntry, # 会計金額入力
                NumKeys, # ソフトキーボード
+               Finish, # 完了
                )
 
     def __init__(self, *args, **kwargs):
@@ -609,6 +631,8 @@ class MapApp(tk.Tk):
         self.after_entry = "" # ソフトキーボード画面で"OK"を押した時に表示される画面
 
         self.point_num = tk.StringVar() # 付与するポイント
+
+        self.finish_message = tk.StringVar() # 完了画面に表示する文言
 
         self.client_images = [] # 画像への参照をキープするために必須
 
