@@ -73,8 +73,8 @@ class Menu(tk.Frame):
         url = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/check"
         headers = {"Content-Type": "application/json"}
 
-        macaddress = self.controller.get_macaddress()
-        serialno = self.controller.get_serialno()
+        macaddress = context.get_macaddress()
+        serialno = context.get_serialno()
         print("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
         data = {
             "terminal": {
@@ -213,8 +213,8 @@ class CoupointShow(tk.Frame):
         url = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/start"
         headers = {"Content-Type": "application/json"}
 
-        macaddress = self.controller.get_macaddress()
-        serialno = self.controller.get_serialno()
+        macaddress = context.get_macaddress()
+        serialno = context.get_serialno()
         print("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
         print("customer_id:{}, carousel_id:{}".format(decoded_data["customer_id"], decoded_data["carousel_id"])) ###
         data = {
@@ -310,8 +310,8 @@ class CardSelect(tk.Frame):
         url = "https://card-dot-my-shop-magee-stg.appspot.com/v1/check"
         headers = {"Content-Type": "application/json"}
 
-        macaddress = self.controller.get_macaddress()
-        serialno = self.controller.get_serialno()
+        macaddress = context.get_macaddress()
+        serialno = context.get_serialno()
         print("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
         data = {
             "terminal": {
@@ -362,8 +362,8 @@ class CardSelect(tk.Frame):
         url = "https://card-dot-my-shop-magee-stg.appspot.com/v1/start"
         headers = {"Content-Type": "application/json"}
 
-        macaddress = self.controller.get_macaddress()
-        serialno = self.controller.get_serialno()
+        macaddress = context.get_macaddress()
+        serialno = context.get_serialno()
         print("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
         data = {
             "terminal": {
@@ -372,7 +372,7 @@ class CardSelect(tk.Frame):
                 },
             "customer": {
                 "card_no": "CRC0S0 32840000000000200001", # TODO:取得情報に差し替え
-                "client_cd": self.controller.selected_client.get(),
+                "client_cd": context.selected_client,
                 "card_id": 1,
                 }
             }
@@ -396,7 +396,7 @@ class CardSelect(tk.Frame):
         """
         def func():
             print("Select card:{}".format(client_cd))
-            self.controller.selected_client.set(client_cd)
+            context.selected_client = client_cd
             result = self.check_card()
             if result == "tel":
                 self.controller.show_frame("TelEntry")
@@ -422,7 +422,7 @@ class TelEntry(tk.Frame):
         label = tk.Label(self, text="電話番号入力")
         label.pack(side="top", fill="x")
 
-        tel_entry = tk.Entry(self, textvariable=self.controller.entry_text, font=default_font)
+        tel_entry = tk.Entry(self, textvariable=context.entry_text, font=default_font)
         tel_entry.pack(side="top", fill="x")
 
         button = tk.Button(self, text="確定",
@@ -434,13 +434,13 @@ class TelEntry(tk.Frame):
 
 
     def show_num_keys(self, event):
-        self.controller.entry_caption.set("電話番号入力")
-        self.controller.after_entry = "TelEntry"
+        context.entry_caption.set("電話番号入力")
+        context.after_entry = "TelEntry"
         self.controller.show_frame("NumKeys")
 
 
     def show_sales_entry(self):
-        self.controller.entry_text.set("")
+        context.entry_text.set("")
         self.controller.show_frame("SalesEntry")
 
 
@@ -455,13 +455,13 @@ class SalesEntry(tk.Frame):
         label = tk.Label(self, text="会計金額入力")
         label.pack(side="top", fill="x")
 
-        sales_entry = tk.Entry(self, textvariable=self.controller.entry_text, font=default_font)
+        sales_entry = tk.Entry(self, textvariable=context.entry_text, font=default_font)
         sales_entry.pack(side="top", fill="x")
 
         label2 = tk.Label(self, text="ポイント")
         label2.pack(side="top", fill="x")
 
-        point_entry = tk.Entry(self, textvariable=self.controller.point_num, font=default_font)
+        point_entry = tk.Entry(self, textvariable=context.point_num, font=default_font)
         point_entry.pack(side="top", fill="x")
 
         button = tk.Button(self, text="付与確定",
@@ -473,8 +473,8 @@ class SalesEntry(tk.Frame):
 
 
     def show_num_keys(self, event):
-        self.controller.entry_caption.set("会計金額入力")
-        self.controller.after_entry = "SalesEntry"
+        context.entry_caption.set("会計金額入力")
+        context.after_entry = "SalesEntry"
         self.controller.show_frame("NumKeys")
 
 
@@ -484,8 +484,8 @@ class SalesEntry(tk.Frame):
         url = "https://card-dot-my-shop-magee-stg.appspot.com/v1/calc"
         headers = {"Content-Type": "application/json"}
 
-        macaddress = self.controller.get_macaddress()
-        serialno = self.controller.get_serialno()
+        macaddress = context.get_macaddress()
+        serialno = context.get_serialno()
         print("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
         data = {
             "terminal": {
@@ -495,7 +495,7 @@ class SalesEntry(tk.Frame):
             "customer": {
                 "card_no": "CRC0S0 32840000000000200001", # TODO:取得情報に差し替え
                 "price": sales,
-                "client_cd": self.controller.selected_client.get(),
+                "client_cd": context.selected_client,
                 "card_id": 1,
                 }
             }
@@ -524,10 +524,10 @@ class NumKeys(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
-        caption = tk.Label(self, textvariable=self.controller.entry_caption)
+        caption = tk.Label(self, textvariable=context.entry_caption)
         caption.pack(side="top", fill="x")
 
-        entry = tk.Entry(self, textvariable=self.controller.entry_text, font=default_font)
+        entry = tk.Entry(self, textvariable=context.entry_text, font=default_font)
         entry.pack(side="top", fill="x")
 
         numkeys = tk.Frame(self)
@@ -555,19 +555,19 @@ class NumKeys(tk.Frame):
 
 
     def add_num(self, num):
-        self.controller.entry_text.set(self.controller.entry_text.get() + num)
+        context.entry_text.set(context.entry_text.get() + num)
 
 
     def del_num(self):
-        self.controller.entry_text.set(self.controller.entry_text.get()[:-1])
+        context.entry_text.set(context.entry_text.get()[:-1])
 
     def enter_tel(self):
         # FIXME: 入力内容によって処理が分岐するのは望ましくない。要:画面遷移の見直し
-        if self.controller.entry_caption.get() == u"会計金額入力":
-            point_num = self.controller.frames["SalesEntry"].calc_point(self.controller.entry_text.get())
-            self.controller.point_num.set(point_num)
+        if context.entry_caption.get() == u"会計金額入力":
+            point_num = self.controller.frames["SalesEntry"].calc_point(context.entry_text.get())
+            context.point_num.set(point_num)
 
-        self.controller.show_frame(self.controller.after_entry)
+        self.controller.show_frame(context.after_entry)
 
 
 class Finish(tk.Frame):
@@ -578,7 +578,7 @@ class Finish(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
-        caption = tk.Label(self, textvariable=self.controller.finish_message)
+        caption = tk.Label(self, textvariable=context.finish_message)
         caption.pack(side="top", fill="x")
 
 
@@ -586,7 +586,7 @@ class Finish(tk.Frame):
         """完了画面にメッセージを表示する
         @param duration 表示時間(単位は秒)
         """
-        self.controller.finish_message.set(message)
+        context.finish_message.set(message)
         self.controller.show_frame("Finish")
         self.after(duration * 1000, lambda: self.controller.show_frame("Menu"))
 
@@ -605,8 +605,7 @@ class MapApp(tk.Tk):
                Finish, # 完了
                )
 
-    def __init__(self, *args, **kwargs):
-        tk.Tk.__init__(self, *args, **kwargs)
+    def build(self):
         self.title("MAP")
 
         if APP_ENV == "Monmag":
@@ -622,17 +621,6 @@ class MapApp(tk.Tk):
 
         header_font = font.Font(self, family="Droid Sans Japanese", size=int(FONT_SIZE*0.8))
         body_font = font.Font(self, family="Droid Sans Japanese", size=int(FONT_SIZE*0.6))
-
-        self.selected_client = tk.StringVar() # 選択されたカード(流通)
-        self.scanned_card_no = tk.StringVar() # スキャンされたカードの番号
-
-        self.entry_text = tk.StringVar() # ソフトキーボードで入力された値
-        self.entry_caption = tk.StringVar() # ソフトキーボード画面に表示する文言
-        self.after_entry = "" # ソフトキーボード画面で"OK"を押した時に表示される画面
-
-        self.point_num = tk.StringVar() # 付与するポイント
-
-        self.finish_message = tk.StringVar() # 完了画面に表示する文言
 
         self.client_images = [] # 画像への参照をキープするために必須
 
@@ -655,41 +643,77 @@ class MapApp(tk.Tk):
         # 初期表示画面
         self.show_frame("Menu")
 
+
     def show_frame(self, scr_name):
         frame = self.frames[scr_name]
         frame.tkraise()
-
-
-    def get_serialno(self):
-        serialno = None
-        try:
-            xml = ET.parse("/home/pi/Git/monmag-rpi/qrcode_reader/mqtt.xml")
-        except IOError:
-            xml = ET.parse("mqtt.xml")
-
-        serialno = xml.find('deviceid').text
-
-        return serialno
-
-
-    def get_macaddress(self):
-        macaddress = None
-        try:
-            file = open("/sys/class/net/wlan0/address", "r") # Monmag
-        except IOError:
-            file = open("macaddress", "r") # 開発用
-
-        macaddress = str.strip(file.readline())
-        file.close()
-
-        return macaddress
 
 
     def debug(self, content):
         print(content)
 
 
+class Context():
+
+    def __init__(self):
+        # 端末のシリアルナンバー
+        self.serialno = None
+
+        # 端末のMACアドレス
+        self.macaddress = None
+
+        # 選択されたカード(流通)
+        self.selected_client = None
+
+        # ソフトキーボード画面で"OK"を押した時に表示される画面
+        self.after_entry = None
+
+        # スキャンされたカードの番号
+        self.scanned_card_no = None
+
+        """"以下、ウィジェットと連携している変数"""
+
+        # ソフトキーボード画面に表示する文言
+        self.entry_caption = tk.StringVar()
+
+        # ソフトキーボードで入力された値
+        self.entry_text = tk.StringVar()
+
+        # 付与するポイント
+        self.point_num = tk.StringVar()
+
+        # 完了画面に表示する文言
+        self.finish_message = tk.StringVar()
+
+
+    def get_serialno(self):
+        if self.serialno is None:
+            try:
+                xml = ET.parse("/home/pi/Git/monmag-rpi/qrcode_reader/mqtt.xml")
+            except IOError:
+                xml = ET.parse("mqtt.xml")
+
+            self.serialno = xml.find('deviceid').text
+
+        return self.serialno
+
+
+    def get_macaddress(self):
+        if self.macaddress is None:
+            try:
+                file = open("/sys/class/net/wlan0/address", "r") # Monmag
+            except IOError:
+                file = open("macaddress", "r") # 開発用
+
+            macaddress = str.strip(file.readline())
+            file.close()
+
+        return self.macaddress
+
+
 if __name__ == "__main__":
     app = MapApp()
+    context = Context()
+    app.build()
     app.mainloop()
 
