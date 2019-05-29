@@ -352,13 +352,58 @@ class CardSelect(tk.Frame):
             button.pack()
 
 
+    def check_card(self):
+        """カードのチェック
+        @return "tel": 初回利用(次に電話番号入力画面を表示)
+                "price": 二回目以降の利用(次に会計金額入力画面を表示)
+                "failure": カード読み込み不正（選択された流通と読み込まれたカードが一致しない等）
+                 None: サーバエラーなど
+        """
+        url = "https://card-dot-my-shop-magee-stg.appspot.com/v1/start"
+        headers = {"Content-Type": "application/json"}
+
+        macaddress = self.controller.get_macaddress()
+        serialno = self.controller.get_serialno()
+        print("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
+        data = {
+            "terminal": {
+                "macaddr": "48:a9:e9:dc:e2:65", #"00:00:00:00:00:00", # TODO:取得情報に差し替え
+                "serial_no": "0123456789ABCDEF",
+                },
+            "customer": {
+                "card_no": "CRC0S0 32840000000000200001", # TODO:取得情報に差し替え
+                "client_cd": self.controller.selected_client.get(),
+                "card_id": 1,
+                }
+            }
+
+        print("POST {}".format(url))
+        print(json.dumps(data))
+        resp = requests.post(url, data=json.dumps(data), headers=headers)
+
+        if resp.status_code == 200 or resp.status_code == 404:
+            print(resp.text)
+            resp_data = resp.json()
+            return resp_data["result"]
+        else:
+            print(resp.status_code)
+            return None
+
+
     def select_card(self, client_cd):
         """カード選択時の処理
         http://memopy.hatenadiary.jp/entry/2017/06/11/220452 を参考に実装した。
         """
         def func():
             print("Select card:{}".format(client_cd))
-            self.controller.show_frame("TelEntry")
+            self.controller.selected_client.set(client_cd)
+            result = self.check_card()
+            if result == "tel":
+                self.controller.show_frame("TelEntry")
+            elif result == "price":
+                self.controller.show_frame("SalesEntry")
+            else:
+                messagebox.showerror("エラー", "エラーが発生しました。")
         return func
 
 
@@ -381,14 +426,94 @@ class TelEntry(tk.Frame):
         tel_entry.pack(side="top", fill="x")
 
         button = tk.Button(self, text="確定",
-                           command=lambda: controller.quit())
+                           command=self.show_sales_entry)
         button.pack(side="top")
         button.focus_set()
 
         tel_entry.bind("<FocusIn>", self.show_num_keys)
 
+
     def show_num_keys(self, event):
+        self.controller.entry_caption.set("電話番号入力")
+        self.controller.after_entry = "TelEntry"
         self.controller.show_frame("NumKeys")
+
+
+    def show_sales_entry(self):
+        self.controller.entry_text.set("")
+        self.controller.show_frame("SalesEntry")
+
+
+class SalesEntry(tk.Frame):
+    """会計金額入力
+    """
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+
+        label = tk.Label(self, text="会計金額入力")
+        label.pack(side="top", fill="x")
+
+        sales_entry = tk.Entry(self, textvariable=self.controller.entry_text, font=default_font)
+        sales_entry.pack(side="top", fill="x")
+
+        label2 = tk.Label(self, text="ポイント")
+        label2.pack(side="top", fill="x")
+
+        point_entry = tk.Entry(self, textvariable=self.controller.point_num, font=default_font)
+        point_entry.pack(side="top", fill="x")
+
+        button = tk.Button(self, text="付与確定",
+                           command=lambda: controller.quit())
+        button.pack(side="top")
+        button.focus_set()
+
+        sales_entry.bind("<FocusIn>", self.show_num_keys)
+
+
+    def show_num_keys(self, event):
+        self.controller.entry_caption.set("会計金額入力")
+        self.controller.after_entry = "SalesEntry"
+        self.controller.show_frame("NumKeys")
+
+
+    def calc_point(self, sales):
+        """付与ポイント算出
+        """
+        url = "https://card-dot-my-shop-magee-stg.appspot.com/v1/calc"
+        headers = {"Content-Type": "application/json"}
+
+        macaddress = self.controller.get_macaddress()
+        serialno = self.controller.get_serialno()
+        print("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
+        data = {
+            "terminal": {
+                "macaddr": "48:a9:e9:dc:e2:65", #"00:00:00:00:00:00", # TODO:取得情報に差し替え
+                "serial_no": "0123456789ABCDEF",
+                },
+            "customer": {
+                "card_no": "CRC0S0 32840000000000200001", # TODO:取得情報に差し替え
+                "price": sales,
+                "client_cd": self.controller.selected_client.get(),
+                "card_id": 1,
+                }
+            }
+
+        print("POST {}".format(url))
+        print(json.dumps(data))
+        resp = requests.post(url, data=json.dumps(data), headers=headers)
+
+        if resp.status_code == 200:
+            print(resp.text)
+            resp_data = resp.json()
+            if resp_data["result"]:
+                return resp_data["result"]
+            else:
+                return None
+        else:
+            print(resp.status_code)
+            return None
 
 
 class NumKeys(tk.Frame):
@@ -399,7 +524,7 @@ class NumKeys(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
-        caption = tk.Label(self, text="電話番号入力")
+        caption = tk.Label(self, textvariable=self.controller.entry_caption)
         caption.pack(side="top", fill="x")
 
         entry = tk.Entry(self, textvariable=self.controller.entry_text, font=default_font)
@@ -437,7 +562,12 @@ class NumKeys(tk.Frame):
         self.controller.entry_text.set(self.controller.entry_text.get()[:-1])
 
     def enter_tel(self):
-        self.controller.show_frame("TelEntry")
+        # FIXME: 入力内容によって処理が分岐するのは望ましくない。要:画面遷移の見直し
+        if self.controller.entry_caption.get() == u"会計金額入力":
+            point_num = self.controller.frames["SalesEntry"].calc_point(self.controller.entry_text.get())
+            self.controller.point_num.set(point_num)
+
+        self.controller.show_frame(self.controller.after_entry)
 
 
 class MapApp(tk.Tk):
@@ -449,6 +579,7 @@ class MapApp(tk.Tk):
                CmdSelect, # 流通ポイント処理選択
                CardSelect, # カード選択
                TelEntry, # 電話番号入力
+               SalesEntry, # 会計金額入力
                NumKeys, # ソフトキーボード
                )
 
@@ -470,7 +601,15 @@ class MapApp(tk.Tk):
         header_font = font.Font(self, family="Droid Sans Japanese", size=int(FONT_SIZE*0.8))
         body_font = font.Font(self, family="Droid Sans Japanese", size=int(FONT_SIZE*0.6))
 
-        self.entry_text = tk.StringVar()
+        self.selected_client = tk.StringVar() # 選択されたカード(流通)
+        self.scanned_card_no = tk.StringVar() # スキャンされたカードの番号
+
+        self.entry_text = tk.StringVar() # ソフトキーボードで入力された値
+        self.entry_caption = tk.StringVar() # ソフトキーボード画面に表示する文言
+        self.after_entry = "" # ソフトキーボード画面で"OK"を押した時に表示される画面
+
+        self.point_num = tk.StringVar() # 付与するポイント
+
         self.client_images = [] # 画像への参照をキープするために必須
 
         # container に画面(frame)を積んでおき、表示する画面を一番上に持ってくる
