@@ -164,8 +164,8 @@ class CoupointScan(tk.Frame):
 
         if decoded_data:
             if APP_ENV == "Monmag":
-                sound_file = os.path.join(SOUND_DIR, "button.wav")
-                subprocess.call("aplay {}".format(sound_file))
+                sound_file = os.path.abspath(os.path.join(SOUND_DIR, "button.wav"))
+                subprocess.call(["aplay", sound_file])
             coupoint = coupoint_show.get_coupoint(decoded_data)
             coupoint_show.show_coupoint(coupoint)
             self.on_scan = False
