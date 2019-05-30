@@ -53,8 +53,8 @@ class Menu(tk.Frame):
         menu2 = tk.Button(self, text="流通会員カードをスキャンする",
                           command=self.show_cmd_select)
 
-        menu1.pack()
-        menu2.pack()
+        menu1.pack(fill="x")
+        menu2.pack(fill="x")
 
 
     def show_coupoint_scan(self):
@@ -112,9 +112,9 @@ class CoupointScan(tk.Frame):
         self.preview = preview = tk.Canvas(self, width = PREVIEW_WIDTH, height = PREVIEW_HEIGHT, bg="blue")
         self.preview.pack(side="top")
 
-        button = tk.Button(self, text="戻る",
+        button = tk.Button(self, text="キャンセル",
                            command=self.back_menu)
-        button.pack()
+        button.pack(side="bottom", fill="x")
 
 #         self.bind("<Activate>", self.start_scan) # Monmagではこのイベントが発生しない
 
@@ -279,9 +279,12 @@ class CmdSelect(tk.Frame):
                             command=lambda: app.show_frame("CardSelect"))
         button2 = tk.Button(self, text="取消",
                             command=lambda: app.show_frame("Menu"))
+        button3 = tk.Button(self, text="キャンセル",
+                            command=app.back_menu)
 
-        button1.pack()
-        button2.pack()
+        button1.pack(fill="x")
+        button2.pack(fill="x")
+        button3.pack(fill="x")
 
 
 class CardSelect(tk.Frame):
@@ -338,7 +341,11 @@ class CardSelect(tk.Frame):
             button = tk.Button(self, compound="left", text=client["card_name"], image=image,
                                width=WINDOW_WIDTH - PADDING * 2,
                                command=self.select_card(client["client_cd"]))
-            button.pack()
+            button.pack(fill="x")
+
+        button = tk.Button(self, text="キャンセル",
+                           command=app.back_menu)
+        button.pack(fill="x")
 
 
     def check_card(self):
@@ -410,10 +417,19 @@ class TelEntry(tk.Frame):
         tel_entry = tk.Entry(self, textvariable=context.entry_text, font=default_font)
         tel_entry.pack(side="top", fill="x")
 
-        button = tk.Button(self, text="確定",
-                           command=self.show_sales_entry)
-        button.pack(side="top")
-        button.focus_set()
+        actions = tk.Frame(self)
+        actions.columnconfigure(0, weight=1)
+        actions.columnconfigure(1, weight=1)
+        actions.pack(side="bottom", fill="x")
+
+        button1 = tk.Button(actions, text="確定",
+                            command=self.show_sales_entry)
+        button1.grid(column=0, row=0, sticky="nswe")
+        button1.focus_set()
+
+        button2 = tk.Button(actions, text="キャンセル",
+                            command=app.back_menu)
+        button2.grid(column=1, row=0, sticky="nswe")
 
         tel_entry.bind("<FocusIn>", self.show_num_keys)
 
@@ -450,7 +466,7 @@ class SalesEntry(tk.Frame):
 
         button = tk.Button(self, text="付与確定",
                            command=lambda: app.frames["Finish"].show("流通ポイントを付与しました。"))
-        button.pack(side="top")
+        button.pack(side="bottom")
         button.focus_set()
 
         sales_entry.bind("<FocusIn>", self.show_num_keys)
@@ -627,6 +643,10 @@ class MapApp(tk.Tk):
         app.log("Show {}".format(scr_name))
         frame = self.frames[scr_name]
         frame.tkraise()
+
+
+    def back_menu(self):
+        app.show_frame("Menu")
 
 
     def log(self, content, level="DEBUG"):
