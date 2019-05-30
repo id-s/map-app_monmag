@@ -72,13 +72,10 @@ class Menu(tk.Frame):
         url = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/check"
         headers = {"Content-Type": "application/json"}
 
-        macaddress = context.get_macaddress()
-        serialno = context.get_serialno()
-        app.log("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
         data = {
             "terminal": {
-                "macaddr": "48:a9:e9:dc:e2:65", #"00:00:00:00:00:00", # TODO:取得情報に差し替え
-                "serial_no": "0123456789ABCDEF",
+                "macaddr": "48:a9:e9:dc:e2:65", # context.macaddress, # TODO:取得情報に差し替え
+                "serial_no": "0123456789ABCDEF", # context.serialno,
                 }
             }
 
@@ -213,14 +210,11 @@ class CoupointShow(tk.Frame):
         url = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/start"
         headers = {"Content-Type": "application/json"}
 
-        macaddress = context.get_macaddress()
-        serialno = context.get_serialno()
-        app.log("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
         app.log("customer_id:{}, carousel_id:{}".format(decoded_data["customer_id"], decoded_data["carousel_id"])) ###
         data = {
             "terminal": {
-                "macaddr": "48:a9:e9:dc:e2:65", #"00:00:00:00:00:00", # TODO:取得情報に差し替え
-                "serial_no": "0123456789ABCDEF",
+                "macaddr": "48:a9:e9:dc:e2:65", # context.macaddress, # TODO:取得情報に差し替え
+                "serial_no": "0123456789ABCDEF", # context.serialno,
                 },
             "carousel": {
                 "customer_id": "20b097add4aea673e074d77fe1495434", # TODO:取得情報に差し替え
@@ -308,13 +302,10 @@ class CardSelect(tk.Frame):
         url = "https://card-dot-my-shop-magee-stg.appspot.com/v1/check"
         headers = {"Content-Type": "application/json"}
 
-        macaddress = context.get_macaddress()
-        serialno = context.get_serialno()
-        app.log("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
         data = {
             "terminal": {
-                "macaddr": "48:a9:e9:dc:e2:65", #"00:00:00:00:00:00", # TODO:取得情報に差し替え
-                "serial_no": "0123456789ABCDEF",
+                "macaddr": "48:a9:e9:dc:e2:65", # context.macaddress, # TODO:取得情報に差し替え
+                "serial_no": "0123456789ABCDEF", # context.serialno,
                 }
             }
 
@@ -360,13 +351,10 @@ class CardSelect(tk.Frame):
         url = "https://card-dot-my-shop-magee-stg.appspot.com/v1/start"
         headers = {"Content-Type": "application/json"}
 
-        macaddress = context.get_macaddress()
-        serialno = context.get_serialno()
-        app.log("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
         data = {
             "terminal": {
-                "macaddr": "48:a9:e9:dc:e2:65", #"00:00:00:00:00:00", # TODO:取得情報に差し替え
-                "serial_no": "0123456789ABCDEF",
+                "macaddr": "48:a9:e9:dc:e2:65", # context.macaddress, # TODO:取得情報に差し替え
+                "serial_no": "0123456789ABCDEF", # context.serialno,
                 },
             "customer": {
                 "card_no": "CRC0S0 32840000000000200001", # TODO:取得情報に差し替え
@@ -480,13 +468,10 @@ class SalesEntry(tk.Frame):
         url = "https://card-dot-my-shop-magee-stg.appspot.com/v1/calc"
         headers = {"Content-Type": "application/json"}
 
-        macaddress = context.get_macaddress()
-        serialno = context.get_serialno()
-        app.log("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
         data = {
             "terminal": {
-                "macaddr": "48:a9:e9:dc:e2:65", #"00:00:00:00:00:00", # TODO:取得情報に差し替え
-                "serial_no": "0123456789ABCDEF",
+                "macaddr": "48:a9:e9:dc:e2:65", # context.macaddress, # TODO:取得情報に差し替え
+                "serial_no": "0123456789ABCDEF", # context.serialno,
                 },
             "customer": {
                 "card_no": "CRC0S0 32840000000000200001", # TODO:取得情報に差し替え
@@ -655,10 +640,10 @@ class Context():
 
     def __init__(self):
         # 端末のシリアルナンバー
-        self.serialno = None
+        self.serialno = self._get_serialno()
 
         # 端末のMACアドレス
-        self.macaddress = None
+        self.macaddress = self._get_serialno()
 
         # 選択されたカード(流通)
         self.selected_client = None
@@ -684,27 +669,25 @@ class Context():
         self.finish_message = tk.StringVar()
 
 
-    def get_serialno(self):
-        if self.serialno is None:
-            try:
-                xml = ET.parse("/home/pi/Git/monmag-rpi/qrcode_reader/mqtt.xml")
-            except IOError:
-                xml = ET.parse("mqtt.xml")
+    def _get_serialno(self):
+        try:
+            xml = ET.parse("/home/pi/Git/monmag-rpi/qrcode_reader/mqtt.xml")
+        except IOError:
+            xml = ET.parse("mqtt.xml")
 
-            self.serialno = xml.find('deviceid').text
+        self.serialno = xml.find('deviceid').text
 
         return self.serialno
 
 
-    def get_macaddress(self):
-        if self.macaddress is None:
-            try:
-                file = open("/sys/class/net/wlan0/address", "r") # Monmag
-            except IOError:
-                file = open("macaddress", "r") # 開発用
+    def _get_macaddress(self):
+        try:
+            file = open("/sys/class/net/wlan0/address", "r") # Monmag
+        except IOError:
+            file = open("macaddress", "r") # 開発用
 
-            macaddress = str.strip(file.readline())
-            file.close()
+        macaddress = str.strip(file.readline())
+        file.close()
 
         return self.macaddress
 
