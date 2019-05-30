@@ -60,6 +60,7 @@ class Menu(tk.Frame):
 
     def show_coupoint_scan(self):
         if self.check_coupoint():
+            context.exec_name = "coupoint"
             app.frames["CoupointScan"].start_scan()
             app.show_frame("CoupointScan")
         else:
@@ -97,6 +98,7 @@ class Menu(tk.Frame):
 
 
     def show_cmd_select(self):
+        # context.exec_nameは次の画面で決定する
         app.show_frame("CmdSelect")
 
 
@@ -181,6 +183,7 @@ class CoupointScan(tk.Frame):
         self.on_scan = False
         self.preview.delete("code")
         self.capture.release()
+        context.exec_name = None
         app.show_frame("Menu")
 
 
@@ -276,16 +279,27 @@ class CmdSelect(tk.Frame):
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
 
-        button1 = tk.Button(self, text="付与",
-                            command=lambda: app.show_frame("CardSelect"))
-        button2 = tk.Button(self, text="取消",
-                            command=lambda: app.show_frame("Menu"))
-        button3 = tk.Button(self, text="キャンセル",
-                            command=app.back_menu)
+        add_point_button = tk.Button(self, text="ポイント付与", command=self.add_point_button_clicked)
+        cancel_point_button = tk.Button(self, text="ポイント取消", command=self.cancel_point_button_clicked)
+        cancel_button = tk.Button(self, text="キャンセル", command=app.back_menu)
 
-        button1.pack(fill="x")
-        button2.pack(fill="x")
-        button3.pack(fill="x")
+        add_point_button.pack(fill="x")
+        cancel_point_button.pack(fill="x")
+        cancel_button.pack(fill="x")
+
+
+    def add_point_button_clicked(self):
+        context.exec_name = "add_point"
+        context.sales_entry_button_text.set("付与確定")
+        context.finish_message.set("流通ポイントを付与しました。")
+        app.show_frame("CardSelect")
+
+
+    def cancel_point_button_clicked(self):
+        context.exec_name = "cancel_point"
+        context.sales_entry_button_text.set("取消確定")
+        context.finish_message.set("付与した流通ポイントを取消しました。")
+        app.show_frame("CardSelect")
 
 
 class CardSelect(tk.Frame):
@@ -391,13 +405,19 @@ class CardSelect(tk.Frame):
         def func():
             app.log("Select card:{}".format(client_cd))
             context.selected_client = client_cd
-            result = self.check_card()
-            if result == "tel":
-                app.show_frame("Policy1")
-            elif result == "price":
-                app.show_frame("SalesEntry")
-            else:
-                messagebox.showerror("エラー", "エラーが発生しました。")
+
+            if context.exec_name == "add_point":
+                result = self.check_card()
+                if result == "tel":
+                    app.show_frame("Policy1")
+                elif result == "price":
+                    app.show_frame("SalesEntry")
+                else:
+                    messagebox.showerror("エラー", "エラーが発生しました。")
+
+            elif context.exec_name == "cancel_point":
+                    app.show_frame("SalesEntry")
+
         return func
 
 
@@ -534,8 +554,8 @@ class SalesEntry(tk.Frame):
         point_entry = tk.Entry(self, textvariable=context.point_num, font=default_font)
         point_entry.pack(side="top", fill="x")
 
-        button = tk.Button(self, text="付与確定",
-                           command=lambda: app.frames["Finish"].show("流通ポイントを付与しました。"))
+        button = tk.Button(self, textvariable=context.sales_entry_button_text,
+                           command=lambda: app.frames["Finish"].show())
         button.pack(side="bottom")
         button.focus_set()
 
@@ -647,11 +667,10 @@ class Finish(tk.Frame):
         caption.pack(side="top", fill="x")
 
 
-    def show(self, message, duration = 3):
+    def show(self, duration = 3):
         """完了画面にメッセージを表示する
         @param duration 表示時間(単位は秒)
         """
-        context.finish_message.set(message)
         app.show_frame("Finish")
         self.after(duration * 1000, lambda: app.show_frame("Menu"))
 
@@ -719,6 +738,7 @@ class MapApp(tk.Tk):
 
 
     def back_menu(self):
+        context.exec_name = None
         app.show_frame("Menu")
 
 
@@ -739,6 +759,9 @@ class Context():
         # 端末のMACアドレス
         self.macaddress = self._get_serialno()
 
+        # 実行中の処理名
+        self.exec_name = None
+
         # 選択されたカード(流通)
         self.selected_client = None
 
@@ -758,6 +781,9 @@ class Context():
 
         # 付与するポイント
         self.point_num = tk.StringVar()
+
+        # 金額入力画面のボタンに表示する文言
+        self.sales_entry_button_text = tk.StringVar()
 
         # 完了画面に表示する文言
         self.finish_message = tk.StringVar()
