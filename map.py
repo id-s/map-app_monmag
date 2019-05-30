@@ -44,15 +44,14 @@ class Menu(tk.Frame):
     """メニュー画面
     """
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent):
         # FIXME: 画面の上下を反転させたいが指定不可？　他同様の画面あり
         tk.Frame.__init__(self, parent)
-        self.controller = controller
 
         menu1 = tk.Button(self, text="MyShopクーポイントをスキャンする",
                           command=self.show_coupoint_scan)
         menu2 = tk.Button(self, text="流通会員カードをスキャンする",
-                          command=lambda: controller.show_frame("CmdSelect"))
+                          command=self.show_cmd_select)
 
         menu1.pack()
         menu2.pack()
@@ -60,8 +59,8 @@ class Menu(tk.Frame):
 
     def show_coupoint_scan(self):
         if self.check_coupoint():
-            self.controller.frames["CoupointScan"].start_scan()
-            self.controller.show_frame("CoupointScan")
+            app.frames["CoupointScan"].start_scan()
+            app.show_frame("CoupointScan")
         else:
             # FIXME: ダイアログの最大化ボタン他を消したいが、指定不可？　他同様
             messagebox.showerror("クーポイントエラー", "この店舗でご利用できるクーポイントはありません。")
@@ -99,13 +98,16 @@ class Menu(tk.Frame):
             return False
 
 
+    def show_cmd_select(self):
+        app.show_frame("CmdSelect")
+
+
 class CoupointScan(tk.Frame):
     """クーポイントスキャン
     """
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent):
         tk.Frame.__init__(self, parent)
-        self.controller = controller
 
         label = tk.Label(self, text="クーポイントをスキャンしてください")
         label.pack(side="top", fill="x")
@@ -159,7 +161,7 @@ class CoupointScan(tk.Frame):
 
     def after_scan(self, data):
         print("after_scan")
-        coupoint_show = self.controller.frames["CoupointShow"]
+        coupoint_show = app.frames["CoupointShow"]
         decoded_data = coupoint_show.parse_decoded_data(data)
 
         if decoded_data:
@@ -170,7 +172,7 @@ class CoupointScan(tk.Frame):
             coupoint_show.show_coupoint(coupoint)
             self.on_scan = False
             self.capture.release()
-            self.controller.show_frame("CoupointShow")
+            app.show_frame("CoupointShow")
         else:
             messagebox.showerror("クーポイントエラー", "このQRコードはクーポイントではありません。")
 
@@ -182,16 +184,15 @@ class CoupointScan(tk.Frame):
         self.on_scan = False
         self.preview.delete("code")
         self.capture.release()
-        self.controller.show_frame("Menu")
+        app.show_frame("Menu")
 
 
 class CoupointShow(tk.Frame):
     """クーポイント詳細表示
     """
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent):
         tk.Frame.__init__(self, parent)
-        self.controller = controller
 
 
     def parse_decoded_data(self, decoded_data):
@@ -271,21 +272,20 @@ class CoupointShow(tk.Frame):
 
     def use_coupoint(self):
         self.clear_coupoint()
-        self.controller.show_frame("Menu")
+        app.show_frame("Menu")
 
 
 class CmdSelect(tk.Frame):
     """流通ポイント処理選択
     """
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent):
         tk.Frame.__init__(self, parent)
-        self.controller = controller
 
         button1 = tk.Button(self, text="付与",
-                            command=lambda: controller.show_frame("CardSelect"))
+                            command=lambda: app.show_frame("CardSelect"))
         button2 = tk.Button(self, text="取消",
-                            command=lambda: controller.show_frame("Menu"))
+                            command=lambda: app.show_frame("Menu"))
 
         button1.pack()
         button2.pack()
@@ -295,9 +295,8 @@ class CardSelect(tk.Frame):
     """カード選択
     """
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent):
         tk.Frame.__init__(self, parent)
-        self.controller = controller
 
         clients = self.get_clients()
         if (clients):
@@ -345,7 +344,7 @@ class CardSelect(tk.Frame):
 
             image = Image.open(file_path)
             image = ImageTk.PhotoImage(image.resize((48, 48)))
-            self.controller.client_images.append(image)
+            app.client_images.append(image)
             button = tk.Button(self, compound="left", text=client["card_name"], image=image,
                                width=WINDOW_WIDTH - PADDING * 2,
                                command=self.select_card(client["client_cd"]))
@@ -399,9 +398,9 @@ class CardSelect(tk.Frame):
             context.selected_client = client_cd
             result = self.check_card()
             if result == "tel":
-                self.controller.show_frame("TelEntry")
+                app.show_frame("TelEntry")
             elif result == "price":
-                self.controller.show_frame("SalesEntry")
+                app.show_frame("SalesEntry")
             else:
                 messagebox.showerror("エラー", "エラーが発生しました。")
         return func
@@ -411,9 +410,8 @@ class TelEntry(tk.Frame):
     """電話番号入力
     """
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent):
         tk.Frame.__init__(self, parent)
-        self.controller = controller
 
         caption = tk.Label(self, text="初めてのご利用の方は進呈ポイントをショートメールでお知らせします。",
                            wraplength=(WINDOW_WIDTH - PADDING * 2), justify="left", height=2, padx=PADDING)
@@ -436,21 +434,20 @@ class TelEntry(tk.Frame):
     def show_num_keys(self, event):
         context.entry_caption.set("電話番号入力")
         context.after_entry = "TelEntry"
-        self.controller.show_frame("NumKeys")
+        app.show_frame("NumKeys")
 
 
     def show_sales_entry(self):
         context.entry_text.set("")
-        self.controller.show_frame("SalesEntry")
+        app.show_frame("SalesEntry")
 
 
 class SalesEntry(tk.Frame):
     """会計金額入力
     """
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent):
         tk.Frame.__init__(self, parent)
-        self.controller = controller
 
         label = tk.Label(self, text="会計金額入力")
         label.pack(side="top", fill="x")
@@ -465,7 +462,7 @@ class SalesEntry(tk.Frame):
         point_entry.pack(side="top", fill="x")
 
         button = tk.Button(self, text="付与確定",
-                           command=lambda: controller.frames["Finish"].show("流通ポイントを付与しました。"))
+                           command=lambda: app.frames["Finish"].show("流通ポイントを付与しました。"))
         button.pack(side="top")
         button.focus_set()
 
@@ -475,7 +472,7 @@ class SalesEntry(tk.Frame):
     def show_num_keys(self, event):
         context.entry_caption.set("会計金額入力")
         context.after_entry = "SalesEntry"
-        self.controller.show_frame("NumKeys")
+        app.show_frame("NumKeys")
 
 
     def calc_point(self, sales):
@@ -520,9 +517,8 @@ class NumKeys(tk.Frame):
     """ソフトキーボード
     """
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent):
         tk.Frame.__init__(self, parent)
-        self.controller = controller
 
         caption = tk.Label(self, textvariable=context.entry_caption)
         caption.pack(side="top", fill="x")
@@ -564,19 +560,18 @@ class NumKeys(tk.Frame):
     def enter_tel(self):
         # FIXME: 入力内容によって処理が分岐するのは望ましくない。要:画面遷移の見直し
         if context.entry_caption.get() == u"会計金額入力":
-            point_num = self.controller.frames["SalesEntry"].calc_point(context.entry_text.get())
+            point_num = app.frames["SalesEntry"].calc_point(context.entry_text.get())
             context.point_num.set(point_num)
 
-        self.controller.show_frame(context.after_entry)
+        app.show_frame(context.after_entry)
 
 
 class Finish(tk.Frame):
     """完了
     """
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent):
         tk.Frame.__init__(self, parent)
-        self.controller = controller
 
         caption = tk.Label(self, textvariable=context.finish_message)
         caption.pack(side="top", fill="x")
@@ -587,8 +582,8 @@ class Finish(tk.Frame):
         @param duration 表示時間(単位は秒)
         """
         context.finish_message.set(message)
-        self.controller.show_frame("Finish")
-        self.after(duration * 1000, lambda: self.controller.show_frame("Menu"))
+        app.show_frame("Finish")
+        self.after(duration * 1000, lambda: app.show_frame("Menu"))
 
 
 class MapApp(tk.Tk):
@@ -635,7 +630,7 @@ class MapApp(tk.Tk):
         self.frames = {}
         for F in MapApp.SCREENS:
             scr_name = F.__name__
-            frame = F(parent=container, controller=self)
+            frame = F(parent=container)
             self.frames[scr_name] = frame
 
             frame.grid(row=0, column=0, sticky="nsew")
