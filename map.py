@@ -79,19 +79,19 @@ class Menu(tk.Frame):
                 }
             }
 
-        app.log("POST {}".format(url))
-        app.log(json.dumps(data))
+        app.log("POST {}".format(url), "INFO")
+        app.log(json.dumps(data), "INFO")
         resp = requests.post(url, data=json.dumps(data), headers=headers)
 
         if resp.status_code == 200:
-            app.log(resp.text)
+            app.log(resp.text, "INFO")
             resp_data = resp.json()
             if resp_data["result"] == "success":
                 return True
             else:
                 return False
         else:
-            app.log(resp.status_code)
+            app.log(resp.status_code, "WARNING")
             return False
 
 
@@ -120,7 +120,7 @@ class CoupointScan(tk.Frame):
 
 
     def start_scan(self, event = None):
-        app.log("start_scan")
+        app.log("start_scan", "INFO")
         self.on_scan = True
         self.capture = cv2.VideoCapture(0)
         self.after(100, self.update_preview)
@@ -131,7 +131,7 @@ class CoupointScan(tk.Frame):
             return
         ret, frame = self.capture.read()
         if not ret:
-            app.log("No capture")
+            app.log("No capture", "WARNING")
             return
 
         app.log("Update preview start")
@@ -141,7 +141,7 @@ class CoupointScan(tk.Frame):
         self.decoded = decode(self.image) ###
         if self.decoded:
             for code in self.decoded:
-                app.log(code)
+                app.log(code, "INFO")
                 self.after_scan(code.data)
 #                 self.preview.create_text(PREVIEW_OFFSET_X, PREVIEW_OFFSET_Y, text=code.data, tag="code") ###
                 return
@@ -222,20 +222,20 @@ class CoupointShow(tk.Frame):
                 }
             }
 
-        app.log("POST {}".format(url))
-        app.log(json.dumps(data))
+        app.log("POST {}".format(url), "INFO")
+        app.log(json.dumps(data), "INFO")
         resp = requests.post(url, data=json.dumps(data), headers=headers)
 
         if resp.status_code == 200:
-            app.log(resp.text)
+            app.log(resp.text, "INFO")
             resp_data = resp.json()
             if resp_data["result"] == "regist":
                 return resp_data["carousel"]
             else:
-                app.log(resp_data["result"])
+                app.log(resp_data["result"], "WARNING")
                 return None
         else:
-            app.log(resp.status_code)
+            app.log(resp.status_code, "WARNING")
             return None
 
 
@@ -309,16 +309,16 @@ class CardSelect(tk.Frame):
                 }
             }
 
-        app.log("POST {}".format(url))
-        app.log(json.dumps(data))
+        app.log("POST {}".format(url), "INFO")
+        app.log(json.dumps(data), "INFO")
         resp = requests.post(url, data=json.dumps(data), headers=headers)
 
         if resp.status_code == 200:
-            app.log(resp.text)
+            app.log(resp.text, "INFO")
             resp_data = resp.json()
             return resp_data["clients"]
         else:
-            app.log(resp.status_code)
+            app.log(resp.status_code, "WARNING")
             return None
 
 
@@ -330,7 +330,7 @@ class CardSelect(tk.Frame):
             file_path = os.path.join(IMAGE_DIR, "{}.png".format(client["client_cd"]))
             with open(file_path, "wb") as f:
                 f.write(resp.content)
-                app.log("Download image: {}".format(file_path))
+                app.log("Download image: {}".format(file_path), "INFO")
 
             image = Image.open(file_path)
             image = ImageTk.PhotoImage(image.resize((48, 48)))
@@ -363,16 +363,16 @@ class CardSelect(tk.Frame):
                 }
             }
 
-        app.log("POST {}".format(url))
-        app.log(json.dumps(data))
+        app.log("POST {}".format(url), "INFO")
+        app.log(json.dumps(data), "INFO")
         resp = requests.post(url, data=json.dumps(data), headers=headers)
 
         if resp.status_code == 200 or resp.status_code == 404:
-            app.log(resp.text)
+            app.log(resp.text, "INFO")
             resp_data = resp.json()
             return resp_data["result"]
         else:
-            app.log(resp.status_code)
+            app.log(resp.status_code, "WARNING")
             return None
 
 
@@ -481,19 +481,19 @@ class SalesEntry(tk.Frame):
                 }
             }
 
-        app.log("POST {}".format(url))
-        app.log(json.dumps(data))
+        app.log("POST {}".format(url), "INFO")
+        app.log(json.dumps(data), "INFO")
         resp = requests.post(url, data=json.dumps(data), headers=headers)
 
         if resp.status_code == 200:
-            app.log(resp.text)
+            app.log(resp.text, "INFO")
             resp_data = resp.json()
             if resp_data["result"]:
                 return resp_data["result"]
             else:
                 return None
         else:
-            app.log(resp.status_code)
+            app.log(resp.status_code, "WARNING")
             return None
 
 
@@ -624,6 +624,7 @@ class MapApp(tk.Tk):
 
 
     def show_frame(self, scr_name):
+        app.log("Show {}".format(scr_name))
         frame = self.frames[scr_name]
         frame.tkraise()
 
