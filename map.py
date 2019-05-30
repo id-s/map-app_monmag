@@ -436,7 +436,7 @@ class CardScan(tk.Frame):
         actions.columnconfigure(1, weight=1)
         actions.pack(side="bottom", fill="x")
 
-        button1 = tk.Button(actions, text="次へ", command=self.next)
+        button1 = tk.Button(actions, text="(次へ)", command=self.next)
         button1.grid(column=0, row=0, sticky="nswe")
         button1.focus_set()
 
@@ -514,7 +514,9 @@ class Policy2(tk.Frame):
 
 
     def next(self):
-        app.show_frame("TelEntry")
+        context.entry_caption.set("電話番号入力")
+        context.after_entry = "TelEntry"
+        app.frames["TelEntry"].show_num_keys()
 
 
 class TelEntry(tk.Frame):
@@ -534,6 +536,10 @@ class TelEntry(tk.Frame):
         tel_entry = tk.Entry(self, textvariable=context.entry_text, font=default_font)
         tel_entry.pack(side="top", fill="x")
 
+        caption = tk.Label(self, text="上記電話番号にショートメールでお知らせします。",
+                           wraplength=(WINDOW_WIDTH - PADDING * 2), justify="left", height=2, padx=PADDING)
+        caption.pack(side="top", fill="x")
+
         actions = tk.Frame(self)
         actions.columnconfigure(0, weight=1)
         actions.columnconfigure(1, weight=1)
@@ -551,7 +557,7 @@ class TelEntry(tk.Frame):
         tel_entry.bind("<FocusIn>", self.show_num_keys)
 
 
-    def show_num_keys(self, event):
+    def show_num_keys(self, event = None):
         context.entry_caption.set("電話番号入力")
         context.after_entry = "TelEntry"
         app.show_frame("NumKeys")
@@ -559,7 +565,7 @@ class TelEntry(tk.Frame):
 
     def show_sales_entry(self):
         context.entry_text.set("")
-        app.show_frame("SalesEntry")
+        app.frames["SalesEntry"].show_num_keys()
 
 
 class SalesEntry(tk.Frame):
@@ -583,13 +589,13 @@ class SalesEntry(tk.Frame):
 
         button = tk.Button(self, textvariable=context.sales_entry_button_text,
                            command=lambda: app.frames["Finish"].show())
-        button.pack(side="bottom")
+        button.pack(side="bottom", fill="x")
         button.focus_set()
 
         sales_entry.bind("<FocusIn>", self.show_num_keys)
 
 
-    def show_num_keys(self, event):
+    def show_num_keys(self, event = None):
         context.entry_caption.set("会計金額入力")
         context.after_entry = "SalesEntry"
         app.show_frame("NumKeys")
