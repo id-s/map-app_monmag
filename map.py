@@ -409,7 +409,7 @@ class CardSelect(tk.Frame):
             if context.exec_name == "add_point":
                 result = self.check_card()
                 if result == "tel":
-                    app.show_frame("Policy1")
+                    app.show_frame("CardScan")
                 elif result == "price":
                     app.show_frame("SalesEntry")
                 else:
@@ -419,6 +419,33 @@ class CardSelect(tk.Frame):
                     app.show_frame("SalesEntry")
 
         return func
+
+
+class CardScan(tk.Frame):
+    """カードスキャン
+    """
+
+    def __init__(self, parent):
+        tk.Frame.__init__(self, parent)
+
+        caption = tk.Label(self, text="カードをスキャンしてください。")
+        caption.pack(side="top", fill="x")
+
+        actions = tk.Frame(self)
+        actions.columnconfigure(0, weight=1)
+        actions.columnconfigure(1, weight=1)
+        actions.pack(side="bottom", fill="x")
+
+        button1 = tk.Button(actions, text="次へ", command=self.next)
+        button1.grid(column=0, row=0, sticky="nswe")
+        button1.focus_set()
+
+        button2 = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        button2.grid(column=1, row=0, sticky="nswe")
+
+
+    def next(self):
+        app.show_frame("Policy1")
 
 
 class Policy1(tk.Frame):
@@ -683,6 +710,7 @@ class MapApp(tk.Tk):
                CoupointShow, # クーポイント詳細
                CmdSelect, # 流通ポイント処理選択
                CardSelect, # カード選択
+               CardScan, # カードスキャン
                Policy1, # ポリシー表示1
                Policy2, # ポリシー表示2
                TelEntry, # 電話番号入力
