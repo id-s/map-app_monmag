@@ -10,6 +10,7 @@ import locale
 import os
 import requests
 import subprocess
+import textwrap
 import time
 import xml.etree.ElementTree as ET
 from datetime import datetime
@@ -392,12 +393,81 @@ class CardSelect(tk.Frame):
             context.selected_client = client_cd
             result = self.check_card()
             if result == "tel":
-                app.show_frame("TelEntry")
+                app.show_frame("Policy1")
             elif result == "price":
                 app.show_frame("SalesEntry")
             else:
                 messagebox.showerror("エラー", "エラーが発生しました。")
         return func
+
+
+class Policy1(tk.Frame):
+    """ポリシー表示1
+    """
+
+    def __init__(self, parent):
+        tk.Frame.__init__(self, parent)
+
+        caption_text = """
+            お得なクーポン満載「MyShop」への入会案内メッセージを携帯電話にお送りしますか？
+
+            事業者名：マギー株式会社
+            個人情報保護管理者：○○本部長 XXX-XXX-XXXX
+
+            入力された情報は、本目的のみに利用いたします。
+            """
+        caption = tk.Label(self, text=textwrap.dedent(caption_text), font=body_font,
+                           wraplength=(WINDOW_WIDTH - PADDING * 2), justify="left", height=12, padx=PADDING)
+        caption.pack(side="top", fill="x")
+
+        actions = tk.Frame(self)
+        actions.columnconfigure(0, weight=1)
+        actions.columnconfigure(1, weight=1)
+        actions.pack(side="bottom", fill="x")
+
+        button1 = tk.Button(actions, text="次へ", command=self.next)
+        button1.grid(column=0, row=0, sticky="nswe")
+        button1.focus_set()
+
+        button2 = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        button2.grid(column=1, row=0, sticky="nswe")
+
+
+    def next(self):
+        app.show_frame("Policy2")
+
+
+class Policy2(tk.Frame):
+    """ポリシー表示2
+    """
+
+    def __init__(self, parent):
+        tk.Frame.__init__(self, parent)
+
+        caption_text = """
+            （続き）
+            入力された情報の第三者提供は行いません。本事業の運用業務を他社に委託する場合があります。
+            情報のご提供は任意です。ご提供いただけない場合、MyShopサービスへの入会案内メッセージはお送りいたしません。
+            """
+        caption = tk.Label(self, text=textwrap.dedent(caption_text), font=body_font,
+                           wraplength=(WINDOW_WIDTH - PADDING * 2), justify="left", height=12, padx=PADDING)
+        caption.pack(side="top", fill="x")
+
+        actions = tk.Frame(self)
+        actions.columnconfigure(0, weight=1)
+        actions.columnconfigure(1, weight=1)
+        actions.pack(side="bottom", fill="x")
+
+        button1 = tk.Button(actions, text="同意する", command=self.next)
+        button1.grid(column=0, row=0, sticky="nswe")
+        button1.focus_set()
+
+        button2 = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        button2.grid(column=1, row=0, sticky="nswe")
+
+
+    def next(self):
+        app.show_frame("TelEntry")
 
 
 class TelEntry(tk.Frame):
@@ -407,9 +477,9 @@ class TelEntry(tk.Frame):
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
 
-        caption = tk.Label(self, text="初めてのご利用の方は進呈ポイントをショートメールでお知らせします。",
-                           wraplength=(WINDOW_WIDTH - PADDING * 2), justify="left", height=2, padx=PADDING)
-        caption.pack(side="top", fill="x")
+#         caption = tk.Label(self, text="初めてのご利用の方は進呈ポイントをショートメールでお知らせします。",
+#                            wraplength=(WINDOW_WIDTH - PADDING * 2), justify="left", height=2, padx=PADDING)
+#         caption.pack(side="top", fill="x")
 
         label = tk.Label(self, text="電話番号入力")
         label.pack(side="top", fill="x")
@@ -594,11 +664,14 @@ class MapApp(tk.Tk):
                CoupointShow, # クーポイント詳細
                CmdSelect, # 流通ポイント処理選択
                CardSelect, # カード選択
+               Policy1, # ポリシー表示1
+               Policy2, # ポリシー表示2
                TelEntry, # 電話番号入力
                SalesEntry, # 会計金額入力
                NumKeys, # ソフトキーボード
                Finish, # 完了
                )
+
 
     def build(self):
         self.title("MAP")
