@@ -74,7 +74,7 @@ class Menu(tk.Frame):
 
         macaddress = context.get_macaddress()
         serialno = context.get_serialno()
-        print("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
+        app.log("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
         data = {
             "terminal": {
                 "macaddr": "48:a9:e9:dc:e2:65", #"00:00:00:00:00:00", # TODO:取得情報に差し替え
@@ -82,19 +82,19 @@ class Menu(tk.Frame):
                 }
             }
 
-        print("POST {}".format(url))
-        print(json.dumps(data))
+        app.log("POST {}".format(url))
+        app.log(json.dumps(data))
         resp = requests.post(url, data=json.dumps(data), headers=headers)
 
         if resp.status_code == 200:
-            print(resp.text)
+            app.log(resp.text)
             resp_data = resp.json()
             if resp_data["result"] == "success":
                 return True
             else:
                 return False
         else:
-            print(resp.status_code)
+            app.log(resp.status_code)
             return False
 
 
@@ -123,7 +123,7 @@ class CoupointScan(tk.Frame):
 
 
     def start_scan(self, event = None):
-        print("{}: start_scan".format(datetime.now()))
+        app.log("start_scan")
         self.on_scan = True
         self.capture = cv2.VideoCapture(0)
         self.after(100, self.update_preview)
@@ -134,33 +134,32 @@ class CoupointScan(tk.Frame):
             return
         ret, frame = self.capture.read()
         if not ret:
-            print("No capture")
+            app.log("No capture")
             return
 
-        print("{}: Update preview start".format(datetime.now()))
+        app.log("Update preview start")
         self.image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         if APP_ENV == "Monmag":
             self.image = self.image.transpose(1,0,2)[::-1] # -90度回転、詳細は https://qiita.com/matsu_mh/items/54b09273aef79ae027bc 参照
         self.decoded = decode(self.image) ###
         if self.decoded:
             for code in self.decoded:
-                print(code)
+                app.log(code)
                 self.after_scan(code.data)
 #                 self.preview.create_text(PREVIEW_OFFSET_X, PREVIEW_OFFSET_Y, text=code.data, tag="code") ###
                 return
 
         self.image = Image.fromarray(self.image)
         self.image = ImageTk.PhotoImage(self.image)
-#         print("w:{} x h:{}".format(self.image.width(), self.image.height())) ###
+#         app.log("w:{} x h:{}".format(self.image.width(), self.image.height())) ###
         self.preview.create_image(PREVIEW_OFFSET_X, PREVIEW_OFFSET_Y, image=self.image)
-        print("{}: Update preview end".format(datetime.now()))
-#         print("Update preview")
+        app.log("Update preview end")
 
         self.after(100, self.update_preview)
 
 
     def after_scan(self, data):
-        print("after_scan")
+        app.log("after_scan")
         coupoint_show = app.frames["CoupointShow"]
         decoded_data = coupoint_show.parse_decoded_data(data)
 
@@ -180,7 +179,7 @@ class CoupointScan(tk.Frame):
 
 
     def back_menu(self):
-        print("back_menu")
+        app.log("back_menu")
         self.on_scan = False
         self.preview.delete("code")
         self.capture.release()
@@ -216,8 +215,8 @@ class CoupointShow(tk.Frame):
 
         macaddress = context.get_macaddress()
         serialno = context.get_serialno()
-        print("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
-        print("customer_id:{}, carousel_id:{}".format(decoded_data["customer_id"], decoded_data["carousel_id"])) ###
+        app.log("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
+        app.log("customer_id:{}, carousel_id:{}".format(decoded_data["customer_id"], decoded_data["carousel_id"])) ###
         data = {
             "terminal": {
                 "macaddr": "48:a9:e9:dc:e2:65", #"00:00:00:00:00:00", # TODO:取得情報に差し替え
@@ -229,20 +228,20 @@ class CoupointShow(tk.Frame):
                 }
             }
 
-        print("POST {}".format(url))
-        print(json.dumps(data))
+        app.log("POST {}".format(url))
+        app.log(json.dumps(data))
         resp = requests.post(url, data=json.dumps(data), headers=headers)
 
         if resp.status_code == 200:
-            print(resp.text)
+            app.log(resp.text)
             resp_data = resp.json()
             if resp_data["result"] == "regist":
                 return resp_data["carousel"]
             else:
-                print(resp_data["result"])
+                app.log(resp_data["result"])
                 return None
         else:
-            print(resp.status_code)
+            app.log(resp.status_code)
             return None
 
 
@@ -311,7 +310,7 @@ class CardSelect(tk.Frame):
 
         macaddress = context.get_macaddress()
         serialno = context.get_serialno()
-        print("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
+        app.log("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
         data = {
             "terminal": {
                 "macaddr": "48:a9:e9:dc:e2:65", #"00:00:00:00:00:00", # TODO:取得情報に差し替え
@@ -319,16 +318,16 @@ class CardSelect(tk.Frame):
                 }
             }
 
-        print("POST {}".format(url))
-        print(json.dumps(data))
+        app.log("POST {}".format(url))
+        app.log(json.dumps(data))
         resp = requests.post(url, data=json.dumps(data), headers=headers)
 
         if resp.status_code == 200:
-            print(resp.text)
+            app.log(resp.text)
             resp_data = resp.json()
             return resp_data["clients"]
         else:
-            print(resp.status_code)
+            app.log(resp.status_code)
             return None
 
 
@@ -340,7 +339,7 @@ class CardSelect(tk.Frame):
             file_path = os.path.join(IMAGE_DIR, "{}.png".format(client["client_cd"]))
             with open(file_path, "wb") as f:
                 f.write(resp.content)
-                print("Download image: {}".format(file_path))
+                app.log("Download image: {}".format(file_path))
 
             image = Image.open(file_path)
             image = ImageTk.PhotoImage(image.resize((48, 48)))
@@ -363,7 +362,7 @@ class CardSelect(tk.Frame):
 
         macaddress = context.get_macaddress()
         serialno = context.get_serialno()
-        print("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
+        app.log("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
         data = {
             "terminal": {
                 "macaddr": "48:a9:e9:dc:e2:65", #"00:00:00:00:00:00", # TODO:取得情報に差し替え
@@ -376,16 +375,16 @@ class CardSelect(tk.Frame):
                 }
             }
 
-        print("POST {}".format(url))
-        print(json.dumps(data))
+        app.log("POST {}".format(url))
+        app.log(json.dumps(data))
         resp = requests.post(url, data=json.dumps(data), headers=headers)
 
         if resp.status_code == 200 or resp.status_code == 404:
-            print(resp.text)
+            app.log(resp.text)
             resp_data = resp.json()
             return resp_data["result"]
         else:
-            print(resp.status_code)
+            app.log(resp.status_code)
             return None
 
 
@@ -394,7 +393,7 @@ class CardSelect(tk.Frame):
         http://memopy.hatenadiary.jp/entry/2017/06/11/220452 を参考に実装した。
         """
         def func():
-            print("Select card:{}".format(client_cd))
+            app.log("Select card:{}".format(client_cd))
             context.selected_client = client_cd
             result = self.check_card()
             if result == "tel":
@@ -483,7 +482,7 @@ class SalesEntry(tk.Frame):
 
         macaddress = context.get_macaddress()
         serialno = context.get_serialno()
-        print("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
+        app.log("macaddress:{}, serialno:{}".format(macaddress, serialno)) ###
         data = {
             "terminal": {
                 "macaddr": "48:a9:e9:dc:e2:65", #"00:00:00:00:00:00", # TODO:取得情報に差し替え
@@ -497,19 +496,19 @@ class SalesEntry(tk.Frame):
                 }
             }
 
-        print("POST {}".format(url))
-        print(json.dumps(data))
+        app.log("POST {}".format(url))
+        app.log(json.dumps(data))
         resp = requests.post(url, data=json.dumps(data), headers=headers)
 
         if resp.status_code == 200:
-            print(resp.text)
+            app.log(resp.text)
             resp_data = resp.json()
             if resp_data["result"]:
                 return resp_data["result"]
             else:
                 return None
         else:
-            print(resp.status_code)
+            app.log(resp.status_code)
             return None
 
 
@@ -612,7 +611,7 @@ class MapApp(tk.Tk):
         global default_font, header_font, body_font
         default_font = font.nametofont("TkDefaultFont")
         default_font.configure(family="Droid Sans Japanese", size=FONT_SIZE)
-        # print(font.families()) ###
+        # app.log(font.families()) ###
 
         header_font = font.Font(self, family="Droid Sans Japanese", size=int(FONT_SIZE*0.8))
         body_font = font.Font(self, family="Droid Sans Japanese", size=int(FONT_SIZE*0.6))
@@ -644,8 +643,12 @@ class MapApp(tk.Tk):
         frame.tkraise()
 
 
-    def debug(self, content):
-        print(content)
+    def log(self, content, level="DEBUG"):
+        """ログ出力
+        """
+        if (not ON_DEBUG) and level == "DEBUG":
+            return
+        print("{} [{}] {}".format(datetime.now(), level, content))
 
 
 class Context():
