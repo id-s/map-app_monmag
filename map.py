@@ -705,6 +705,7 @@ class Finish(tk.Frame):
         @param duration 表示時間(単位は秒)
         """
         app.show_frame("Finish")
+        context.clear(excepts=["finish_message"])
         self.after(duration * 1000, lambda: app.show_frame("Menu"))
 
 
@@ -821,6 +822,35 @@ class Context():
 
         # 完了画面に表示する文言
         self.finish_message = tk.StringVar()
+
+
+    def clear(self, excepts=[]):
+        if not "exec_name" in excepts:
+            self.exec_name = None
+
+        if not "selected_client" in excepts:
+            self.selected_client = None
+
+        if not "after_entry" in excepts:
+            self.after_entry = None
+
+        if not "scanned_card_no" in excepts:
+            self.scanned_card_no = None
+
+        if not "entry_caption" in excepts:
+            self.entry_caption.set("")
+
+        if not "entry_text" in excepts:
+            self.entry_text.set("")
+
+        if not "point_num" in excepts:
+            self.point_num.set("")
+
+        if not "sales_entry_button_text" in excepts:
+            self.sales_entry_button_text.set("")
+
+        if not "finish_message" in excepts:
+            self.finish_message.set("")
 
 
     def _get_serialno(self):
