@@ -363,6 +363,42 @@ class CardSelect(tk.Frame):
         button.pack(fill="x")
 
 
+    def select_card(self, client_cd):
+        """カード選択時の処理
+        http://memopy.hatenadiary.jp/entry/2017/06/11/220452 を参考に実装した。
+        """
+        def func():
+            app.log("Select card:{}".format(client_cd))
+            context.selected_client = client_cd
+
+            app.show_frame("CardScan")
+
+        return func
+
+
+class CardScan(tk.Frame):
+    """カードスキャン
+    """
+
+    def __init__(self, parent):
+        tk.Frame.__init__(self, parent)
+
+        caption = tk.Label(self, text="カードをスキャンしてください。")
+        caption.pack(side="top", fill="x")
+
+        actions = tk.Frame(self)
+        actions.columnconfigure(0, weight=1)
+        actions.columnconfigure(1, weight=1)
+        actions.pack(side="bottom", fill="x")
+
+        button1 = tk.Button(actions, text="(次へ)", command=self.next)
+        button1.grid(column=0, row=0, sticky="nswe")
+        button1.focus_set()
+
+        button2 = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        button2.grid(column=1, row=0, sticky="nswe")
+
+
     def check_card(self):
         """カードのチェック
         @return "tel": 初回利用(次に電話番号入力画面を表示)
@@ -398,54 +434,18 @@ class CardSelect(tk.Frame):
             return None
 
 
-    def select_card(self, client_cd):
-        """カード選択時の処理
-        http://memopy.hatenadiary.jp/entry/2017/06/11/220452 を参考に実装した。
-        """
-        def func():
-            app.log("Select card:{}".format(client_cd))
-            context.selected_client = client_cd
-
-            if context.exec_name == "add_point":
-                result = self.check_card()
-                if result == "tel":
-                    app.show_frame("CardScan")
-                elif result == "price":
-                    app.show_frame("SalesEntry")
-                else:
-                    messagebox.showerror("エラー", "エラーが発生しました。")
-
-            elif context.exec_name == "cancel_point":
-                    app.show_frame("SalesEntry")
-
-        return func
-
-
-class CardScan(tk.Frame):
-    """カードスキャン
-    """
-
-    def __init__(self, parent):
-        tk.Frame.__init__(self, parent)
-
-        caption = tk.Label(self, text="カードをスキャンしてください。")
-        caption.pack(side="top", fill="x")
-
-        actions = tk.Frame(self)
-        actions.columnconfigure(0, weight=1)
-        actions.columnconfigure(1, weight=1)
-        actions.pack(side="bottom", fill="x")
-
-        button1 = tk.Button(actions, text="(次へ)", command=self.next)
-        button1.grid(column=0, row=0, sticky="nswe")
-        button1.focus_set()
-
-        button2 = tk.Button(actions, text="キャンセル", command=app.back_menu)
-        button2.grid(column=1, row=0, sticky="nswe")
-
-
     def next(self):
-        app.show_frame("Policy1")
+        if context.exec_name == "add_point":
+            result = self.check_card()
+            if result == "tel":
+                app.show_frame("Policy1")
+            elif result == "price":
+                app.show_frame("SalesEntry")
+            else:
+                messagebox.showerror("エラー", "エラーが発生しました。")
+
+        elif context.exec_name == "cancel_point":
+                app.show_frame("SalesEntry")
 
 
 class Policy1(tk.Frame):
