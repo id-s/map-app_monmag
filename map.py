@@ -182,6 +182,8 @@ class CoupointScan(tk.Frame):
 
     def back_menu(self):
         app.log("back_menu")
+        app.play("button")
+
         self.on_scan = False
         self.preview.delete("code")
         self.capture.release()
@@ -270,6 +272,8 @@ class CoupointShow(tk.Frame):
 
 
     def use_coupoint(self):
+        app.play("button")
+
         self.clear_coupoint()
         app.show_frame("Menu")
 
@@ -291,6 +295,8 @@ class CmdSelect(tk.Frame):
 
 
     def add_point_button_clicked(self):
+        app.play("button")
+
         context.exec_name = "add_point"
         context.sales_entry_button_text.set("付与確定")
         context.finish_message.set("流通ポイントを付与しました。")
@@ -298,6 +304,8 @@ class CmdSelect(tk.Frame):
 
 
     def cancel_point_button_clicked(self):
+        app.play("button")
+
         context.exec_name = "cancel_point"
         context.sales_entry_button_text.set("取消確定")
         context.finish_message.set("付与した流通ポイントを取消しました。")
@@ -370,6 +378,8 @@ class CardSelect(tk.Frame):
         http://memopy.hatenadiary.jp/entry/2017/06/11/220452 を参考に実装した。
         """
         def func():
+            app.play("button")
+
             app.log("Select card:{}".format(client_cd))
             context.selected_client = client_cd
 
@@ -437,6 +447,8 @@ class CardScan(tk.Frame):
 
 
     def next(self):
+        app.play("button")
+
         if context.exec_name == "add_point":
             result = self.check_card()
             if result == "tel":
@@ -483,6 +495,8 @@ class Policy1(tk.Frame):
 
 
     def next(self):
+        app.play("button")
+
         app.show_frame("Policy2")
 
 
@@ -516,6 +530,8 @@ class Policy2(tk.Frame):
 
 
     def next(self):
+        app.play("button")
+
         context.entry_caption.set("電話番号入力")
         context.after_entry = "TelEntry"
         app.frames["TelEntry"].show_num_keys()
@@ -566,6 +582,8 @@ class TelEntry(tk.Frame):
 
 
     def show_sales_entry(self):
+        app.play("button")
+
         context.entry_text.set("")
         app.frames["SalesEntry"].show_num_keys()
 
@@ -589,8 +607,7 @@ class SalesEntry(tk.Frame):
         point_entry = tk.Entry(self, textvariable=context.point_num, font=default_font)
         point_entry.pack(side="top", fill="x")
 
-        button = tk.Button(self, textvariable=context.sales_entry_button_text,
-                           command=lambda: app.frames["Finish"].show())
+        button = tk.Button(self, textvariable=context.sales_entry_button_text, command=self.show_finish)
         button.pack(side="bottom", fill="x")
         button.focus_set()
 
@@ -638,6 +655,12 @@ class SalesEntry(tk.Frame):
             return None
 
 
+    def show_finish(self):
+        app.sound("button")
+
+        app.frames["Finish"].show()
+
+
 class NumKeys(tk.Frame):
     """ソフトキーボード
     """
@@ -676,13 +699,17 @@ class NumKeys(tk.Frame):
 
 
     def add_num(self, num):
+        app.play("button")
         context.entry_text.set(context.entry_text.get() + num)
 
 
     def del_num(self):
+        app.play("button")
         context.entry_text.set(context.entry_text.get()[:-1])
 
     def enter_tel(self):
+        app.play("button")
+
         # FIXME: 入力内容によって処理が分岐するのは望ましくない。要:画面遷移の見直し
         if context.entry_caption.get() == u"会計金額入力":
             point_num = app.frames["SalesEntry"].calc_point(context.entry_text.get())
@@ -775,6 +802,8 @@ class MapApp(tk.Tk):
 
 
     def back_menu(self):
+        app.play("button")
+
         context.exec_name = None
         app.show_frame("Menu")
 
