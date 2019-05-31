@@ -453,12 +453,12 @@ class CardScan(tk.Frame):
             if result == "tel":
                 app.show_frame("Policy1")
             elif result == "price":
-                app.show_frame("SalesEntry")
+                app.frames["SalesEntry"].show_num_keys()
             else:
                 app.showerror("エラー", "エラーが発生しました。")
 
         elif context.exec_name == "cancel_point":
-                app.show_frame("SalesEntry")
+                app.frames["SalesEntry"].show_num_keys()
 
 
 class Policy1(tk.Frame):
