@@ -606,9 +606,17 @@ class SalesEntry(tk.Frame):
         point_entry = tk.Entry(self, textvariable=context.point_num, font=default_font)
         point_entry.pack(side="top", fill="x")
 
-        button = tk.Button(self, textvariable=context.sales_entry_button_text, command=self.show_finish)
-        button.pack(side="bottom", fill="x")
-        button.focus_set()
+        actions = tk.Frame(self)
+        actions.columnconfigure(0, weight=1)
+        actions.columnconfigure(1, weight=1)
+        actions.pack(side="bottom", fill="x")
+
+        button1 = tk.Button(actions, textvariable=context.sales_entry_button_text, command=self.show_finish)
+        button1.grid(column=0, row=0, sticky="nswe")
+        button1.focus_set()
+
+        button2 = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        button2.grid(column=1, row=0, sticky="nswe")
 
         sales_entry.bind("<FocusIn>", self.show_num_keys)
 
