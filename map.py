@@ -66,8 +66,7 @@ class Menu(tk.Frame):
             app.frames["CoupointScan"].start_scan()
             app.show_frame("CoupointScan")
         else:
-            # FIXME: ダイアログの最大化ボタン他を消したいが、指定不可？　他同様
-            messagebox.showerror("クーポイントエラー", "この店舗でご利用できるクーポイントはありません。")
+            app.showerror("クーポイントエラー", "この店舗でご利用できるクーポイントはありません。")
 
 
     def check_coupoint(self):
@@ -175,7 +174,7 @@ class CoupointScan(tk.Frame):
             self.capture.release()
             app.show_frame("CoupointShow")
         else:
-            messagebox.showerror("クーポイントエラー", "このQRコードはクーポイントではありません。")
+            app.showerror("クーポイントエラー", "このQRコードはクーポイントではありません。")
 
             self.after(500, self.update_preview)
 
@@ -456,7 +455,7 @@ class CardScan(tk.Frame):
             elif result == "price":
                 app.show_frame("SalesEntry")
             else:
-                messagebox.showerror("エラー", "エラーが発生しました。")
+                app.showerror("エラー", "エラーが発生しました。")
 
         elif context.exec_name == "cancel_point":
                 app.show_frame("SalesEntry")
@@ -806,6 +805,15 @@ class MapApp(tk.Tk):
 
         context.exec_name = None
         app.show_frame("Menu")
+
+
+    def showerror(self, title, message):
+        """エラーダイアログを表示する
+        """
+        app.play("failure")
+
+        # FIXME: ダイアログの最大化ボタン他を消したいが、指定不可？　他同様
+        messagebox.showerror(title, message)
 
 
     def beep(self):
