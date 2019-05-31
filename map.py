@@ -168,7 +168,7 @@ class CoupointScan(tk.Frame):
         decoded_data = coupoint_show.parse_decoded_data(data)
 
         if decoded_data:
-            app.beep()
+            app.play("success")
             coupoint = coupoint_show.get_coupoint(decoded_data)
             coupoint_show.show_coupoint(coupoint)
             self.on_scan = False
@@ -781,6 +781,7 @@ class MapApp(tk.Tk):
 
     def beep(self):
         """ビープ音を鳴らす
+        @deprecated: Monmag(Raspberry Pi)ではこの方法で鳴らせませんでした。
         """
         if APP_ENV == "Monmag":
             print("\007")
