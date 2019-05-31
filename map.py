@@ -655,7 +655,7 @@ class SalesEntry(tk.Frame):
 
 
     def show_finish(self):
-        app.sound("button")
+        app.play("button")
 
         app.frames["Finish"].show()
 
