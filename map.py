@@ -59,6 +59,8 @@ class Menu(tk.Frame):
 
 
     def show_coupoint_scan(self):
+        app.play("button")
+
         if self.check_coupoint():
             context.exec_name = "coupoint"
             app.frames["CoupointScan"].start_scan()
@@ -98,6 +100,8 @@ class Menu(tk.Frame):
 
 
     def show_cmd_select(self):
+        app.play("button")
+
         # context.exec_nameは次の画面で決定する
         app.show_frame("CmdSelect")
 
@@ -164,9 +168,7 @@ class CoupointScan(tk.Frame):
         decoded_data = coupoint_show.parse_decoded_data(data)
 
         if decoded_data:
-            if APP_ENV == "Monmag":
-                sound_file = os.path.abspath(os.path.join(SOUND_DIR, "button.wav"))
-                subprocess.call(["aplay", sound_file])
+            app.beep()
             coupoint = coupoint_show.get_coupoint(decoded_data)
             coupoint_show.show_coupoint(coupoint)
             self.on_scan = False
@@ -775,6 +777,21 @@ class MapApp(tk.Tk):
     def back_menu(self):
         context.exec_name = None
         app.show_frame("Menu")
+
+
+    def beep(self):
+        """ビープ音を鳴らす
+        """
+        if APP_ENV == "Monmag":
+            print("\007")
+
+
+    def play(self, sound_name):
+        """サウンドを再生する
+        """
+        if APP_ENV == "Monmag":
+            sound_file = os.path.abspath(os.path.join(SOUND_DIR, "{}.wav".format(sound_name)))
+            subprocess.call(["aplay", sound_file])
 
 
     def log(self, content, level="DEBUG"):
