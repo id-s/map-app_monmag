@@ -477,7 +477,7 @@ class Policy1(tk.Frame):
             入力された情報は、本目的のみに利用いたします。
             """
         caption = tk.Label(self, text=textwrap.dedent(caption_text), font=body_font,
-                           wraplength=(WINDOW_WIDTH - PADDING * 2), justify="left", height=12, padx=PADDING)
+                           wraplength=(WINDOW_WIDTH - PADDING * 2), justify="left", height=10, padx=PADDING)
         caption.pack(side="top", fill="x")
 
         actions = tk.Frame(self)
@@ -512,7 +512,7 @@ class Policy2(tk.Frame):
             情報のご提供は任意です。ご提供いただけない場合、MyShopサービスへの入会案内メッセージはお送りいたしません。
             """
         caption = tk.Label(self, text=textwrap.dedent(caption_text), font=body_font,
-                           wraplength=(WINDOW_WIDTH - PADDING * 2), justify="left", height=12, padx=PADDING)
+                           wraplength=(WINDOW_WIDTH - PADDING * 2), justify="left", height=10, padx=PADDING)
         caption.pack(side="top", fill="x")
 
         actions = tk.Frame(self)
@@ -770,7 +770,7 @@ class MapApp(tk.Tk):
         # app.log(font.families()) ###
 
         header_font = font.Font(self, family="Droid Sans Japanese", size=int(FONT_SIZE*0.8))
-        body_font = font.Font(self, family="Droid Sans Japanese", size=int(FONT_SIZE*0.6))
+        body_font = font.Font(self, family="Droid Sans Japanese", size=int(FONT_SIZE*0.8))
 
         self.client_images = [] # 画像への参照をキープするために必須
 
