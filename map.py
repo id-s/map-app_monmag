@@ -54,8 +54,24 @@ class Menu(tk.Frame):
         menu2 = tk.Button(self, text="流通会員カードをスキャンする",
                           command=self.show_cmd_select)
 
+        menu3 = tk.Button(self, text="クーポイントスキャン(プレビューなし)", # FIXME:delete
+                          command=self.show_coupoint_scan2)
+        menu3.pack(fill="x")
+
         menu1.pack(fill="x")
         menu2.pack(fill="x")
+
+
+    def show_coupoint_scan2(self): # FIXME:delete
+        app.play("button")
+
+        if self.check_coupoint():
+            context.exec_name = "coupoint"
+            context.on_preview = False ###
+            app.frames["CoupointScan"].start_scan()
+            app.show_frame("CoupointScan")
+        else:
+            app.showerror("クーポイントエラー", "この店舗でご利用できるクーポイントはありません。")
 
 
     def show_coupoint_scan(self):
@@ -63,6 +79,7 @@ class Menu(tk.Frame):
 
         if self.check_coupoint():
             context.exec_name = "coupoint"
+            context.on_preview = True ###
             app.frames["CoupointScan"].start_scan()
             app.show_frame("CoupointScan")
         else:
@@ -152,10 +169,11 @@ class CoupointScan(tk.Frame):
 #                 self.preview.create_text(PREVIEW_OFFSET_X, PREVIEW_OFFSET_Y, text=code.data, tag="code") ###
                 return
 
-        self.image = Image.fromarray(self.image)
-        self.image = ImageTk.PhotoImage(self.image)
-#         app.log("w:{} x h:{}".format(self.image.width(), self.image.height())) ###
-        self.preview.create_image(PREVIEW_OFFSET_X, PREVIEW_OFFSET_Y, image=self.image)
+        if context.on_preview:
+            self.image = Image.fromarray(self.image)
+            self.image = ImageTk.PhotoImage(self.image)
+    #         app.log("w:{} x h:{}".format(self.image.width(), self.image.height())) ###
+            self.preview.create_image(PREVIEW_OFFSET_X, PREVIEW_OFFSET_Y, image=self.image)
         app.log("Update preview end")
 
         self.after(100, self.update_preview)
@@ -860,6 +878,9 @@ class Context():
         # 実行中の処理名
         self.exec_name = None
 
+        # プレビュー表示フラグ
+        self.on_preview = True
+
         # 選択されたカード(流通)
         self.selected_client = None
 
@@ -890,6 +911,9 @@ class Context():
     def clear(self, excepts=[]):
         if not "exec_name" in excepts:
             self.exec_name = None
+
+        if not "on_preview" in excepts:
+            self.on_preview = True
 
         if not "selected_client" in excepts:
             self.selected_client = None
