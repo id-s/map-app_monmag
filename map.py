@@ -54,24 +54,8 @@ class Menu(tk.Frame):
         menu2 = tk.Button(self, text="流通会員カードをスキャンする",
                           command=self.show_cmd_select)
 
-        menu3 = tk.Button(self, text="クーポイントスキャン(プレビューなし)", # FIXME:delete
-                          command=self.show_coupoint_scan2)
-        menu3.pack(fill="x")
-
         menu1.pack(fill="x")
         menu2.pack(fill="x")
-
-
-    def show_coupoint_scan2(self): # FIXME:delete
-        app.play("button")
-
-        if self.check_coupoint():
-            context.exec_name = "coupoint"
-            context.on_preview = False ###
-            app.frames["CoupointScan"].start_scan()
-            app.show_frame("CoupointScan")
-        else:
-            app.showerror("クーポイントエラー", "この店舗でご利用できるクーポイントはありません。")
 
 
     def show_coupoint_scan(self):
@@ -79,7 +63,6 @@ class Menu(tk.Frame):
 
         if self.check_coupoint():
             context.exec_name = "coupoint"
-            context.on_preview = True ###
             app.frames["CoupointScan"].start_scan()
             app.show_frame("CoupointScan")
         else:
@@ -132,8 +115,9 @@ class CoupointScan(tk.Frame):
         label = tk.Label(self, text="クーポイントをスキャンしてください")
         label.pack(side="top", fill="x")
 
-        self.preview = preview = tk.Canvas(self, width = PREVIEW_WIDTH, height = PREVIEW_HEIGHT, bg="blue")
-        self.preview.pack(side="top")
+        if context.on_preview:
+            self.preview = tk.Canvas(self, width = PREVIEW_WIDTH, height = PREVIEW_HEIGHT, bg="blue")
+            self.preview.pack(side="top")
 
         button = tk.Button(self, text="キャンセル",
                            command=self.back_menu)
@@ -202,7 +186,8 @@ class CoupointScan(tk.Frame):
         app.play("button")
 
         self.on_scan = False
-        self.preview.delete("code")
+        if context.on_preview:
+            self.preview.delete("code")
         self.capture.release()
         context.exec_name = None
         app.show_frame("Menu")
@@ -797,6 +782,9 @@ class MapApp(tk.Tk):
 
         header_font = font.Font(self, family="Droid Sans Japanese", size=int(FONT_SIZE*0.8))
         body_font = font.Font(self, family="Droid Sans Japanese", size=int(FONT_SIZE*0.8))
+
+        # プレビューのタイムラグが問題になるようなら、下記フラグをFalseにする
+        context.on_preview = True
 
         self.client_images = [] # 画像への参照をキープするために必須
 
