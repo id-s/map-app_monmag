@@ -277,7 +277,8 @@ class CoupointShow(tk.Frame):
         app.play("button")
 
         self.clear_coupoint()
-        app.show_frame("Menu")
+        context.finish_message.set("MyShopポイントを付与しました。")
+        app.frames["Finish"].show()
 
 
 class CmdSelect(tk.Frame):
