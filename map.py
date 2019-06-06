@@ -49,25 +49,23 @@ class Menu(tk.Frame):
         # FIXME: 画面の上下を反転させたいが指定不可？　他同様の画面あり
         tk.Frame.__init__(self, parent)
 
-        menu1 = tk.Button(self, text="MyShopクーポイントをスキャンする",
-                          command=self.show_coupoint_scan)
-        menu2 = tk.Button(self, text="流通会員カードをスキャンする",
-                          command=self.show_card_select)
-        menu3 = tk.Button(self, text="設定",
-                          command=self.show_setting)
+        menu1_button = tk.Button(self, text="MyShopクーポイントをスキャンする",
+                                 command=self.menu1_button_clicked)
+        menu2_button = tk.Button(self, text="流通会員カードをスキャンする",
+                                 command=self.menu2_button_clicked)
+        menu3_button = tk.Button(self, text="設定",
+                                 command=self.menu3_button_clicked)
 
-        menu1.pack(fill="x")
-        menu2.pack(fill="x")
-        menu3.pack(fill="x", side="bottom")
+        menu1_button.pack(fill="x")
+        menu2_button.pack(fill="x")
+        menu3_button.pack(fill="x", side="bottom")
 
 
-    def show_coupoint_scan(self):
+    def menu1_button_clicked(self):
         app.play("button")
 
         if self.check_coupoint():
-            context.exec_name = "coupoint"
-            app.frames["CoupointScan"].start_scan()
-            app.show_frame("CoupointScan")
+            app.frames["CoupointScan"].show()
         else:
             app.showerror("クーポイントエラー", "この店舗でご利用できるクーポイントはありません。")
 
@@ -101,13 +99,9 @@ class Menu(tk.Frame):
             return False
 
 
-    def show_card_select(self):
+    def menu2_button_clicked(self):
         app.play("button")
-
-        context.exec_name = "add_point"
-        context.sales_entry_button_text.set("付与確定")
-        context.finish_message.set("流通ポイントを付与しました。")
-        app.show_frame("CardSelect")
+        app.frames["CardSelect"].show("add")
 
 
     def show_cmd_select(self):
@@ -119,9 +113,8 @@ class Menu(tk.Frame):
         app.show_frame("CmdSelect")
 
 
-    def show_setting(self):
+    def menu3_button_clicked(self):
         app.play("button")
-
         app.show_frame("Setting")
 
 
@@ -190,15 +183,19 @@ class CoupointScan(tk.Frame):
 
         if decoded_data:
             app.play("success")
-            coupoint = coupoint_show.get_coupoint(decoded_data)
-            coupoint_show.show_coupoint(coupoint)
             self.on_scan = False
             self.capture.release()
-            app.show_frame("CoupointShow")
+            app.frames["CoupointShow"].show(decoded_data)
         else:
             app.showerror("クーポイントエラー", "このQRコードはクーポイントではありません。")
 
             self.after(500, self.update_preview)
+
+
+    def show(self):
+        context.exec_name = "coupoint"
+        app.frames["CoupointScan"].start_scan()
+        app.show_frame(self)
 
 
     def back_menu(self):
@@ -299,6 +296,12 @@ class CoupointShow(tk.Frame):
         self.clear_coupoint()
         context.finish_message.set("MyShopポイントを付与しました。")
         app.frames["Finish"].show()
+
+
+    def show(self, decoded_data):
+        coupoint = self.get_coupoint(decoded_data)
+        self.show_coupoint(coupoint)
+        app.show_frame(self)
 
 
 class CmdSelect(tk.Frame):
@@ -412,6 +415,21 @@ class CardSelect(tk.Frame):
         return func
 
 
+    def show(self, mode="add"):
+        if mode == "add":
+            context.exec_name = "add_point"
+            context.sales_entry_button_text.set("付与確定")
+            context.finish_message.set("流通ポイントを付与しました。")
+        elif mode == "cancel":
+            context.exec_name = "cancel_point"
+            context.sales_entry_button_text.set("取消確定")
+            context.finish_message.set("付与した流通ポイントを取消しました。")
+        else:
+            raise MapAppException("Invalid mode:{}".format(mode))
+
+        app.show_frame(self)
+
+
 class CardScan(tk.Frame):
     """カードスキャン
     """
@@ -427,7 +445,7 @@ class CardScan(tk.Frame):
         actions.columnconfigure(1, weight=1)
         actions.pack(side="bottom", fill="x")
 
-        button1 = tk.Button(actions, text="(次へ)", command=self.next)
+        button1 = tk.Button(actions, text="(次へ)", command=self.button1_clicked)
         button1.grid(column=0, row=0, sticky="nswe")
         button1.focus_set()
 
@@ -470,7 +488,7 @@ class CardScan(tk.Frame):
             return None
 
 
-    def next(self):
+    def button1_clicked(self):
         app.play("button")
 
         if context.exec_name == "add_point":
@@ -510,7 +528,7 @@ class Policy1(tk.Frame):
         actions.columnconfigure(1, weight=1)
         actions.pack(side="bottom", fill="x")
 
-        button1 = tk.Button(actions, text="次へ", command=self.next)
+        button1 = tk.Button(actions, text="次へ", command=self.button1_clicked)
         button1.grid(column=0, row=0, sticky="nswe")
         button1.focus_set()
 
@@ -518,9 +536,8 @@ class Policy1(tk.Frame):
         button2.grid(column=1, row=0, sticky="nswe")
 
 
-    def next(self):
+    def button1_clicked(self):
         app.play("button")
-
         app.show_frame("Policy2")
 
 
@@ -545,7 +562,7 @@ class Policy2(tk.Frame):
         actions.columnconfigure(1, weight=1)
         actions.pack(side="bottom", fill="x")
 
-        button1 = tk.Button(actions, text="同意する", command=self.next)
+        button1 = tk.Button(actions, text="同意する", command=self.button1_clicked)
         button1.grid(column=0, row=0, sticky="nswe")
         button1.focus_set()
 
@@ -553,7 +570,7 @@ class Policy2(tk.Frame):
         button2.grid(column=1, row=0, sticky="nswe")
 
 
-    def next(self):
+    def button1_clicked(self):
         app.play("button")
 
         context.entry_caption.set("電話番号入力")
@@ -588,7 +605,7 @@ class TelEntry(tk.Frame):
         actions.pack(side="bottom", fill="x")
 
         button1 = tk.Button(actions, text="確定",
-                            command=self.show_sales_entry)
+                            command=self.button1_clicked)
         button1.grid(column=0, row=0, sticky="nswe")
         button1.focus_set()
 
@@ -602,14 +619,18 @@ class TelEntry(tk.Frame):
     def show_num_keys(self, event = None):
         context.entry_caption.set("電話番号入力")
         context.after_entry = "TelEntry"
-        app.show_frame("NumKeys")
+        app.show_frame("NumKeys", False)
 
 
-    def show_sales_entry(self):
+    def button1_clicked(self):
         app.play("button")
 
         context.entry_text.set("")
         app.frames["SalesEntry"].show_num_keys()
+
+
+    def show(self):
+        app.show_frame(self)
 
 
 class SalesEntry(tk.Frame):
@@ -636,7 +657,7 @@ class SalesEntry(tk.Frame):
         actions.columnconfigure(1, weight=1)
         actions.pack(side="bottom", fill="x")
 
-        button1 = tk.Button(actions, textvariable=context.sales_entry_button_text, command=self.show_finish)
+        button1 = tk.Button(actions, textvariable=context.sales_entry_button_text, command=self.button1_clicked)
         button1.grid(column=0, row=0, sticky="nswe")
         button1.focus_set()
 
@@ -649,7 +670,7 @@ class SalesEntry(tk.Frame):
     def show_num_keys(self, event = None):
         context.entry_caption.set("会計金額入力")
         context.after_entry = "SalesEntry"
-        app.show_frame("NumKeys")
+        app.show_frame("NumKeys", False)
 
 
     def calc_point(self, sales):
@@ -687,10 +708,15 @@ class SalesEntry(tk.Frame):
             return None
 
 
-    def show_finish(self):
+    def button1_clicked(self):
         app.play("button")
-
         app.frames["Finish"].show()
+
+
+    def show(self):
+        point_num = self.calc_point(context.entry_text.get())
+        context.point_num.set(point_num)
+        app.show_frame(self)
 
 
 class NumKeys(tk.Frame):
@@ -727,7 +753,7 @@ class NumKeys(tk.Frame):
 
         button_del = tk.Button(numkeys, text="Del", command=lambda: self.del_num()).grid(column=0, row=3, sticky="nswe")
         button_0   = tk.Button(numkeys, text="0", command=lambda: self.add_num("0")).grid(column=1, row=3, sticky="nswe")
-        button_ok  = tk.Button(numkeys, text="OK", command=lambda: self.enter_tel()).grid(column=2, row=3, sticky="nswe")
+        button_ok  = tk.Button(numkeys, text="OK", command=self.button_ok_clicked).grid(column=2, row=3, sticky="nswe")
 
 
     def add_num(self, num):
@@ -739,15 +765,9 @@ class NumKeys(tk.Frame):
         app.play("button")
         context.entry_text.set(context.entry_text.get()[:-1])
 
-    def enter_tel(self):
+    def button_ok_clicked(self):
         app.play("button")
-
-        # FIXME: 入力内容によって処理が分岐するのは望ましくない。要:画面遷移の見直し
-        if context.entry_caption.get() == u"会計金額入力":
-            point_num = app.frames["SalesEntry"].calc_point(context.entry_text.get())
-            context.point_num.set(point_num)
-
-        app.show_frame(context.after_entry)
+        app.frames[context.after_entry].show()
 
 
 class Finish(tk.Frame):
@@ -765,9 +785,9 @@ class Finish(tk.Frame):
         """完了画面にメッセージを表示する
         @param duration 表示時間(単位は秒)
         """
-        app.show_frame("Finish")
+        app.show_frame(self)
         context.clear(excepts=["finish_message"])
-        self.after(duration * 1000, lambda: app.show_frame("Menu"))
+        self.after(duration * 1000, lambda: app.show_frame("Menu", False))
 
 
 class Setting(tk.Frame):
@@ -788,11 +808,7 @@ class Setting(tk.Frame):
 
     def cancel_point_button_clicked(self):
         app.play("button")
-
-        context.exec_name = "cancel_point"
-        context.sales_entry_button_text.set("取消確定")
-        context.finish_message.set("付与した流通ポイントを取消しました。")
-        app.show_frame("CardSelect")
+        app.frames["CardSelect"].show("cancel")
 
 
 class MapApp(tk.Tk):
@@ -846,9 +862,9 @@ class MapApp(tk.Tk):
 
         self.frames = {}
         for F in MapApp.SCREENS:
-            scr_name = F.__name__
+            screen_name = F.__name__
             frame = F(parent=container)
-            self.frames[scr_name] = frame
+            self.frames[screen_name] = frame
 
             frame.grid(row=0, column=0, sticky="nsew")
 
@@ -856,9 +872,18 @@ class MapApp(tk.Tk):
         self.show_frame("Menu")
 
 
-    def show_frame(self, scr_name):
-        app.log("Show {}".format(scr_name))
-        frame = self.frames[scr_name]
+    def show_frame(self, screen, check_show = True):
+        """指定された画面を表示する
+        @param screen string or Frame
+        """
+        if isinstance(screen, tk.Frame):
+            check_show = False
+            screen = screen.__class__.__name__
+        app.log("Show {}".format(screen))
+
+        frame = self.frames[screen]
+        if check_show and hasattr(frame, "show"):
+            raise MapAppException("'{}' should use `show()`".format(screen))
         frame.tkraise()
 
 
@@ -997,6 +1022,10 @@ class Context():
         file.close()
 
         return self.macaddress
+
+
+class MapAppException(Exception):
+    pass
 
 
 if __name__ == "__main__":
