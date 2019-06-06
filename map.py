@@ -98,11 +98,12 @@ class CoupointScan(tk.Frame):
         tk.Frame.__init__(self, parent)
 
         label = tk.Label(self, text="クーポイントをスキャンしてください")
-        label.pack(side="top", fill="x")
+        label.configure(style.default_label)
+        label.pack(fill="x")
 
         if context.on_preview:
             self.preview = tk.Canvas(self, width = PREVIEW_WIDTH, height = PREVIEW_HEIGHT, bg="blue")
-            self.preview.pack(side="top")
+            self.preview.pack()
 
         button = tk.Button(self, text="キャンセル", command=self.back_menu)
         button.configure(style.default_button)
@@ -204,15 +205,18 @@ class CoupointShow(tk.Frame):
 
     def show_coupoint(self, coupoint):
         self.title = tk.Label(self, text="来店ポイントプレゼント")
-        self.title.pack(side="top", fill="x")
+        self.title.configure(style.default_label)
+        self.title.pack(fill="x")
 
         self.use_term_label = tk.Label(self, text="利用可能期間", font=style.header_font, anchor="w")
-        self.use_term_label.pack(side="top", fill="x")
+        self.use_term_label.configure(style.default_label)
+        self.use_term_label.pack(fill="x")
 
         use_term_from = datetime.strptime(coupoint["use_term_from"], "%Y-%m-%d %H:%M:%S").strftime("%Y年%B%d日(%A)")
         use_term_to = datetime.strptime(coupoint["use_term_to"], "%Y-%m-%d %H:%M:%S").strftime("%Y年%B%d日(%A)")
         self.use_term = tk.Label(self, text="{} 〜 {}".format(use_term_from, use_term_to), font=style.body_font, justify="left")
-        self.use_term.pack(side="top", fill="x")
+        self.use_term.configure(style.default_label)
+        self.use_term.pack(fill="x")
 
         self.button = tk.Button(self, text="利用確定", command=self.use_coupoint)
         self.button.configure(style.primary_button)
@@ -351,12 +355,13 @@ class CardScan(tk.Frame):
         tk.Frame.__init__(self, parent)
 
         caption = tk.Label(self, text="カードをスキャンしてください。")
-        caption.pack(side="top", fill="x")
+        caption.configure(style.default_label)
+        caption.pack(fill="x")
 
         actions = tk.Frame(self)
         actions.columnconfigure(0, weight=1)
         actions.columnconfigure(1, weight=1)
-        actions.pack(side="bottom", fill="x")
+        actions.pack(fill="x", side="bottom")
 
         button1 = tk.Button(actions, text="(次へ)", command=self.button1_clicked)
         button1.configure(style.primary_button)
@@ -401,12 +406,13 @@ class Policy1(tk.Frame):
             """
         caption = tk.Label(self, text=textwrap.dedent(caption_text), font=style.body_font,
                            wraplength=(WINDOW_WIDTH - PADDING * 2), justify="left", height=9, padx=PADDING)
-        caption.pack(side="top", fill="x")
+        caption.configure(style.default_label)
+        caption.pack(fill="x")
 
         actions = tk.Frame(self)
         actions.columnconfigure(0, weight=1)
         actions.columnconfigure(1, weight=1)
-        actions.pack(side="bottom", fill="x")
+        actions.pack(fill="x", side="bottom")
 
         button1 = tk.Button(actions, text="次へ", command=self.button1_clicked)
         button1.configure(style.primary_button)
@@ -437,12 +443,13 @@ class Policy2(tk.Frame):
             """
         caption = tk.Label(self, text=textwrap.dedent(caption_text), font=style.body_font,
                            wraplength=(WINDOW_WIDTH - PADDING * 2), justify="left", height=9, padx=PADDING)
-        caption.pack(side="top", fill="x")
+        caption.configure(style.default_label)
+        caption.pack(fill="x")
 
         actions = tk.Frame(self)
         actions.columnconfigure(0, weight=1)
         actions.columnconfigure(1, weight=1)
-        actions.pack(side="bottom", fill="x")
+        actions.pack(fill="x", side="bottom")
 
         button1 = tk.Button(actions, text="同意する", command=self.button1_clicked)
         button1.configure(style.primary_button)
@@ -471,17 +478,20 @@ class TelEntry(tk.Frame):
 
 #         caption = tk.Label(self, text="初めてのご利用の方は進呈ポイントをショートメールでお知らせします。",
 #                            wraplength=(WINDOW_WIDTH - PADDING * 2), justify="left", height=2, padx=PADDING)
-#         caption.pack(side="top", fill="x")
+#         caption.configure(style.default_label)
+#         caption.pack(fill="x")
 
         label = tk.Label(self, text="電話番号入力")
-        label.pack(side="top", fill="x")
+        label.configure(style.default_label)
+        label.pack(fill="x")
 
         tel_entry = tk.Entry(self, textvariable=context.entry_text, font=style.default_font)
-        tel_entry.pack(side="top", fill="x")
+        tel_entry.pack(fill="x")
 
         caption = tk.Label(self, text="上記電話番号にショートメールでお知らせします。",
                            wraplength=(WINDOW_WIDTH - PADDING * 2), justify="left", height=2, padx=PADDING)
-        caption.pack(side="top", fill="x")
+        caption.configure(style.default_label)
+        caption.pack(fill="x")
 
         actions = tk.Frame(self)
         actions.columnconfigure(0, weight=1)
@@ -525,16 +535,18 @@ class SalesEntry(tk.Frame):
         tk.Frame.__init__(self, parent)
 
         label = tk.Label(self, text="会計金額入力")
-        label.pack(side="top", fill="x")
+        label.configure(style.default_label)
+        label.pack(fill="x")
 
         sales_entry = tk.Entry(self, textvariable=context.entry_text, font=style.default_font)
-        sales_entry.pack(side="top", fill="x")
+        sales_entry.pack(fill="x")
 
         label2 = tk.Label(self, text="ポイント")
-        label2.pack(side="top", fill="x")
+        label2.configure(style.default_label)
+        label2.pack(fill="x")
 
         point_entry = tk.Entry(self, textvariable=context.point_num, font=style.default_font)
-        point_entry.pack(side="top", fill="x")
+        point_entry.pack(fill="x")
 
         actions = tk.Frame(self)
         actions.columnconfigure(0, weight=1)
@@ -578,13 +590,14 @@ class NumKeys(tk.Frame):
         tk.Frame.__init__(self, parent)
 
         caption = tk.Label(self, textvariable=context.entry_caption)
-        caption.pack(side="top", fill="x")
+        caption.configure(style.default_label)
+        caption.pack(fill="x")
 
         entry = tk.Entry(self, textvariable=context.entry_text, font=style.default_font)
-        entry.pack(side="top", fill="x")
+        entry.pack(fill="x")
 
         keyboard = tk.Frame(self)
-        keyboard.pack(side="top", fill="x")
+        keyboard.pack(fill="x")
 
         keyboard.columnconfigure(0, weight=1)
         keyboard.columnconfigure(1, weight=1)
@@ -646,7 +659,8 @@ class Finish(tk.Frame):
         tk.Frame.__init__(self, parent)
 
         caption = tk.Label(self, textvariable=context.finish_message)
-        caption.pack(side="top", fill="x")
+        caption.configure(style.default_label)
+        caption.pack(fill="x")
 
 
     def show(self, duration = 3):
@@ -883,7 +897,7 @@ class MapApp(tk.Tk):
         container = tk.Frame(self)
         if APP_ENV == "Monmag":
             container.config(cursor='none')
-        container.pack(side="top", fill="both", expand=True)
+        container.pack(fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
@@ -970,6 +984,8 @@ class Style():
         self.default_button = {"bg":"white", "fg":"#e40023"}
         self.primary_button = {"bg":"#e40023", "fg":"white"}
         self.number_button = {"bg":"#dddddd", "fg":"black"}
+
+        self.default_label = {"background":"white"}
 
 
 class Context():
