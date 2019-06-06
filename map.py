@@ -58,7 +58,7 @@ class Menu(tk.Frame):
 
         menu1_button.pack(fill="x")
         menu2_button.pack(fill="x")
-        menu3_button.pack(fill="x", side="bottom")
+        menu3_button.pack(fill="x")
 
 
     def menu1_button_clicked(self):
