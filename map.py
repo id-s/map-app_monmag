@@ -16,7 +16,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 from PIL import Image, ImageTk
 from pprint import pprint
-from pyzbar.pyzbar import decode
+from pyzbar import pyzbar
 
 APP_ENV = os.getenv("APP_ENV", "Monmag")
 ON_DEBUG = os.getenv("ON_DEBUG", False)
@@ -158,7 +158,7 @@ class CoupointScan(tk.Frame):
         self.image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         if APP_ENV == "Monmag":
             self.image = self.image.transpose(1,0,2)[::-1] # -90度回転、詳細は https://qiita.com/matsu_mh/items/54b09273aef79ae027bc 参照
-        self.decoded = decode(self.image) ###
+        self.decoded = pyzbar.decode(self.image)
         if self.decoded:
             for code in self.decoded:
                 app.log(code, "INFO")
