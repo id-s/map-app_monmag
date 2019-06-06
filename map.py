@@ -59,7 +59,7 @@ class Menu(tk.Frame):
 
         menu3_button = tk.Button(self, text="設定",command=self.menu3_button_clicked)
         menu3_button.configure(style.default_button)
-        menu3_button.pack(fill="x")
+        menu3_button.pack(fill="x", side="bottom")
 
 
     def menu1_button_clicked(self):
@@ -689,7 +689,11 @@ class Setting(tk.Frame):
 
         quit_button = tk.Button(self, text="アプリ終了", command=app.quit)
         quit_button.configure(style.default_button)
-        quit_button.pack(fill="x", side="bottom")
+        quit_button.pack(fill="x")
+
+        cancel_button = tk.Button(self, text="キャンセル", command=app.back_menu)
+        cancel_button.configure(style.default_button)
+        cancel_button.pack(fill="x", side="bottom")
 
 
     def cancel_point_button_clicked(self):
