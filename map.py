@@ -49,15 +49,16 @@ class Menu(tk.Frame):
         # FIXME: 画面の上下を反転させたいが指定不可？　他同様の画面あり
         tk.Frame.__init__(self, parent)
 
-        menu1_button = tk.Button(self, text="MyShopクーポイントをスキャンする",
-                                 command=self.menu1_button_clicked)
-        menu2_button = tk.Button(self, text="流通会員カードをスキャンする",
-                                 command=self.menu2_button_clicked)
-        menu3_button = tk.Button(self, text="設定",
-                                 command=self.menu3_button_clicked)
-
+        menu1_button = tk.Button(self, text="MyShopクーポイントをスキャンする",command=self.menu1_button_clicked)
+        menu1_button.configure(style.default_button)
         menu1_button.pack(fill="x")
+
+        menu2_button = tk.Button(self, text="流通会員カードをスキャンする",command=self.menu2_button_clicked)
+        menu2_button.configure(style.default_button)
         menu2_button.pack(fill="x")
+
+        menu3_button = tk.Button(self, text="設定",command=self.menu3_button_clicked)
+        menu3_button.configure(style.default_button)
         menu3_button.pack(fill="x")
 
 
@@ -103,9 +104,9 @@ class CoupointScan(tk.Frame):
             self.preview = tk.Canvas(self, width = PREVIEW_WIDTH, height = PREVIEW_HEIGHT, bg="blue")
             self.preview.pack(side="top")
 
-        button = tk.Button(self, text="キャンセル",
-                           command=self.back_menu)
-        button.pack(side="bottom", fill="x")
+        button = tk.Button(self, text="キャンセル", command=self.back_menu)
+        button.configure(style.default_button)
+        button.pack(fill="x", side="bottom")
 
 #         self.bind("<Activate>", self.start_scan) # Monmagではこのイベントが発生しない
 
@@ -205,17 +206,17 @@ class CoupointShow(tk.Frame):
         self.title = tk.Label(self, text="来店ポイントプレゼント")
         self.title.pack(side="top", fill="x")
 
-        self.use_term_label = tk.Label(self, text="利用可能期間", font=header_font, anchor="w")
+        self.use_term_label = tk.Label(self, text="利用可能期間", font=style.header_font, anchor="w")
         self.use_term_label.pack(side="top", fill="x")
 
         use_term_from = datetime.strptime(coupoint["use_term_from"], "%Y-%m-%d %H:%M:%S").strftime("%Y年%B%d日(%A)")
         use_term_to = datetime.strptime(coupoint["use_term_to"], "%Y-%m-%d %H:%M:%S").strftime("%Y年%B%d日(%A)")
-        self.use_term = tk.Label(self, text="{} 〜 {}".format(use_term_from, use_term_to), font=body_font, justify="left")
+        self.use_term = tk.Label(self, text="{} 〜 {}".format(use_term_from, use_term_to), font=style.body_font, justify="left")
         self.use_term.pack(side="top", fill="x")
 
-        self.button = tk.Button(self, text="利用確定",
-                                command=self.use_coupoint)
-        self.button.pack(side="bottom", fill="x")
+        self.button = tk.Button(self, text="利用確定", command=self.use_coupoint)
+        self.button.configure(style.primary_button)
+        self.button.pack(fill="x", side="bottom")
 
 
     def clear_coupoint(self):
@@ -248,11 +249,15 @@ class CmdSelect(tk.Frame):
         tk.Frame.__init__(self, parent)
 
         add_point_button = tk.Button(self, text="ポイント付与", command=self.add_point_button_clicked)
-        cancel_point_button = tk.Button(self, text="ポイント取消", command=self.cancel_point_button_clicked)
-        cancel_button = tk.Button(self, text="キャンセル", command=app.back_menu)
-
+        add_point_button.configure(style.default_button)
         add_point_button.pack(fill="x")
+
+        cancel_point_button = tk.Button(self, text="ポイント取消", command=self.cancel_point_button_clicked)
+        cancel_point_button.configure(style.default_button)
         cancel_point_button.pack(fill="x")
+
+        cancel_button = tk.Button(self, text="キャンセル", command=app.back_menu)
+        cancel_button.configure(style.default_button)
         cancel_button.pack(fill="x")
 
 
@@ -299,14 +304,13 @@ class CardSelect(tk.Frame):
             image = Image.open(file_path)
             image = ImageTk.PhotoImage(image.resize((48, 48)))
             app.client_images.append(image)
-            button = tk.Button(self, compound="left", text=client["card_name"], image=image,
-                               width=WINDOW_WIDTH - PADDING * 2,
-                               command=self.select_card(client["client_cd"]))
+            button = tk.Button(self, text=client["card_name"], image=image, compound="left", command=self.select_card(client["client_cd"]))
+            button.configure(style.default_button)
             button.pack(fill="x")
 
-        button = tk.Button(self, text="キャンセル",
-                           command=app.back_menu)
-        button.pack(fill="x")
+        button = tk.Button(self, text="キャンセル", command=app.back_menu)
+        button.configure(style.default_button)
+        button.pack(fill="x", side="bottom")
 
 
     def select_card(self, client_cd):
@@ -355,10 +359,12 @@ class CardScan(tk.Frame):
         actions.pack(side="bottom", fill="x")
 
         button1 = tk.Button(actions, text="(次へ)", command=self.button1_clicked)
+        button1.configure(style.primary_button)
         button1.grid(column=0, row=0, sticky="nswe")
         button1.focus_set()
 
         button2 = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        button2.configure(style.default_button)
         button2.grid(column=1, row=0, sticky="nswe")
 
 
@@ -393,7 +399,7 @@ class Policy1(tk.Frame):
 
             入力された情報は、本目的のみに利用いたします。
             """
-        caption = tk.Label(self, text=textwrap.dedent(caption_text), font=body_font,
+        caption = tk.Label(self, text=textwrap.dedent(caption_text), font=style.body_font,
                            wraplength=(WINDOW_WIDTH - PADDING * 2), justify="left", height=9, padx=PADDING)
         caption.pack(side="top", fill="x")
 
@@ -403,10 +409,12 @@ class Policy1(tk.Frame):
         actions.pack(side="bottom", fill="x")
 
         button1 = tk.Button(actions, text="次へ", command=self.button1_clicked)
+        button1.configure(style.primary_button)
         button1.grid(column=0, row=0, sticky="nswe")
         button1.focus_set()
 
         button2 = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        button2.configure(style.default_button)
         button2.grid(column=1, row=0, sticky="nswe")
 
 
@@ -427,7 +435,7 @@ class Policy2(tk.Frame):
             入力された情報の第三者提供は行いません。本事業の運用業務を他社に委託する場合があります。
             情報のご提供は任意です。ご提供いただけない場合、MyShopサービスへの入会案内メッセージはお送りいたしません。
             """
-        caption = tk.Label(self, text=textwrap.dedent(caption_text), font=body_font,
+        caption = tk.Label(self, text=textwrap.dedent(caption_text), font=style.body_font,
                            wraplength=(WINDOW_WIDTH - PADDING * 2), justify="left", height=9, padx=PADDING)
         caption.pack(side="top", fill="x")
 
@@ -437,10 +445,12 @@ class Policy2(tk.Frame):
         actions.pack(side="bottom", fill="x")
 
         button1 = tk.Button(actions, text="同意する", command=self.button1_clicked)
+        button1.configure(style.primary_button)
         button1.grid(column=0, row=0, sticky="nswe")
         button1.focus_set()
 
         button2 = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        button2.configure(style.default_button)
         button2.grid(column=1, row=0, sticky="nswe")
 
 
@@ -466,7 +476,7 @@ class TelEntry(tk.Frame):
         label = tk.Label(self, text="電話番号入力")
         label.pack(side="top", fill="x")
 
-        tel_entry = tk.Entry(self, textvariable=context.entry_text, font=default_font)
+        tel_entry = tk.Entry(self, textvariable=context.entry_text, font=style.default_font)
         tel_entry.pack(side="top", fill="x")
 
         caption = tk.Label(self, text="上記電話番号にショートメールでお知らせします。",
@@ -478,13 +488,13 @@ class TelEntry(tk.Frame):
         actions.columnconfigure(1, weight=1)
         actions.pack(side="bottom", fill="x")
 
-        button1 = tk.Button(actions, text="確定",
-                            command=self.button1_clicked)
+        button1 = tk.Button(actions, text="確定", command=self.button1_clicked)
+        button1.configure(style.primary_button)
         button1.grid(column=0, row=0, sticky="nswe")
         button1.focus_set()
 
-        button2 = tk.Button(actions, text="キャンセル",
-                            command=app.back_menu)
+        button2 = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        button2.configure(style.default_button)
         button2.grid(column=1, row=0, sticky="nswe")
 
         tel_entry.bind("<FocusIn>", self.show_num_keys)
@@ -517,13 +527,13 @@ class SalesEntry(tk.Frame):
         label = tk.Label(self, text="会計金額入力")
         label.pack(side="top", fill="x")
 
-        sales_entry = tk.Entry(self, textvariable=context.entry_text, font=default_font)
+        sales_entry = tk.Entry(self, textvariable=context.entry_text, font=style.default_font)
         sales_entry.pack(side="top", fill="x")
 
         label2 = tk.Label(self, text="ポイント")
         label2.pack(side="top", fill="x")
 
-        point_entry = tk.Entry(self, textvariable=context.point_num, font=default_font)
+        point_entry = tk.Entry(self, textvariable=context.point_num, font=style.default_font)
         point_entry.pack(side="top", fill="x")
 
         actions = tk.Frame(self)
@@ -532,10 +542,12 @@ class SalesEntry(tk.Frame):
         actions.pack(side="bottom", fill="x")
 
         button1 = tk.Button(actions, textvariable=context.sales_entry_button_text, command=self.button1_clicked)
+        button1.configure(style.primary_button)
         button1.grid(column=0, row=0, sticky="nswe")
         button1.focus_set()
 
         button2 = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        button2.configure(style.default_button)
         button2.grid(column=1, row=0, sticky="nswe")
 
         sales_entry.bind("<FocusIn>", self.show_num_keys)
@@ -568,31 +580,48 @@ class NumKeys(tk.Frame):
         caption = tk.Label(self, textvariable=context.entry_caption)
         caption.pack(side="top", fill="x")
 
-        entry = tk.Entry(self, textvariable=context.entry_text, font=default_font)
+        entry = tk.Entry(self, textvariable=context.entry_text, font=style.default_font)
         entry.pack(side="top", fill="x")
 
-        numkeys = tk.Frame(self)
-        numkeys.pack(side="top", fill="x")
+        keyboard = tk.Frame(self)
+        keyboard.pack(side="top", fill="x")
 
-        numkeys.columnconfigure(0, weight=1)
-        numkeys.columnconfigure(1, weight=1)
-        numkeys.columnconfigure(2, weight=1)
+        keyboard.columnconfigure(0, weight=1)
+        keyboard.columnconfigure(1, weight=1)
+        keyboard.columnconfigure(2, weight=1)
 
-        button_7 = tk.Button(numkeys, text="7", command=lambda: self.add_num("7")).grid(column=0, row=0, sticky="nswe")
-        button_8 = tk.Button(numkeys, text="8", command=lambda: self.add_num("8")).grid(column=1, row=0, sticky="nswe")
-        button_9 = tk.Button(numkeys, text="9", command=lambda: self.add_num("9")).grid(column=2, row=0, sticky="nswe")
+        num_buttons = [
+                [
+                    tk.Button(keyboard, text="7", command=lambda: self.add_num("7")),
+                    tk.Button(keyboard, text="8", command=lambda: self.add_num("8")),
+                    tk.Button(keyboard, text="9", command=lambda: self.add_num("9")),
+                    ],
+                [
+                    tk.Button(keyboard, text="4", command=lambda: self.add_num("4")),
+                    tk.Button(keyboard, text="5", command=lambda: self.add_num("5")),
+                    tk.Button(keyboard, text="6", command=lambda: self.add_num("6")),
+                    ],
+                [
+                    tk.Button(keyboard, text="1", command=lambda: self.add_num("1")),
+                    tk.Button(keyboard, text="2", command=lambda: self.add_num("2")),
+                    tk.Button(keyboard, text="3", command=lambda: self.add_num("3")),
+                    ],
+                [
+                    tk.Button(keyboard, text="Del", command=lambda: self.del_num()),
+                    tk.Button(keyboard, text="0",  command=lambda: self.add_num("0")),
+                    tk.Button(keyboard, text="OK", command=self.button_ok_clicked),
+                    ],
+            ]
 
-        button_4 = tk.Button(numkeys, text="4", command=lambda: self.add_num("4")).grid(column=0, row=1, sticky="nswe")
-        button_5 = tk.Button(numkeys, text="5", command=lambda: self.add_num("5")).grid(column=1, row=1, sticky="nswe")
-        button_6 = tk.Button(numkeys, text="6", command=lambda: self.add_num("6")).grid(column=2, row=1, sticky="nswe")
+        for r in range(len(num_buttons)):
+            row = num_buttons[r]
+            for c in range(len(row)):
+                button = row[c]
+                button.configure(style.number_button)
+                button.grid(column=c, row=r, sticky="nswe")
 
-        button_1 = tk.Button(numkeys, text="1", command=lambda: self.add_num("1")).grid(column=0, row=2, sticky="nswe")
-        button_2 = tk.Button(numkeys, text="2", command=lambda: self.add_num("2")).grid(column=1, row=2, sticky="nswe")
-        button_3 = tk.Button(numkeys, text="3", command=lambda: self.add_num("3")).grid(column=2, row=2, sticky="nswe")
-
-        button_del = tk.Button(numkeys, text="Del", command=lambda: self.del_num()).grid(column=0, row=3, sticky="nswe")
-        button_0   = tk.Button(numkeys, text="0", command=lambda: self.add_num("0")).grid(column=1, row=3, sticky="nswe")
-        button_ok  = tk.Button(numkeys, text="OK", command=self.button_ok_clicked).grid(column=2, row=3, sticky="nswe")
+        num_buttons[3][0].configure(style.default_button) # Del
+        num_buttons[3][2].configure(style.primary_button) # OK
 
 
     def add_num(self, num):
@@ -637,11 +666,15 @@ class Setting(tk.Frame):
         tk.Frame.__init__(self, parent)
 
         cancel_point_button = tk.Button(self, text="ポイント取消", command=self.cancel_point_button_clicked)
-        wifi_button = tk.Button(self, text="Wi-Fi設定", state="disabled")
-        quit_button = tk.Button(self, text="アプリ終了", command=app.quit)
-
+        cancel_point_button.configure(style.default_button)
         cancel_point_button.pack(fill="x")
+
+        wifi_button = tk.Button(self, text="Wi-Fi設定", state="disabled")
+        wifi_button.configure(style.default_button)
         wifi_button.pack(fill="x")
+
+        quit_button = tk.Button(self, text="アプリ終了", command=app.quit)
+        quit_button.configure(style.default_button)
         quit_button.pack(fill="x", side="bottom")
 
 
@@ -841,14 +874,6 @@ class MapApp(tk.Tk):
         else:
             self.geometry("{}x{}".format(WINDOW_WIDTH, WINDOW_HEIGHT))
 
-        global default_font, header_font, body_font
-        default_font = font.nametofont("TkDefaultFont")
-        default_font.configure(family="Droid Sans Japanese", size=FONT_SIZE)
-        # app.log(font.families()) ###
-
-        header_font = font.Font(self, family="Droid Sans Japanese", size=int(FONT_SIZE*0.8))
-        body_font = font.Font(self, family="Droid Sans Japanese", size=int(FONT_SIZE*0.8))
-
         # プレビューのタイムラグが問題になるようなら、下記フラグをFalseにする
         context.on_preview = True
 
@@ -868,6 +893,7 @@ class MapApp(tk.Tk):
             frame = F(parent=container)
             self.frames[screen_name] = frame
 
+            frame.configure(style.screen)
             frame.grid(row=0, column=0, sticky="nsew")
 
         # 初期表示画面
@@ -927,6 +953,23 @@ class MapApp(tk.Tk):
         if (not ON_DEBUG) and level == "DEBUG":
             return
         print("{} [{}] {}".format(datetime.now(), level, content))
+
+
+class Style():
+
+    def __init__(self, app):
+        self.default_font = font.nametofont("TkDefaultFont")
+        self.default_font.configure(family="Droid Sans Japanese", size=FONT_SIZE)
+        # app.log(font.families()) ###
+
+        self.header_font = font.Font(app, family="Droid Sans Japanese", size=int(FONT_SIZE*0.8))
+        self.body_font = font.Font(app, family="Droid Sans Japanese", size=int(FONT_SIZE*0.8))
+
+        self.screen = {"background":"white"}
+
+        self.default_button = {"bg":"white", "fg":"#e40023"}
+        self.primary_button = {"bg":"#e40023", "fg":"white"}
+        self.number_button = {"bg":"#dddddd", "fg":"black"}
 
 
 class Context():
@@ -1032,6 +1075,7 @@ class MapAppException(Exception):
 
 if __name__ == "__main__":
     app = MapApp()
+    style = Style(app)
     context = Context()
     api = MapApi()
 
