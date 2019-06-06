@@ -52,10 +52,13 @@ class Menu(tk.Frame):
         menu1 = tk.Button(self, text="MyShopクーポイントをスキャンする",
                           command=self.show_coupoint_scan)
         menu2 = tk.Button(self, text="流通会員カードをスキャンする",
-                          command=self.show_cmd_select)
+                          command=self.show_card_select)
+        menu3 = tk.Button(self, text="設定",
+                          command=self.show_setting)
 
         menu1.pack(fill="x")
         menu2.pack(fill="x")
+        menu3.pack(fill="x", side="bottom")
 
 
     def show_coupoint_scan(self):
@@ -98,11 +101,28 @@ class Menu(tk.Frame):
             return False
 
 
+    def show_card_select(self):
+        app.play("button")
+
+        context.exec_name = "add_point"
+        context.sales_entry_button_text.set("付与確定")
+        context.finish_message.set("流通ポイントを付与しました。")
+        app.show_frame("CardSelect")
+
+
     def show_cmd_select(self):
+        """@deprecated 操作手順短縮のため、CardSelectへ直行するようにしました。
+        """
         app.play("button")
 
         # context.exec_nameは次の画面で決定する
         app.show_frame("CmdSelect")
+
+
+    def show_setting(self):
+        app.play("button")
+
+        app.show_frame("Setting")
 
 
 class CoupointScan(tk.Frame):
@@ -282,7 +302,8 @@ class CoupointShow(tk.Frame):
 
 
 class CmdSelect(tk.Frame):
-    """流通ポイント処理選択
+    """@deprecated 操作手順短縮のため、取消フローを設定画面へ移しました。
+       流通ポイント処理選択
     """
 
     def __init__(self, parent):
@@ -749,6 +770,31 @@ class Finish(tk.Frame):
         self.after(duration * 1000, lambda: app.show_frame("Menu"))
 
 
+class Setting(tk.Frame):
+    """設定
+    """
+
+    def __init__(self, parent):
+        tk.Frame.__init__(self, parent)
+
+        cancel_point_button = tk.Button(self, text="ポイント取消", command=self.cancel_point_button_clicked)
+        wifi_button = tk.Button(self, text="Wi-Fi設定", state="disabled")
+        quit_button = tk.Button(self, text="アプリ終了", command=app.quit)
+
+        cancel_point_button.pack(fill="x")
+        wifi_button.pack(fill="x")
+        quit_button.pack(fill="x", side="bottom")
+
+
+    def cancel_point_button_clicked(self):
+        app.play("button")
+
+        context.exec_name = "cancel_point"
+        context.sales_entry_button_text.set("取消確定")
+        context.finish_message.set("付与した流通ポイントを取消しました。")
+        app.show_frame("CardSelect")
+
+
 class MapApp(tk.Tk):
 
     # 画面
@@ -764,6 +810,7 @@ class MapApp(tk.Tk):
                SalesEntry, # 会計金額入力
                NumKeys, # ソフトキーボード
                Finish, # 完了
+               Setting, # 設定
                )
 
 
