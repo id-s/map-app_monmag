@@ -140,13 +140,13 @@ class CoupointScan(tk.Frame):
 
 
     def start_scan(self, event = None):
-        app.log("start_scan", "INFO")
+        app.log("start_scan")
         self.on_scan = True
         self.capture = cv2.VideoCapture(0)
-        self.after(100, self.update_preview)
+        self.after(100, self.scan)
 
 
-    def update_preview(self):
+    def scan(self):
         if not self.on_scan:
             return
         ret, frame = self.capture.read()
@@ -154,9 +154,9 @@ class CoupointScan(tk.Frame):
             app.log("No capture", "WARNING")
             return
 
-        app.log("Update preview start")
+        app.log("Scan start")
         self.image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        if APP_ENV == "Monmag":
+        if APP_ENV == "Monmag" and context.on_preview:
             self.image = self.image.transpose(1,0,2)[::-1] # -90度回転、詳細は https://qiita.com/matsu_mh/items/54b09273aef79ae027bc 参照
         self.decoded = pyzbar.decode(self.image)
         if self.decoded:
@@ -171,9 +171,9 @@ class CoupointScan(tk.Frame):
             self.image = ImageTk.PhotoImage(self.image)
     #         app.log("w:{} x h:{}".format(self.image.width(), self.image.height())) ###
             self.preview.create_image(PREVIEW_OFFSET_X, PREVIEW_OFFSET_Y, image=self.image)
-        app.log("Update preview end")
+        app.log("Scan end")
 
-        self.after(100, self.update_preview)
+        self.after(100, self.scan)
 
 
     def after_scan(self, data):
@@ -189,7 +189,7 @@ class CoupointScan(tk.Frame):
         else:
             app.showerror("クーポイントエラー", "このQRコードはクーポイントではありません。")
 
-            self.after(500, self.update_preview)
+            self.after(500, self.scan)
 
 
     def show(self):
