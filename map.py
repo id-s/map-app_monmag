@@ -376,7 +376,6 @@ class CardScan(tk.Frame):
         next_button = tk.Button(actions, text="(次へ)", command=self.next_button_clicked)
         next_button.configure(style.primary_button)
         next_button.grid(column=0, row=0, sticky="nswe")
-        next_button.focus_set()
 
         cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
         cancel_button.configure(style.default_button)
@@ -431,7 +430,6 @@ class Policy1(tk.Frame):
         next_button = tk.Button(actions, text="次へ", command=self.next_button_clicked)
         next_button.configure(style.primary_button)
         next_button.grid(column=0, row=0, sticky="nswe")
-        next_button.focus_set()
 
         cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
         cancel_button.configure(style.default_button)
@@ -472,7 +470,6 @@ class Policy2(tk.Frame):
         next_button = tk.Button(actions, text="同意する", command=self.next_button_clicked)
         next_button.configure(style.primary_button)
         next_button.grid(column=0, row=0, sticky="nswe")
-        next_button.focus_set()
 
         cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
         cancel_button.configure(style.default_button)
@@ -519,7 +516,6 @@ class TelEntry(tk.Frame):
         next_button = tk.Button(actions, text="確定", command=self.next_button_clicked)
         next_button.configure(style.primary_button)
         next_button.grid(column=0, row=0, sticky="nswe")
-        next_button.focus_set()
 
         cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
         cancel_button.configure(style.default_button)
@@ -574,7 +570,6 @@ class SalesEntry(tk.Frame):
         next_button = tk.Button(actions, textvariable=context.sales_entry_button_text, command=self.next_button_clicked)
         next_button.configure(style.primary_button)
         next_button.grid(column=0, row=0, sticky="nswe")
-        next_button.focus_set()
 
         cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
         cancel_button.configure(style.default_button)
