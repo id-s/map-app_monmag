@@ -418,7 +418,7 @@ class Policy1(tk.Frame):
             入力された情報は、本目的のみに利用いたします。
             """
         text_label = tk.Label(self, text=textwrap.dedent(text), font=style.body_font,
-                              wraplength=(WINDOW_WIDTH - style.padding * 2), justify="left", height=9, padx=style.padding)
+                              wraplength=(WINDOW_WIDTH - style.padding * 2), justify="left", height=8, padx=style.padding)
         text_label.configure(style.default_label)
         text_label.pack(fill="x")
 
@@ -458,7 +458,7 @@ class Policy2(tk.Frame):
             情報のご提供は任意です。ご提供いただけない場合、MyShopサービスへの入会案内メッセージはお送りいたしません。
             """
         text_label = tk.Label(self, text=textwrap.dedent(text), font=style.body_font,
-                              wraplength=(WINDOW_WIDTH - style.padding * 2), justify="left", height=9, padx=style.padding)
+                              wraplength=(WINDOW_WIDTH - style.padding * 2), justify="left", height=8, padx=style.padding)
         text_label.configure(style.default_label)
         text_label.pack(fill="x")
 
