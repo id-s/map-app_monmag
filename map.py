@@ -25,17 +25,6 @@ locale.setlocale(locale.LC_TIME, 'ja_JP.UTF-8')
 
 WINDOW_WIDTH = 480
 WINDOW_HEIGHT = 320
-PADDING = 4
-
-PREVIEW_WIDTH = 320
-PREVIEW_HEIGHT = 200
-PREVIEW_OFFSET_X = PREVIEW_WIDTH / 2 + 64
-PREVIEW_OFFSET_Y = PREVIEW_HEIGHT / 2 + 64
-
-if APP_ENV == "Monmag":
-    FONT_SIZE = 19
-else:
-    FONT_SIZE = 24
 
 IMAGE_DIR = "images"
 SOUND_DIR = "sounds"
@@ -102,7 +91,7 @@ class CoupointScan(tk.Frame):
         label.pack(fill="x")
 
         if context.on_preview:
-            self.preview = tk.Canvas(self, width = PREVIEW_WIDTH, height = PREVIEW_HEIGHT, bg="blue")
+            self.preview = tk.Canvas(self, width = style.preview_width, height = style.preview_height, bg="blue")
             self.preview.pack()
 
         button = tk.Button(self, text="キャンセル", command=self.back_menu)
@@ -136,14 +125,14 @@ class CoupointScan(tk.Frame):
             for code in self.decoded:
                 app.log(code, "INFO")
                 self.after_scan(code.data)
-#                 self.preview.create_text(PREVIEW_OFFSET_X, PREVIEW_OFFSET_Y, text=code.data, tag="code") ###
+#                 self.preview.create_text(style.preview_offset_x, style.preview_offset_y, text=code.data, tag="code") ###
                 return
 
         if context.on_preview:
             self.image = Image.fromarray(self.image)
             self.image = ImageTk.PhotoImage(self.image)
     #         app.log("w:{} x h:{}".format(self.image.width(), self.image.height())) ###
-            self.preview.create_image(PREVIEW_OFFSET_X, PREVIEW_OFFSET_Y, image=self.image)
+            self.preview.create_image(style.preview_offset_x, style.preview_offset_y, image=self.image)
         app.log("Scan end")
 
         self.after(100, self.scan)
@@ -405,7 +394,7 @@ class Policy1(tk.Frame):
             入力された情報は、本目的のみに利用いたします。
             """
         caption = tk.Label(self, text=textwrap.dedent(caption_text), font=style.body_font,
-                           wraplength=(WINDOW_WIDTH - PADDING * 2), justify="left", height=9, padx=PADDING)
+                           wraplength=(WINDOW_WIDTH - style.padding * 2), justify="left", height=9, padx=style.padding)
         caption.configure(style.default_label)
         caption.pack(fill="x")
 
@@ -442,7 +431,7 @@ class Policy2(tk.Frame):
             情報のご提供は任意です。ご提供いただけない場合、MyShopサービスへの入会案内メッセージはお送りいたしません。
             """
         caption = tk.Label(self, text=textwrap.dedent(caption_text), font=style.body_font,
-                           wraplength=(WINDOW_WIDTH - PADDING * 2), justify="left", height=9, padx=PADDING)
+                           wraplength=(WINDOW_WIDTH - style.padding * 2), justify="left", height=9, padx=style.padding)
         caption.configure(style.default_label)
         caption.pack(fill="x")
 
@@ -477,7 +466,7 @@ class TelEntry(tk.Frame):
         tk.Frame.__init__(self, parent)
 
 #         caption = tk.Label(self, text="初めてのご利用の方は進呈ポイントをショートメールでお知らせします。",
-#                            wraplength=(WINDOW_WIDTH - PADDING * 2), justify="left", height=2, padx=PADDING)
+#                            wraplength=(WINDOW_WIDTH - style.padding * 2), justify="left", height=2, padx=style.padding)
 #         caption.configure(style.default_label)
 #         caption.pack(fill="x")
 
@@ -489,7 +478,7 @@ class TelEntry(tk.Frame):
         tel_entry.pack(fill="x")
 
         caption = tk.Label(self, text="上記電話番号にショートメールでお知らせします。",
-                           wraplength=(WINDOW_WIDTH - PADDING * 2), justify="left", height=2, padx=PADDING)
+                           wraplength=(WINDOW_WIDTH - style.padding * 2), justify="left", height=2, padx=style.padding)
         caption.configure(style.default_label)
         caption.pack(fill="x")
 
@@ -978,22 +967,29 @@ class MapApp(tk.Tk):
 class Style():
 
     def __init__(self, app):
+        if APP_ENV == "Monmag":
+            self.font_size = 19
+        else:
+            self.font_size = 24
+
         self.default_font = font.nametofont("TkDefaultFont")
-        self.default_font.configure(family="Droid Sans Japanese", size=FONT_SIZE)
+        self.default_font.configure(family="Droid Sans Japanese", size=self.font_size)
         # app.log(font.families()) ###
 
-        self.header_font = font.Font(app, family="Droid Sans Japanese", size=int(FONT_SIZE*0.8))
-        self.body_font = font.Font(app, family="Droid Sans Japanese", size=int(FONT_SIZE*0.8))
+        self.header_font = font.Font(app, family="Droid Sans Japanese", size=int(self.font_size*0.8))
+        self.body_font = font.Font(app, family="Droid Sans Japanese", size=int(self.font_size*0.8))
 
         self.base_color = "#e40023" # MyShopの基本色(ロゴより取得)
         self.base_color_S05 = "#e4d9da" # base_colorのSaturation(彩度)を"05"まで落とした色
+
+        self.padding = 4
 
         self.screen = {"background":"white"}
 
         self.button_borderwidth = 4
         self.button_relief = "groove"
         self.button_padx = 0
-        self.button_pady = FONT_SIZE / 4
+        self.button_pady = self.font_size / 4
         self.default_button = {
             "bg":"white", "activebackground":"white",
             "fg":self.base_color, "activeforeground":self.base_color,
@@ -1014,6 +1010,11 @@ class Style():
             }
 
         self.default_label = {"background":"white"}
+
+        self.preview_width = 320
+        self.preview_height = 200
+        self.preview_offset_x = self.preview_width / 2 + 64
+        self.preview_offset_y = self.preview_height / 2 + 64
 
 
 class Context():
