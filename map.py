@@ -634,7 +634,9 @@ class NumKeys(tk.Frame):
                 button.grid(column=c, row=r, sticky="nswe")
 
         num_buttons[3][0].configure(style.default_button) # Del
+        num_buttons[3][0].configure(padx=num_buttons[3][1].cget("padx"), pady=num_buttons[3][1].cget("pady"))
         num_buttons[3][2].configure(style.primary_button) # OK
+        num_buttons[3][2].configure(padx=num_buttons[3][1].cget("padx"), pady=num_buttons[3][1].cget("pady"))
 
 
     def add_num(self, num):
@@ -983,11 +985,33 @@ class Style():
         self.header_font = font.Font(app, family="Droid Sans Japanese", size=int(FONT_SIZE*0.8))
         self.body_font = font.Font(app, family="Droid Sans Japanese", size=int(FONT_SIZE*0.8))
 
+        self.base_color = "#e40023" # MyShopの基本色(ロゴより取得)
+        self.base_color_S05 = "#e4d9da" # base_colorのSaturation(彩度)を"05"まで落とした色
+
         self.screen = {"background":"white"}
 
-        self.default_button = {"bg":"white", "fg":"#e40023"}
-        self.primary_button = {"bg":"#e40023", "fg":"white"}
-        self.number_button = {"bg":"#dddddd", "fg":"black"}
+        self.button_borderwidth = 4
+        self.button_relief = "groove"
+        self.button_padx = 0
+        self.button_pady = FONT_SIZE / 4
+        self.default_button = {
+            "bg":"white", "activebackground":"white",
+            "fg":self.base_color, "activeforeground":self.base_color,
+            "highlightbackground":"white", "highlightcolor":"white",
+            "borderwidth":self.button_borderwidth, "relief":self.button_relief,
+            "padx":self.button_padx, "pady":self.button_pady,
+            }
+        self.primary_button = {
+            "bg":self.base_color, "activebackground":self.base_color,
+            "fg":"white", "activeforeground":"white",
+            "borderwidth":self.button_borderwidth, "relief":self.button_relief,
+            "padx":self.button_padx, "pady":self.button_pady,
+            }
+        self.number_button = {
+            "bg":self.base_color_S05, "activebackground":self.base_color_S05,
+            "fg":"black", "activeforeground":"black",
+            "borderwidth":self.button_borderwidth, "relief":self.button_relief,
+            }
 
         self.default_label = {"background":"white"}
 
