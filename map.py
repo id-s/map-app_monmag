@@ -984,7 +984,7 @@ class Style():
 
         self.padding = 4
 
-        self.screen = {"background":"white"}
+        self.screen = {"background":self.base_color_S05}
 
         self.button_borderwidth = 4
         self.button_relief = "raised"
@@ -1014,7 +1014,7 @@ class Style():
             "borderwidth":self.button_borderwidth, "relief":self.button_relief,
             }
 
-        self.default_label = {"background":"white"}
+        self.default_label = {"background":self.base_color_S05}
 
         self.preview_width = 320
         self.preview_height = 200
