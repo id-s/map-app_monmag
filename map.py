@@ -38,6 +38,10 @@ class Menu(tk.Frame):
         # FIXME: 画面の上下を反転させたいが指定不可？　他同様の画面あり
         tk.Frame.__init__(self, parent)
 
+        title_label = tk.Label(self, text="メニュー")
+        title_label.configure(style.title_label)
+        title_label.pack(fill="x")
+
         menu1_button = tk.Button(self, text="MyShopクーポイントをスキャンする",command=self.menu1_button_clicked)
         menu1_button.configure(style.default_button)
         menu1_button.pack(fill="x")
@@ -86,7 +90,11 @@ class CoupointScan(tk.Frame):
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
 
-        label = tk.Label(self, text="クーポイントをスキャンしてください")
+        title_label = tk.Label(self, text="")
+        title_label.configure(style.title_label)
+        title_label.pack(fill="x")
+
+        label = tk.Label(self, text="クーポイントをスキャンしてください。")
         label.configure(style.default_label)
         label.pack(fill="x")
 
@@ -193,9 +201,10 @@ class CoupointShow(tk.Frame):
 
 
     def show_coupoint(self, coupoint):
-        self.title = tk.Label(self, text="来店ポイントプレゼント")
-        self.title.configure(style.default_label)
-        self.title.pack(fill="x")
+
+        self.title_label = tk.Label(self, text="来店ポイントプレゼント")
+        self.title_label.configure(style.title_label)
+        self.title_label.pack(fill="x")
 
         self.use_term_label = tk.Label(self, text="利用可能期間", font=style.header_font, anchor="w")
         self.use_term_label.configure(style.default_label)
@@ -213,7 +222,7 @@ class CoupointShow(tk.Frame):
 
 
     def clear_coupoint(self):
-        self.title.destroy()
+        self.title_label.destroy()
         self.use_term_label.destroy()
         self.use_term.destroy()
         self.button.destroy()
@@ -240,6 +249,10 @@ class CmdSelect(tk.Frame):
 
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
+
+        title_label = tk.Label(self, text="")
+        title_label.configure(style.title_label)
+        title_label.pack(fill="x")
 
         add_point_button = tk.Button(self, text="ポイント付与", command=self.add_point_button_clicked)
         add_point_button.configure(style.default_button)
@@ -278,6 +291,10 @@ class CardSelect(tk.Frame):
 
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
+
+        title_label = tk.Label(self, text="カード選択")
+        title_label.configure(style.title_label)
+        title_label.pack(fill="x")
 
         clients = api.get_clients()
         if (clients):
@@ -343,6 +360,10 @@ class CardScan(tk.Frame):
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
 
+        title_label = tk.Label(self, text="")
+        title_label.configure(style.title_label)
+        title_label.pack(fill="x")
+
         caption = tk.Label(self, text="カードをスキャンしてください。")
         caption.configure(style.default_label)
         caption.pack(fill="x")
@@ -385,6 +406,10 @@ class Policy1(tk.Frame):
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
 
+        title_label = tk.Label(self, text="")
+        title_label.configure(style.title_label)
+        title_label.pack(fill="x")
+
         caption_text = """
             お得なクーポン満載「MyShop」への入会案内メッセージを携帯電話にお送りしますか？
 
@@ -424,6 +449,10 @@ class Policy2(tk.Frame):
 
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
+
+        title_label = tk.Label(self, text="")
+        title_label.configure(style.title_label)
+        title_label.pack(fill="x")
 
         caption_text = """
             （続き）
@@ -470,9 +499,9 @@ class TelEntry(tk.Frame):
 #         caption.configure(style.default_label)
 #         caption.pack(fill="x")
 
-        label = tk.Label(self, text="電話番号入力")
-        label.configure(style.default_label)
-        label.pack(fill="x")
+        title_label = tk.Label(self, text="電話番号入力")
+        title_label.configure(style.title_label)
+        title_label.pack(fill="x")
 
         tel_entry = tk.Entry(self, textvariable=context.entry_text, font=style.default_font)
         tel_entry.pack(fill="x")
@@ -523,9 +552,9 @@ class SalesEntry(tk.Frame):
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
 
-        label = tk.Label(self, text="会計金額入力")
-        label.configure(style.default_label)
-        label.pack(fill="x")
+        title_label = tk.Label(self, text="会計金額入力")
+        title_label.configure(style.title_label)
+        title_label.pack(fill="x")
 
         sales_entry = tk.Entry(self, textvariable=context.entry_text, font=style.default_font)
         sales_entry.pack(fill="x")
@@ -578,9 +607,9 @@ class NumKeys(tk.Frame):
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
 
-        caption = tk.Label(self, textvariable=context.entry_caption)
-        caption.configure(style.default_label)
-        caption.pack(fill="x")
+        title_label = tk.Label(self, textvariable=context.entry_caption)
+        title_label.configure(style.title_label)
+        title_label.pack(fill="x")
 
         entry = tk.Entry(self, textvariable=context.entry_text, font=style.default_font)
         entry.pack(fill="x")
@@ -649,6 +678,10 @@ class Finish(tk.Frame):
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
 
+        title_label = tk.Label(self, text="")
+        title_label.configure(style.title_label)
+        title_label.pack(fill="x")
+
         caption = tk.Label(self, textvariable=context.finish_message)
         caption.configure(style.default_label)
         caption.pack(fill="x")
@@ -669,6 +702,10 @@ class Setting(tk.Frame):
 
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
+
+        title_label = tk.Label(self, text="設定")
+        title_label.configure(style.title_label)
+        title_label.pack(fill="x")
 
         cancel_point_button = tk.Button(self, text="ポイント取消", command=self.cancel_point_button_clicked)
         cancel_point_button.configure(style.default_button)
@@ -1015,6 +1052,7 @@ class Style():
             }
 
         self.default_label = {"background":self.base_color_S05}
+        self.title_label = {"background":"white"}
 
         self.preview_width = 320
         self.preview_height = 200
