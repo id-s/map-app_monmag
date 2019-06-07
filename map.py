@@ -61,13 +61,6 @@ class Menu(tk.Frame):
         menu3_button.configure(style.default_button)
         menu3_button.pack(fill="x", side="bottom")
 
-        menu3_button.bind("<Leave>", self.test_event) ###
-
-
-    def test_event(self, event):
-        app.log(event.type, "TEST") ###
-        menu3_button.configure(state="normal")
-
 
     def menu1_button_clicked(self):
         app.play("button")
