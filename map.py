@@ -99,7 +99,7 @@ class CoupointScan(tk.Frame):
         text_label.pack(fill="x")
 
         if context.on_preview:
-            self.preview = tk.Canvas(self, width = style.preview_width, height = style.preview_height, bg="blue")
+            self.preview = tk.Canvas(self, width = style.preview_width, height = style.preview_height, bg=style.preview_background)
             self.preview.pack()
 
         cancel_button = tk.Button(self, text="キャンセル", command=self.back_menu)
@@ -1053,6 +1053,7 @@ class Style():
         self.preview_height = 200
         self.preview_offset_x = self.preview_width / 2 + 64
         self.preview_offset_y = self.preview_height / 2 + 64
+        self.preview_background = "black"
 
 
 class Context():
