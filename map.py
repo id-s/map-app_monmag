@@ -384,18 +384,7 @@ class CardScan(tk.Frame):
 
     def next_button_clicked(self):
         app.play("button")
-
-        if context.exec_name == "add_point":
-            result = api.check_card()
-            if result == "tel":
-                app.show_frame("Policy1")
-            elif result == "price":
-                app.frames["SalesEntry"].show_num_keys()
-            else:
-                app.showerror("エラー", "エラーが発生しました。")
-
-        elif context.exec_name == "cancel_point":
-                app.frames["SalesEntry"].show_num_keys()
+        app.frames["SalesEntry"].show_num_keys()
 
 
 class Policy1(tk.Frame):
@@ -532,9 +521,7 @@ class TelEntry(tk.Frame):
 
     def next_button_clicked(self):
         app.play("button")
-
-        context.entry_text.set("")
-        app.frames["SalesEntry"].show_num_keys()
+        app.frames["Finish"].show()
 
 
     def show(self):
@@ -586,7 +573,19 @@ class SalesEntry(tk.Frame):
 
     def next_button_clicked(self):
         app.play("button")
-        app.frames["Finish"].show()
+
+        context.entry_text.set("")
+        if context.exec_name == "add_point":
+            result = api.check_card()
+            if result == "tel":
+                app.show_frame("Policy1")
+            elif result == "price":
+                app.frames["Finish"].show()
+            else:
+                app.showerror("エラー", "エラーが発生しました。")
+
+        elif context.exec_name == "cancel_point":
+            app.frames["Finish"].show()
 
 
     def show(self):
