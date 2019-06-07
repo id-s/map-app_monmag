@@ -987,25 +987,30 @@ class Style():
         self.screen = {"background":"white"}
 
         self.button_borderwidth = 4
-        self.button_relief = "groove"
+        self.button_relief = "raised"
         self.button_padx = 0
         self.button_pady = self.font_size / 4
         self.default_button = {
             "bg":"white", "activebackground":"white",
             "fg":self.base_color, "activeforeground":self.base_color,
-            "highlightbackground":"white", "highlightcolor":"white",
+            "highlightbackground":self.base_color_S05, "highlightcolor":self.base_color,
+            "highlightthickness":self.button_borderwidth,
             "borderwidth":self.button_borderwidth, "relief":self.button_relief,
             "padx":self.button_padx, "pady":self.button_pady,
             }
         self.primary_button = {
             "bg":self.base_color, "activebackground":self.base_color,
             "fg":"white", "activeforeground":"white",
+            "highlightbackground":self.base_color_S05, "highlightcolor":self.base_color,
+            "highlightthickness":self.button_borderwidth,
             "borderwidth":self.button_borderwidth, "relief":self.button_relief,
             "padx":self.button_padx, "pady":self.button_pady,
             }
         self.number_button = {
             "bg":self.base_color_S05, "activebackground":self.base_color_S05,
             "fg":"black", "activeforeground":"black",
+            "highlightbackground":self.base_color_S05, "highlightcolor":self.base_color,
+            "highlightthickness":self.button_borderwidth,
             "borderwidth":self.button_borderwidth, "relief":self.button_relief,
             }
 
