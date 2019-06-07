@@ -333,7 +333,7 @@ class CardSelect(tk.Frame):
             app.log("Select card:{}".format(client_cd))
             context.selected_client = client_cd
 
-            app.show_frame("CardScan")
+            app.frames["CardScan"].show()
 
         return func
 
@@ -368,23 +368,51 @@ class CardScan(tk.Frame):
         text_label.configure(style.default_label)
         text_label.pack(fill="x")
 
+        cardno_entry = tk.Entry(self, textvariable=context.scanned_card_no, show="*",
+                                background=style.base_color_S05,
+                                borderwidth=0, highlightthickness=0,
+                                insertbackground=style.base_color_S05, insertborderwidth=0,
+                                selectbackground=style.base_color_S05, selectborderwidth=0,
+                                )
+        cardno_entry.pack(fill="x")
+        cardno_entry.focus_set()
+
+        cardno_entry.bind("<Return>", self.card_scanned)
+
         actions = tk.Frame(self)
         actions.columnconfigure(0, weight=1)
         actions.columnconfigure(1, weight=1)
         actions.pack(fill="x", side="bottom")
 
-        next_button = tk.Button(actions, text="(次へ)", command=self.next_button_clicked)
-        next_button.configure(style.primary_button)
-        next_button.grid(column=0, row=0, sticky="nswe")
-
         cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
         cancel_button.configure(style.default_button)
-        cancel_button.grid(column=1, row=0, sticky="nswe")
+
+        if ON_DEBUG:
+            next_button = tk.Button(actions, text="(次へ)", command=self.next_button_clicked)
+            next_button.configure(style.primary_button)
+            next_button.grid(column=0, row=0, sticky="nswe")
+            cancel_button.grid(column=1, row=0, sticky="nswe")
+
+        else:
+            cancel_button.pack(fill="x", side="bottom")
 
 
     def next_button_clicked(self):
         app.play("button")
+
+        app.log("Entered card:{}".format(context.scanned_card_no.get()))
         app.frames["SalesEntry"].show_num_keys()
+
+
+    def card_scanned(self, event):
+        app.play("success")
+
+        app.log("Scanned card:{}".format(context.scanned_card_no.get()), "INFO")
+        app.frames["SalesEntry"].show_num_keys()
+
+
+    def show(self):
+        app.show_frame(self)
 
 
 class Policy1(tk.Frame):
@@ -1076,10 +1104,10 @@ class Context():
         # ソフトキーボード画面で"OK"を押した時に表示される画面
         self.after_entry = None
 
-        # スキャンされたカードの番号
-        self.scanned_card_no = None
-
         """"以下、ウィジェットと連携している変数"""
+
+        # スキャンされたカードの番号
+        self.scanned_card_no = tk.StringVar()
 
         # ソフトキーボード画面に表示する文言
         self.entry_caption = tk.StringVar()
