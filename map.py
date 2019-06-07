@@ -94,17 +94,17 @@ class CoupointScan(tk.Frame):
         title_label.configure(style.title_label)
         title_label.pack(fill="x")
 
-        label = tk.Label(self, text="クーポイントをスキャンしてください。")
-        label.configure(style.default_label)
-        label.pack(fill="x")
+        text_label = tk.Label(self, text="クーポイントをスキャンしてください。")
+        text_label.configure(style.default_label)
+        text_label.pack(fill="x")
 
         if context.on_preview:
             self.preview = tk.Canvas(self, width = style.preview_width, height = style.preview_height, bg="blue")
             self.preview.pack()
 
-        button = tk.Button(self, text="キャンセル", command=self.back_menu)
-        button.configure(style.default_button)
-        button.pack(fill="x", side="bottom")
+        cancel_button = tk.Button(self, text="キャンセル", command=self.back_menu)
+        cancel_button.configure(style.default_button)
+        cancel_button.pack(fill="x", side="bottom")
 
 #         self.bind("<Activate>", self.start_scan) # Monmagではこのイベントが発生しない
 
@@ -212,20 +212,20 @@ class CoupointShow(tk.Frame):
 
         use_term_from = datetime.strptime(coupoint["use_term_from"], "%Y-%m-%d %H:%M:%S").strftime("%Y年%B%d日(%A)")
         use_term_to = datetime.strptime(coupoint["use_term_to"], "%Y-%m-%d %H:%M:%S").strftime("%Y年%B%d日(%A)")
-        self.use_term = tk.Label(self, text="{} 〜 {}".format(use_term_from, use_term_to), font=style.body_font, justify="left")
-        self.use_term.configure(style.default_label)
-        self.use_term.pack(fill="x")
+        self.use_term_text = tk.Label(self, text="{} 〜 {}".format(use_term_from, use_term_to), font=style.body_font, justify="left")
+        self.use_term_text.configure(style.default_label)
+        self.use_term_text.pack(fill="x")
 
-        self.button = tk.Button(self, text="利用確定", command=self.use_coupoint)
-        self.button.configure(style.primary_button)
-        self.button.pack(fill="x", side="bottom")
+        self.use_button = tk.Button(self, text="利用確定", command=self.use_coupoint)
+        self.use_button.configure(style.primary_button)
+        self.use_button.pack(fill="x", side="bottom")
 
 
     def clear_coupoint(self):
         self.title_label.destroy()
         self.use_term_label.destroy()
-        self.use_term.destroy()
-        self.button.destroy()
+        self.use_term_text.destroy()
+        self.use_button.destroy()
 
 
     def use_coupoint(self):
@@ -364,26 +364,26 @@ class CardScan(tk.Frame):
         title_label.configure(style.title_label)
         title_label.pack(fill="x")
 
-        caption = tk.Label(self, text="カードをスキャンしてください。")
-        caption.configure(style.default_label)
-        caption.pack(fill="x")
+        text_label = tk.Label(self, text="カードをスキャンしてください。")
+        text_label.configure(style.default_label)
+        text_label.pack(fill="x")
 
         actions = tk.Frame(self)
         actions.columnconfigure(0, weight=1)
         actions.columnconfigure(1, weight=1)
         actions.pack(fill="x", side="bottom")
 
-        button1 = tk.Button(actions, text="(次へ)", command=self.button1_clicked)
-        button1.configure(style.primary_button)
-        button1.grid(column=0, row=0, sticky="nswe")
-        button1.focus_set()
+        next_button = tk.Button(actions, text="(次へ)", command=self.next_button_clicked)
+        next_button.configure(style.primary_button)
+        next_button.grid(column=0, row=0, sticky="nswe")
+        next_button.focus_set()
 
-        button2 = tk.Button(actions, text="キャンセル", command=app.back_menu)
-        button2.configure(style.default_button)
-        button2.grid(column=1, row=0, sticky="nswe")
+        cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        cancel_button.configure(style.default_button)
+        cancel_button.grid(column=1, row=0, sticky="nswe")
 
 
-    def button1_clicked(self):
+    def next_button_clicked(self):
         app.play("button")
 
         if context.exec_name == "add_point":
@@ -410,7 +410,7 @@ class Policy1(tk.Frame):
         title_label.configure(style.title_label)
         title_label.pack(fill="x")
 
-        caption_text = """
+        text = """
             お得なクーポン満載「MyShop」への入会案内メッセージを携帯電話にお送りしますか？
 
             事業者名：マギー株式会社
@@ -418,27 +418,27 @@ class Policy1(tk.Frame):
 
             入力された情報は、本目的のみに利用いたします。
             """
-        caption = tk.Label(self, text=textwrap.dedent(caption_text), font=style.body_font,
-                           wraplength=(WINDOW_WIDTH - style.padding * 2), justify="left", height=9, padx=style.padding)
-        caption.configure(style.default_label)
-        caption.pack(fill="x")
+        text_label = tk.Label(self, text=textwrap.dedent(text), font=style.body_font,
+                              wraplength=(WINDOW_WIDTH - style.padding * 2), justify="left", height=9, padx=style.padding)
+        text_label.configure(style.default_label)
+        text_label.pack(fill="x")
 
         actions = tk.Frame(self)
         actions.columnconfigure(0, weight=1)
         actions.columnconfigure(1, weight=1)
         actions.pack(fill="x", side="bottom")
 
-        button1 = tk.Button(actions, text="次へ", command=self.button1_clicked)
-        button1.configure(style.primary_button)
-        button1.grid(column=0, row=0, sticky="nswe")
-        button1.focus_set()
+        next_button = tk.Button(actions, text="次へ", command=self.next_button_clicked)
+        next_button.configure(style.primary_button)
+        next_button.grid(column=0, row=0, sticky="nswe")
+        next_button.focus_set()
 
-        button2 = tk.Button(actions, text="キャンセル", command=app.back_menu)
-        button2.configure(style.default_button)
-        button2.grid(column=1, row=0, sticky="nswe")
+        cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        cancel_button.configure(style.default_button)
+        cancel_button.grid(column=1, row=0, sticky="nswe")
 
 
-    def button1_clicked(self):
+    def next_button_clicked(self):
         app.play("button")
         app.show_frame("Policy2")
 
@@ -454,32 +454,32 @@ class Policy2(tk.Frame):
         title_label.configure(style.title_label)
         title_label.pack(fill="x")
 
-        caption_text = """
+        text = """
             （続き）
             入力された情報の第三者提供は行いません。本事業の運用業務を他社に委託する場合があります。
             情報のご提供は任意です。ご提供いただけない場合、MyShopサービスへの入会案内メッセージはお送りいたしません。
             """
-        caption = tk.Label(self, text=textwrap.dedent(caption_text), font=style.body_font,
-                           wraplength=(WINDOW_WIDTH - style.padding * 2), justify="left", height=9, padx=style.padding)
-        caption.configure(style.default_label)
-        caption.pack(fill="x")
+        text_label = tk.Label(self, text=textwrap.dedent(text), font=style.body_font,
+                              wraplength=(WINDOW_WIDTH - style.padding * 2), justify="left", height=9, padx=style.padding)
+        text_label.configure(style.default_label)
+        text_label.pack(fill="x")
 
         actions = tk.Frame(self)
         actions.columnconfigure(0, weight=1)
         actions.columnconfigure(1, weight=1)
         actions.pack(fill="x", side="bottom")
 
-        button1 = tk.Button(actions, text="同意する", command=self.button1_clicked)
-        button1.configure(style.primary_button)
-        button1.grid(column=0, row=0, sticky="nswe")
-        button1.focus_set()
+        next_button = tk.Button(actions, text="同意する", command=self.next_button_clicked)
+        next_button.configure(style.primary_button)
+        next_button.grid(column=0, row=0, sticky="nswe")
+        next_button.focus_set()
 
-        button2 = tk.Button(actions, text="キャンセル", command=app.back_menu)
-        button2.configure(style.default_button)
-        button2.grid(column=1, row=0, sticky="nswe")
+        cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        cancel_button.configure(style.default_button)
+        cancel_button.grid(column=1, row=0, sticky="nswe")
 
 
-    def button1_clicked(self):
+    def next_button_clicked(self):
         app.play("button")
 
         context.entry_caption.set("電話番号入力")
@@ -506,24 +506,24 @@ class TelEntry(tk.Frame):
         tel_entry = tk.Entry(self, textvariable=context.entry_text, font=style.default_font)
         tel_entry.pack(fill="x")
 
-        caption = tk.Label(self, text="上記電話番号にショートメールでお知らせします。",
-                           wraplength=(WINDOW_WIDTH - style.padding * 2), justify="left", height=2, padx=style.padding)
-        caption.configure(style.default_label)
-        caption.pack(fill="x")
+        text_label = tk.Label(self, text="上記電話番号にショートメールでお知らせします。",
+                              wraplength=(WINDOW_WIDTH - style.padding * 2), justify="left", height=2, padx=style.padding)
+        text_label.configure(style.default_label)
+        text_label.pack(fill="x")
 
         actions = tk.Frame(self)
         actions.columnconfigure(0, weight=1)
         actions.columnconfigure(1, weight=1)
         actions.pack(side="bottom", fill="x")
 
-        button1 = tk.Button(actions, text="確定", command=self.button1_clicked)
-        button1.configure(style.primary_button)
-        button1.grid(column=0, row=0, sticky="nswe")
-        button1.focus_set()
+        next_button = tk.Button(actions, text="確定", command=self.next_button_clicked)
+        next_button.configure(style.primary_button)
+        next_button.grid(column=0, row=0, sticky="nswe")
+        next_button.focus_set()
 
-        button2 = tk.Button(actions, text="キャンセル", command=app.back_menu)
-        button2.configure(style.default_button)
-        button2.grid(column=1, row=0, sticky="nswe")
+        cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        cancel_button.configure(style.default_button)
+        cancel_button.grid(column=1, row=0, sticky="nswe")
 
         tel_entry.bind("<FocusIn>", self.show_num_keys)
 
@@ -534,7 +534,7 @@ class TelEntry(tk.Frame):
         app.show_frame("NumKeys", False)
 
 
-    def button1_clicked(self):
+    def next_button_clicked(self):
         app.play("button")
 
         context.entry_text.set("")
@@ -559,9 +559,9 @@ class SalesEntry(tk.Frame):
         sales_entry = tk.Entry(self, textvariable=context.entry_text, font=style.default_font)
         sales_entry.pack(fill="x")
 
-        label2 = tk.Label(self, text="ポイント")
-        label2.configure(style.default_label)
-        label2.pack(fill="x")
+        point_label = tk.Label(self, text="ポイント")
+        point_label.configure(style.default_label)
+        point_label.pack(fill="x")
 
         point_entry = tk.Entry(self, textvariable=context.point_num, font=style.default_font)
         point_entry.pack(fill="x")
@@ -571,14 +571,14 @@ class SalesEntry(tk.Frame):
         actions.columnconfigure(1, weight=1)
         actions.pack(side="bottom", fill="x")
 
-        button1 = tk.Button(actions, textvariable=context.sales_entry_button_text, command=self.button1_clicked)
-        button1.configure(style.primary_button)
-        button1.grid(column=0, row=0, sticky="nswe")
-        button1.focus_set()
+        next_button = tk.Button(actions, textvariable=context.sales_entry_button_text, command=self.next_button_clicked)
+        next_button.configure(style.primary_button)
+        next_button.grid(column=0, row=0, sticky="nswe")
+        next_button.focus_set()
 
-        button2 = tk.Button(actions, text="キャンセル", command=app.back_menu)
-        button2.configure(style.default_button)
-        button2.grid(column=1, row=0, sticky="nswe")
+        cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        cancel_button.configure(style.default_button)
+        cancel_button.grid(column=1, row=0, sticky="nswe")
 
         sales_entry.bind("<FocusIn>", self.show_num_keys)
 
@@ -589,7 +589,7 @@ class SalesEntry(tk.Frame):
         app.show_frame("NumKeys", False)
 
 
-    def button1_clicked(self):
+    def next_button_clicked(self):
         app.play("button")
         app.frames["Finish"].show()
 
@@ -682,9 +682,9 @@ class Finish(tk.Frame):
         title_label.configure(style.title_label)
         title_label.pack(fill="x")
 
-        caption = tk.Label(self, textvariable=context.finish_message)
-        caption.configure(style.default_label)
-        caption.pack(fill="x")
+        message_label = tk.Label(self, textvariable=context.finish_message)
+        message_label.configure(style.default_label)
+        message_label.pack(fill="x")
 
 
     def show(self, duration = 3):
