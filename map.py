@@ -202,7 +202,7 @@ class CoupointShow(tk.Frame):
 
     def show_coupoint(self, coupoint):
 
-        self.title_label = tk.Label(self, text="来店ポイントプレゼント")
+        self.title_label = tk.Label(self, text=coupoint["title"])
         self.title_label.configure(style.title_label)
         self.title_label.pack(fill="x")
 
@@ -210,26 +210,32 @@ class CoupointShow(tk.Frame):
         self.use_term_label.configure(style.default_label)
         self.use_term_label.pack(fill="x")
 
-        use_term_from = datetime.strptime(coupoint["use_term_from"], "%Y-%m-%d %H:%M:%S").strftime("%Y年%B%d日(%A)")
-        use_term_to = datetime.strptime(coupoint["use_term_to"], "%Y-%m-%d %H:%M:%S").strftime("%Y年%B%d日(%A)")
+        use_term_from = datetime.strptime(coupoint["use_term_from"], "%Y-%m-%d %H:%M:%S").strftime("%Y年%B%d日(%a)")
+        use_term_to = datetime.strptime(coupoint["use_term_to"], "%Y-%m-%d %H:%M:%S").strftime("%Y年%B%d日(%a)")
         self.use_term_text = tk.Label(self, text="{} 〜 {}".format(use_term_from, use_term_to), font=style.body_font, justify="left")
         self.use_term_text.configure(style.default_label)
         self.use_term_text.pack(fill="x")
 
         self.description_label = tk.Label(self, text="[クーポイント内容]", font=style.header_font, anchor="w")
-        self.description_label.configure(style.default_label)
-        self.description_label.pack(fill="x")
-
         self.description_text = tk.Label(self, text=coupoint["description"], font=style.body_font, justify="left", height=1)
-        self.description_text.configure(style.default_label)
-#         self.description_text.configure(background="white")
-        self.description_text.pack(fill="x")
+        if (coupoint["description"]):
+            self.description_label.configure(style.default_label)
+            self.description_label.pack(fill="x")
+
+            self.description_text.configure(style.default_label)
+    #         self.description_text.configure(background="white")
+            self.description_text.pack(fill="x")
+
+            use_condition_height = 3
+
+        else:
+            use_condition_height = 5
 
         self.use_condition_label = tk.Label(self, text="[利用条件]", font=style.header_font, anchor="w")
         self.use_condition_label.configure(style.default_label)
         self.use_condition_label.pack(fill="x")
 
-        self.use_condition_text = tk.Label(self, text=coupoint["use_condition"], font=style.body_font, justify="left", height=3)
+        self.use_condition_text = tk.Label(self, text=coupoint["use_condition"], font=style.body_font, justify="left", height=use_condition_height)
         self.use_condition_text.configure(style.default_label)
 #         self.use_condition_text.configure(background="white")
         self.use_condition_text.pack(fill="x")
