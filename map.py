@@ -19,6 +19,7 @@ from pprint import pprint
 from pyzbar import pyzbar
 
 APP_ENV = os.getenv("APP_ENV", "Monmag")
+APP_MODE = os.getenv("APP_MODE", "normal")
 ON_DEBUG = os.getenv("ON_DEBUG", False)
 
 locale.setlocale(locale.LC_TIME, 'ja_JP.UTF-8')
@@ -149,13 +150,13 @@ class CoupointScan(tk.Frame):
     def after_scan(self, data):
         app.log("after_scan")
         coupoint_show = app.frames["CoupointShow"]
-        decoded_data = coupoint_show.parse_decoded_data(data)
+        result = coupoint_show.parse_decoded_data(data)
 
-        if decoded_data:
+        if result:
             app.play("success")
             self.on_scan = False
             self.capture.release()
-            app.frames["CoupointShow"].show(decoded_data)
+            app.frames["CoupointShow"].show()
         else:
             app.showerror("クーポイントエラー", "このQRコードはクーポイントではありません。")
 
@@ -189,15 +190,21 @@ class CoupointShow(tk.Frame):
 
 
     def parse_decoded_data(self, decoded_data):
-        """QRコードで読み取った文字列をパースする
+        """QRコードで読み取った文字列をパースし、customer_id, carousel_idを取得する
         @see https://redmine.magee.co.jp/projects/myshop/wiki/%E3%82%AF%E3%83%BC%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88QR%E3%82%B3%E3%83%BC%E3%83%89%E3%81%AE%E4%BB%95%E6%A7%98
         """
-        parsed_data = {}
         lines = decoded_data.split("\r\n")
-        if (len(lines) == 4 and lines[0] == "MyShop"):
-            parsed_data["customer_id"] = lines[1]
-            parsed_data["carousel_id"] = lines[2]
-        return parsed_data
+        if context.app_mode == "test":
+            context.customer_id = "20b097add4aea673e074d77fe1495434"
+            context.carousel_id = "327765a3ec00962ccc050e91354dcc64"
+            return True
+
+        elif (len(lines) == 4 and lines[0] == "MyShop"):
+            context.customer_id = lines[1]
+            context.carousel_id = lines[2]
+            return True
+
+        return False
 
 
     def show_coupoint(self, coupoint):
@@ -264,8 +271,8 @@ class CoupointShow(tk.Frame):
         app.frames["Finish"].show()
 
 
-    def show(self, decoded_data):
-        coupoint = api.get_coupoint(decoded_data)
+    def show(self):
+        coupoint = api.get_coupoint()
         self.show_coupoint(coupoint)
         app.show_frame(self)
 
@@ -415,7 +422,7 @@ class CardScan(tk.Frame):
         cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
         cancel_button.configure(style.default_button)
 
-        if ON_DEBUG:
+        if context.app_mode == "test":
             next_button = tk.Button(actions, text="(次へ)", command=self.next_button_clicked)
             next_button.configure(style.primary_button)
             next_button.grid(column=0, row=0, sticky="nswe")
@@ -428,14 +435,20 @@ class CardScan(tk.Frame):
     def next_button_clicked(self):
         app.play("button")
 
-        app.log("Entered card:{}".format(context.scanned_no.get()))
+        if context.app_mode == "test":
+            context.card_no = "CRC0S0 32840000000000200001"
+        else:
+            context.card_no = context.scanned_no.get()
+
+        app.log("Entered card:{}".format(context.card_no))
         app.frames["SalesEntry"].show_num_keys()
 
 
     def card_scanned(self, event):
         app.play("success")
 
-        app.log("Scanned card:{}".format(context.scanned_no.get()), "INFO")
+        context.card_no = context.scanned_no.get()
+        app.log("Scanned card:{}".format(context.card_no), "INFO")
         app.frames["SalesEntry"].show_num_keys()
 
 
@@ -535,11 +548,6 @@ class TelEntry(tk.Frame):
 
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
-
-#         caption = tk.Label(self, text="初めてのご利用の方は進呈ポイントをショートメールでお知らせします。",
-#                            wraplength=(WINDOW_WIDTH - style.padding * 2), justify="left", height=2, padx=style.padding)
-#         caption.configure(style.default_label)
-#         caption.pack(fill="x")
 
         title_label = tk.Label(self, text="電話番号入力")
         title_label.configure(style.title_label)
@@ -753,7 +761,7 @@ class Finish(tk.Frame):
         @param duration 表示時間(単位は秒)
         """
         app.show_frame(self)
-        context.clear(excepts=["finish_message"])
+        context.reset(excepts=["finish_message"])
         self.after(duration * 1000, lambda: app.show_frame("Menu", False))
 
 
@@ -771,6 +779,10 @@ class Setting(tk.Frame):
         cancel_point_button = tk.Button(self, text="ポイント取消", command=self.cancel_point_button_clicked)
         cancel_point_button.configure(style.default_button)
         cancel_point_button.pack(fill="x")
+
+        switch_mode_button = tk.Button(self, text="モード切り替え", command=self.switch_mode_button_clicked)
+        switch_mode_button.configure(style.default_button)
+        switch_mode_button.pack(fill="x")
 
         wifi_button = tk.Button(self, text="Wi-Fi設定", state="disabled")
         wifi_button.configure(style.default_button)
@@ -790,6 +802,63 @@ class Setting(tk.Frame):
         app.frames["CardSelect"].show("cancel")
 
 
+    def switch_mode_button_clicked(self):
+        app.play("button")
+        app.show_frame("SwitchMode")
+
+
+class SwitchMode(tk.Frame):
+    """モード切り替え
+    """
+
+    def __init__(self, parent):
+        tk.Frame.__init__(self, parent)
+
+        title_label = tk.Label(self, text="モード切り替え")
+        title_label.configure(style.title_label)
+        title_label.pack(fill="x")
+
+        self.text_label = tk.Label(self, text=self.get_mode_text())
+        self.text_label.configure(style.default_label)
+        self.text_label.pack(fill="x")
+
+        normal_mode_button = tk.Button(self, text="通常モード", command=lambda: self.mode_button_clicked("normal"))
+        normal_mode_button.configure(style.default_button)
+        normal_mode_button.pack(fill="x")
+
+        test_mode_button = tk.Button(self, text="テストモード", command=lambda: self.mode_button_clicked("test"))
+        test_mode_button.configure(style.default_button)
+        test_mode_button.pack(fill="x")
+
+        cancel_button = tk.Button(self, text="キャンセル", command=app.back_menu)
+        cancel_button.configure(style.default_button)
+        cancel_button.pack(fill="x", side="bottom")
+
+
+    def get_mode_name(self):
+        if context.app_mode == "normal":
+            return "通常"
+        elif context.app_mode == "test":
+            return "テスト"
+        else:
+            return ""
+
+
+    def get_mode_text(self):
+        return "現在は「{}」モードです。".format(self.get_mode_name())
+
+
+    def mode_button_clicked(self, mode):
+        app.play("button")
+
+        context.reset()
+        context.app_mode = mode
+        self.text_label.configure(text=self.get_mode_text())
+
+        context.finish_message.set("「{}」モードへ変更しました。".format(self.get_mode_name()))
+        app.frames["Finish"].show()
+
+
 class MapApi():
 
     def check_coupoint(self):
@@ -800,60 +869,67 @@ class MapApi():
 
         data = {
             "terminal": {
-                "macaddr": "48:a9:e9:dc:e2:65", # context.macaddress, # TODO:取得情報に差し替え
-                "serial_no": "0123456789ABCDEF", # context.serialno,
+                "macaddr": context.macaddress,
+                "serial_no": context.serialno,
                 }
             }
 
         app.log("POST {}".format(url), "INFO")
         app.log(json.dumps(data), "INFO")
-        resp = requests.post(url, data=json.dumps(data), headers=headers)
+        try:
+            resp = requests.post(url, data=json.dumps(data), headers=headers)
 
-        if resp.status_code == 200:
-            app.log(resp.text, "INFO")
-            resp_data = resp.json()
-            if resp_data["result"] == "success":
-                return True
+            if resp.status_code == 200:
+                app.log(resp.text, "INFO")
+                resp_data = resp.json()
+                if resp_data["result"] == "success":
+                    return True
+                else:
+                    return False
             else:
+                app.log(resp.status_code, "WARNING")
                 return False
-        else:
-            app.log(resp.status_code, "WARNING")
+
+        except Exception as e:
+            print(e)
             return False
 
 
-    def get_coupoint(self, decoded_data):
+    def get_coupoint(self):
         """クーポイントの詳細を取得する
-        @param decoded_data QRコードから読み込まれたデータ(要parse)
         """
         url = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/start"
         headers = {"Content-Type": "application/json"}
 
-        app.log("customer_id:{}, carousel_id:{}".format(decoded_data["customer_id"], decoded_data["carousel_id"])) ###
         data = {
             "terminal": {
-                "macaddr": "48:a9:e9:dc:e2:65", # context.macaddress, # TODO:取得情報に差し替え
-                "serial_no": "0123456789ABCDEF", # context.serialno,
+                "macaddr": context.macaddress,
+                "serial_no": context.serialno,
                 },
             "carousel": {
-                "customer_id": "20b097add4aea673e074d77fe1495434", # TODO:取得情報に差し替え
-                "carousel_id": "327765a3ec00962ccc050e91354dcc64",
+                "customer_id": context.customer_id,
+                "carousel_id": context.carousel_id,
                 }
             }
 
         app.log("POST {}".format(url), "INFO")
         app.log(json.dumps(data), "INFO")
-        resp = requests.post(url, data=json.dumps(data), headers=headers)
+        try:
+            resp = requests.post(url, data=json.dumps(data), headers=headers)
 
-        if resp.status_code == 200:
-            app.log(resp.text, "INFO")
-            resp_data = resp.json()
-            if resp_data["result"] == "regist":
-                return resp_data["carousel"]
+            if resp.status_code == 200:
+                app.log(resp.text, "INFO")
+                resp_data = resp.json()
+                if resp_data["result"] == "regist":
+                    return resp_data["carousel"]
+                else:
+                    return None
             else:
-                app.log(resp_data["result"], "WARNING")
+                app.log(resp.status_code, "WARNING")
                 return None
-        else:
-            app.log(resp.status_code, "WARNING")
+
+        except Exception as e:
+            print(e)
             return None
 
 
@@ -865,25 +941,30 @@ class MapApi():
 
         data = {
             "terminal": {
-                "macaddr": "48:a9:e9:dc:e2:65", # context.macaddress, # TODO:取得情報に差し替え
-                "serial_no": "0123456789ABCDEF", # context.serialno,
+                "macaddr": context.macaddress,
+                "serial_no": context.serialno,
                 },
             "carousel": {
-                "customer_id": "20b097add4aea673e074d77fe1495434", # TODO:取得情報に差し替え
-                "carousel_id": "327765a3ec00962ccc050e91354dcc64",
+                "customer_id": context.customer_id,
+                "carousel_id": context.carousel_id,
                 }
             }
 
         app.log("POST {}".format(url), "INFO")
         app.log(json.dumps(data), "INFO")
-        resp = requests.post(url, data=json.dumps(data), headers=headers)
+        try:
+            resp = requests.post(url, data=json.dumps(data), headers=headers)
 
-        if resp.status_code == 200 or resp.status_code == 404:
-            app.log(resp.text, "INFO")
-            resp_data = resp.json()
-            return resp_data["result"]
-        else:
-            app.log(resp.status_code, "WARNING")
+            if resp.status_code == 200 or resp.status_code == 404:
+                app.log(resp.text, "INFO")
+                resp_data = resp.json()
+                return resp_data["result"]
+            else:
+                app.log(resp.status_code, "WARNING")
+                return None
+
+        except Exception as e:
+            print(e)
             return None
 
 
@@ -895,25 +976,30 @@ class MapApi():
 
         data = {
             "terminal": {
-                "macaddr": "48:a9:e9:dc:e2:65", # context.macaddress, # TODO:取得情報に差し替え
-                "serial_no": "0123456789ABCDEF", # context.serialno,
+                "macaddr": context.macaddress,
+                "serial_no": context.serialno,
                 },
             "carousel": {
-                "customer_id": "20b097add4aea673e074d77fe1495434", # TODO:取得情報に差し替え
-                "carousel_id": "327765a3ec00962ccc050e91354dcc64",
+                "customer_id": context.customer_id,
+                "carousel_id": context.carousel_id,
                 }
             }
 
         app.log("POST {}".format(url), "INFO")
         app.log(json.dumps(data), "INFO")
-        resp = requests.post(url, data=json.dumps(data), headers=headers)
+        try:
+            resp = requests.post(url, data=json.dumps(data), headers=headers)
 
-        if resp.status_code == 200 or resp.status_code == 404:
-            app.log(resp.text, "INFO")
-            resp_data = resp.json()
-            return resp_data["result"]
-        else:
-            app.log(resp.status_code, "WARNING")
+            if resp.status_code == 200 or resp.status_code == 404:
+                app.log(resp.text, "INFO")
+                resp_data = resp.json()
+                return resp_data["result"]
+            else:
+                app.log(resp.status_code, "WARNING")
+                return None
+
+        except Exception as e:
+            print(e)
             return None
 
 
@@ -925,21 +1011,29 @@ class MapApi():
 
         data = {
             "terminal": {
-                "macaddr": "48:a9:e9:dc:e2:65", # context.macaddress, # TODO:取得情報に差し替え
-                "serial_no": "0123456789ABCDEF", # context.serialno,
+                "macaddr": context.macaddress,
+                "serial_no": context.serialno,
                 }
             }
 
         app.log("POST {}".format(url), "INFO")
         app.log(json.dumps(data), "INFO")
-        resp = requests.post(url, data=json.dumps(data), headers=headers)
+        try:
+            resp = requests.post(url, data=json.dumps(data), headers=headers)
 
-        if resp.status_code == 200:
-            app.log(resp.text, "INFO")
-            resp_data = resp.json()
-            return resp_data["clients"]
-        else:
-            app.log(resp.status_code, "WARNING")
+            if resp.status_code == 200:
+                app.log(resp.text, "INFO")
+                resp_data = resp.json()
+                if resp_data["result"] == "success":
+                    return resp_data["clients"]
+                else:
+                    return None
+            else:
+                app.log(resp.status_code, "WARNING")
+                return None
+
+        except Exception as e:
+            print(e)
             return None
 
 
@@ -955,26 +1049,30 @@ class MapApi():
 
         data = {
             "terminal": {
-                "macaddr": "48:a9:e9:dc:e2:65", # context.macaddress, # TODO:取得情報に差し替え
-                "serial_no": "0123456789ABCDEF", # context.serialno,
+                "macaddr": context.macaddress,
+                "serial_no": context.serialno,
                 },
             "customer": {
-                "card_no": "CRC0S0 32840000000000200001", # TODO:取得情報に差し替え
+                "card_no": context.card_no,
                 "client_cd": context.selected_client,
-                "card_id": 1,
                 }
             }
 
         app.log("POST {}".format(url), "INFO")
         app.log(json.dumps(data), "INFO")
-        resp = requests.post(url, data=json.dumps(data), headers=headers)
+        try:
+            resp = requests.post(url, data=json.dumps(data), headers=headers)
 
-        if resp.status_code == 200 or resp.status_code == 404:
-            app.log(resp.text, "INFO")
-            resp_data = resp.json()
-            return resp_data["result"]
-        else:
-            app.log(resp.status_code, "WARNING")
+            if resp.status_code == 200 or resp.status_code == 404:
+                app.log(resp.text, "INFO")
+                resp_data = resp.json()
+                return resp_data["result"]
+            else:
+                app.log(resp.status_code, "WARNING")
+                return None
+
+        except Exception as e:
+            print(e)
             return None
 
 
@@ -986,30 +1084,31 @@ class MapApi():
 
         data = {
             "terminal": {
-                "macaddr": "48:a9:e9:dc:e2:65", # context.macaddress, # TODO:取得情報に差し替え
-                "serial_no": "0123456789ABCDEF", # context.serialno,
+                "macaddr": context.macaddress,
+                "serial_no": context.serialno,
                 },
             "customer": {
-                "card_no": "CRC0S0 32840000000000200001", # TODO:取得情報に差し替え
+                "card_no": context.card_no,
                 "price": context.price,
                 "client_cd": context.selected_client,
-                "card_id": 1,
                 }
             }
 
         app.log("POST {}".format(url), "INFO")
         app.log(json.dumps(data), "INFO")
-        resp = requests.post(url, data=json.dumps(data), headers=headers)
+        try:
+            resp = requests.post(url, data=json.dumps(data), headers=headers)
 
-        if resp.status_code == 200:
-            app.log(resp.text, "INFO")
-            resp_data = resp.json()
-            if resp_data["result"]:
+            if resp.status_code == 200:
+                app.log(resp.text, "INFO")
+                resp_data = resp.json()
                 return resp_data["result"]
             else:
+                app.log(resp.status_code, "WARNING")
                 return None
-        else:
-            app.log(resp.status_code, "WARNING")
+
+        except Exception as e:
+            print(e)
             return None
 
 
@@ -1021,11 +1120,11 @@ class MapApi():
 
         data = {
             "terminal": {
-                "macaddr": "48:a9:e9:dc:e2:65", # context.macaddress, # TODO:取得情報に差し替え
-                "serial_no": "0123456789ABCDEF", # context.serialno,
+                "macaddr": context.macaddress,
+                "serial_no": context.serialno,
                 },
             "customer": {
-                "card_no": "CRC0S0 32840000000000200001", # context.card_no, # TODO:取得情報に差し替え
+                "card_no": context.card_no,
                 "price": context.price,
                 "point": context.point_num.get(),
                 "tel": context.tel,
@@ -1034,14 +1133,19 @@ class MapApi():
 
         app.log("POST {}".format(url), "INFO")
         app.log(json.dumps(data), "INFO")
-        resp = requests.post(url, data=json.dumps(data), headers=headers)
+        try:
+            resp = requests.post(url, data=json.dumps(data), headers=headers)
 
-        if resp.status_code == 200 or resp.status_code == 404:
-            app.log(resp.text, "INFO")
-            resp_data = resp.json()
-            return resp_data["result"]
-        else:
-            app.log(resp.status_code, "WARNING")
+            if resp.status_code == 200 or resp.status_code == 404:
+                app.log(resp.text, "INFO")
+                resp_data = resp.json()
+                return resp_data["result"]
+            else:
+                app.log(resp.status_code, "WARNING")
+                return None
+
+        except Exception as e:
+            print(e)
             return None
 
 
@@ -1053,11 +1157,11 @@ class MapApi():
 
         data = {
             "terminal": {
-                "macaddr": "48:a9:e9:dc:e2:65", # context.macaddress, # TODO:取得情報に差し替え
-                "serial_no": "0123456789ABCDEF", # context.serialno,
+                "macaddr": context.macaddress,
+                "serial_no": context.serialno,
                 },
             "customer": {
-                "card_no": "CRC0S0 32840000000000200001", # context.card_no, # TODO:取得情報に差し替え
+                "card_no": context.card_no,
                 "price": context.price,
                 "point": context.point_num.get(),
                 }
@@ -1065,14 +1169,19 @@ class MapApi():
 
         app.log("POST {}".format(url), "INFO")
         app.log(json.dumps(data), "INFO")
-        resp = requests.post(url, data=json.dumps(data), headers=headers)
+        try:
+            resp = requests.post(url, data=json.dumps(data), headers=headers)
 
-        if resp.status_code == 200 or resp.status_code == 404:
-            app.log(resp.text, "INFO")
-            resp_data = resp.json()
-            return resp_data["result"]
-        else:
-            app.log(resp.status_code, "WARNING")
+            if resp.status_code == 200 or resp.status_code == 404:
+                app.log(resp.text, "INFO")
+                resp_data = resp.json()
+                return resp_data["result"]
+            else:
+                app.log(resp.status_code, "WARNING")
+                return None
+
+        except Exception as e:
+            print(e)
             return None
 
 
@@ -1092,6 +1201,7 @@ class MapApp(tk.Tk):
                NumKeys, # ソフトキーボード
                Finish, # 完了
                Setting, # 設定
+               SwitchMode, # モード切り替え
                )
 
 
@@ -1248,17 +1358,26 @@ class Style():
 class Context():
 
     def __init__(self):
+        # 実行モード
+        self.app_mode = APP_MODE
+
         # 端末のシリアルナンバー
         self.serialno = self._get_serialno()
 
         # 端末のMACアドレス
-        self.macaddress = self._get_serialno()
+        self.macaddress = self._get_macaddress()
 
         # 実行中の処理名
         self.exec_name = None
 
         # プレビュー表示フラグ
         self.on_preview = True
+
+        # カスタマーID
+        self.customer_id = None
+
+        # クーポイントID
+        self.carousel_id = None
 
         # 選択されたカード(流通)
         self.selected_client = None
@@ -1296,12 +1415,24 @@ class Context():
         self.finish_message = tk.StringVar()
 
 
-    def clear(self, excepts=[]):
+    def reset(self, excepts=[]):
+        if not "serialno" in excepts:
+            self.serialno = self._get_serialno()
+
+        if not "macaddress" in excepts:
+            self.macaddress = self._get_macaddress()
+
         if not "exec_name" in excepts:
             self.exec_name = None
 
         if not "on_preview" in excepts:
             self.on_preview = True
+
+        if not "customer_id" in excepts:
+            self.customer_id = None
+
+        if not "carousel_id" in excepts:
+            self.carousel_id = None
 
         if not "selected_client" in excepts:
             self.selected_client = None
@@ -1319,7 +1450,7 @@ class Context():
             self.after_entry = None
 
         if not "scanned_no" in excepts:
-            self.scanned_no = None
+            self.scanned_no.set("")
 
         if not "entry_caption" in excepts:
             self.entry_caption.set("")
@@ -1338,17 +1469,23 @@ class Context():
 
 
     def _get_serialno(self):
+        if self.app_mode == "test":
+            return "0123456789ABCDEF"
+
         try:
-            xml = ET.parse("/home/pi/Git/monmag-rpi/qrcode_reader/mqtt.xml")
+            xml = ET.parse("/home/pi/Git/monmag-rpi/qrcode_reader/mqtt.xml") # Monmag
         except IOError:
-            xml = ET.parse("mqtt.xml")
+            xml = ET.parse("mqtt.xml") # 開発用
 
-        self.serialno = xml.find('deviceid').text
+        serialno = xml.find('deviceid').text
 
-        return self.serialno
+        return serialno
 
 
     def _get_macaddress(self):
+        if self.app_mode == "test":
+            return "48:a9:e9:dc:e2:65"
+
         try:
             file = open("/sys/class/net/wlan0/address", "r") # Monmag
         except IOError:
@@ -1357,7 +1494,7 @@ class Context():
         macaddress = str.strip(file.readline())
         file.close()
 
-        return self.macaddress
+        return macaddress
 
 
 class MapAppException(Exception):
