@@ -330,12 +330,19 @@ class CardSelect(tk.Frame):
         title_label.configure(style.title_label)
         title_label.pack(fill="x")
 
+        self.card_buttons = []
+        self.add_buttons()
+
+        cancel_button = tk.Button(self, text="キャンセル", command=app.back_menu)
+        cancel_button.configure(style.default_button)
+        cancel_button.pack(fill="x", side="bottom")
+
+
+    def add_buttons(self):
         clients = api.get_clients()
-        if (clients):
-            self.add_buttons(clients)
+        if not clients:
+            return
 
-
-    def add_buttons(self, clients):
         for client in clients:
             resp = requests.get(client["img_url"], stream=True)
             if resp.status_code != 200:
@@ -352,9 +359,14 @@ class CardSelect(tk.Frame):
             button.configure(style.default_button)
             button.pack(fill="x")
 
-        button = tk.Button(self, text="キャンセル", command=app.back_menu)
-        button.configure(style.default_button)
-        button.pack(fill="x", side="bottom")
+            self.card_buttons.append(button)
+
+
+    def reset_buttons(self):
+        for button in self.card_buttons:
+            button.destroy()
+
+        self.add_buttons()
 
 
     def select_card(self, client_cd):
@@ -850,9 +862,12 @@ class SwitchMode(tk.Frame):
     def mode_button_clicked(self, mode):
         app.play("button")
 
-        context.reset()
         context.app_mode = mode
+        context.reset()
         self.text_label.configure(text=self.get_mode_text())
+
+        app.log(context.macaddress, "DEV") ###
+        app.frames["CardSelect"].reset_buttons()
 
         context.finish_message.set("「{}」モードへ変更しました。".format(self.get_mode_name()))
         app.frames["Finish"].show()
