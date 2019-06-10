@@ -1257,7 +1257,7 @@ class MapApp(tk.Tk):
     def back_menu(self):
         app.play("button")
 
-        context.exec_name = None
+        context.reset()
         app.show_frame("Menu")
 
 
