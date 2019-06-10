@@ -147,10 +147,27 @@ class CoupointScan(tk.Frame):
         self.after(100, self.scan)
 
 
+    def parse_decoded_data(self, decoded_data):
+        """QRコードで読み取った文字列をパースし、customer_id, carousel_idを取得する
+        @see https://redmine.magee.co.jp/projects/myshop/wiki/%E3%82%AF%E3%83%BC%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88QR%E3%82%B3%E3%83%BC%E3%83%89%E3%81%AE%E4%BB%95%E6%A7%98
+        """
+        lines = decoded_data.split("\r\n")
+        if context.app_mode == "test":
+            context.customer_id = "20b097add4aea673e074d77fe1495434"
+            context.carousel_id = "327765a3ec00962ccc050e91354dcc64"
+            return True
+
+        elif (len(lines) == 4 and lines[0] == "MyShop"):
+            context.customer_id = lines[1]
+            context.carousel_id = lines[2]
+            return True
+
+        return False
+
+
     def after_scan(self, data):
         app.log("after_scan")
-        coupoint_show = app.frames["CoupointShow"]
-        result = coupoint_show.parse_decoded_data(data)
+        result = self.parse_decoded_data(data)
 
         if result:
             app.play("success")
@@ -187,24 +204,6 @@ class CoupointShow(tk.Frame):
 
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
-
-
-    def parse_decoded_data(self, decoded_data):
-        """QRコードで読み取った文字列をパースし、customer_id, carousel_idを取得する
-        @see https://redmine.magee.co.jp/projects/myshop/wiki/%E3%82%AF%E3%83%BC%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88QR%E3%82%B3%E3%83%BC%E3%83%89%E3%81%AE%E4%BB%95%E6%A7%98
-        """
-        lines = decoded_data.split("\r\n")
-        if context.app_mode == "test":
-            context.customer_id = "20b097add4aea673e074d77fe1495434"
-            context.carousel_id = "327765a3ec00962ccc050e91354dcc64"
-            return True
-
-        elif (len(lines) == 4 and lines[0] == "MyShop"):
-            context.customer_id = lines[1]
-            context.carousel_id = lines[2]
-            return True
-
-        return False
 
 
     def show_coupoint(self, coupoint):
