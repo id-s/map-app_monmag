@@ -206,7 +206,7 @@ class CoupointShow(tk.Frame):
         self.title_label.configure(style.title_label)
         self.title_label.pack(fill="x")
 
-        self.use_term_label = tk.Label(self, text="利用可能期間", font=style.header_font, anchor="w")
+        self.use_term_label = tk.Label(self, text="[利用可能期間]", font=style.header_font, anchor="w")
         self.use_term_label.configure(style.default_label)
         self.use_term_label.pack(fill="x")
 
@@ -215,6 +215,24 @@ class CoupointShow(tk.Frame):
         self.use_term_text = tk.Label(self, text="{} 〜 {}".format(use_term_from, use_term_to), font=style.body_font, justify="left")
         self.use_term_text.configure(style.default_label)
         self.use_term_text.pack(fill="x")
+
+        self.description_label = tk.Label(self, text="[クーポイント内容]", font=style.header_font, anchor="w")
+        self.description_label.configure(style.default_label)
+        self.description_label.pack(fill="x")
+
+        self.description_text = tk.Label(self, text=coupoint["description"], font=style.body_font, justify="left", height=1)
+        self.description_text.configure(style.default_label)
+#         self.description_text.configure(background="white")
+        self.description_text.pack(fill="x")
+
+        self.use_condition_label = tk.Label(self, text="[利用条件]", font=style.header_font, anchor="w")
+        self.use_condition_label.configure(style.default_label)
+        self.use_condition_label.pack(fill="x")
+
+        self.use_condition_text = tk.Label(self, text=coupoint["use_condition"], font=style.body_font, justify="left", height=3)
+        self.use_condition_text.configure(style.default_label)
+#         self.use_condition_text.configure(background="white")
+        self.use_condition_text.pack(fill="x")
 
         self.use_button = tk.Button(self, text="利用確定", command=self.use_coupoint)
         self.use_button.configure(style.primary_button)
@@ -225,6 +243,10 @@ class CoupointShow(tk.Frame):
         self.title_label.destroy()
         self.use_term_label.destroy()
         self.use_term_text.destroy()
+        self.description_label.destroy()
+        self.description_text.destroy()
+        self.use_condition_label.destroy()
+        self.use_condition_text.destroy()
         self.use_button.destroy()
 
 
