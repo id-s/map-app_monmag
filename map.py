@@ -368,7 +368,7 @@ class CardScan(tk.Frame):
         text_label.configure(style.default_label)
         text_label.pack(fill="x")
 
-        cardno_entry = tk.Entry(self, textvariable=context.scanned_card_no, show="*",
+        cardno_entry = tk.Entry(self, textvariable=context.scanned_no, show="*",
                                 background=style.base_color_S05,
                                 borderwidth=0, highlightthickness=0,
                                 insertbackground=style.base_color_S05, insertborderwidth=0,
@@ -400,14 +400,14 @@ class CardScan(tk.Frame):
     def next_button_clicked(self):
         app.play("button")
 
-        app.log("Entered card:{}".format(context.scanned_card_no.get()))
+        app.log("Entered card:{}".format(context.scanned_no.get()))
         app.frames["SalesEntry"].show_num_keys()
 
 
     def card_scanned(self, event):
         app.play("success")
 
-        app.log("Scanned card:{}".format(context.scanned_card_no.get()), "INFO")
+        app.log("Scanned card:{}".format(context.scanned_no.get()), "INFO")
         app.frames["SalesEntry"].show_num_keys()
 
 
@@ -549,10 +549,16 @@ class TelEntry(tk.Frame):
 
     def next_button_clicked(self):
         app.play("button")
-        app.frames["Finish"].show()
+
+        result = api.add_point()
+        if (result == "success"):
+            app.frames["Finish"].show()
+        else:
+            app.showerror("エラー", "エラーが発生しました。")
 
 
     def show(self):
+        context.tel = context.entry_text.get()
         app.show_frame(self)
 
 
@@ -608,7 +614,11 @@ class SalesEntry(tk.Frame):
             if result == "tel":
                 app.show_frame("Policy1")
             elif result == "price":
-                app.frames["Finish"].show()
+                result = api.add_point()
+                if (result == "success"):
+                    app.frames["Finish"].show()
+                else:
+                    app.showerror("エラー", "エラーが発生しました。")
             else:
                 app.showerror("エラー", "エラーが発生しました。")
 
@@ -617,7 +627,8 @@ class SalesEntry(tk.Frame):
 
 
     def show(self):
-        point_num = api.calc_point(context.entry_text.get())
+        context.price = context.entry_text.get()
+        point_num = api.calc_point()
         context.point_num.set(point_num)
         app.show_frame(self)
 
@@ -818,6 +829,66 @@ class MapApi():
             return None
 
 
+    def use_coupoint(self):
+        """クーポイントを利用する
+        """
+        url = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/regist"
+        headers = {"Content-Type": "application/json"}
+
+        data = {
+            "terminal": {
+                "macaddr": "48:a9:e9:dc:e2:65", # context.macaddress, # TODO:取得情報に差し替え
+                "serial_no": "0123456789ABCDEF", # context.serialno,
+                },
+            "carousel": {
+                "customer_id": "20b097add4aea673e074d77fe1495434", # TODO:取得情報に差し替え
+                "carousel_id": "327765a3ec00962ccc050e91354dcc64",
+                }
+            }
+
+        app.log("POST {}".format(url), "INFO")
+        app.log(json.dumps(data), "INFO")
+        resp = requests.post(url, data=json.dumps(data), headers=headers)
+
+        if resp.status_code == 200 or resp.status_code == 404:
+            app.log(resp.text, "INFO")
+            resp_data = resp.json()
+            return resp_data["result"]
+        else:
+            app.log(resp.status_code, "WARNING")
+            return None
+
+
+    def cancel_coupoint(self):
+        """クーポイントを利用キャンセルする
+        """
+        url = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/cancel"
+        headers = {"Content-Type": "application/json"}
+
+        data = {
+            "terminal": {
+                "macaddr": "48:a9:e9:dc:e2:65", # context.macaddress, # TODO:取得情報に差し替え
+                "serial_no": "0123456789ABCDEF", # context.serialno,
+                },
+            "carousel": {
+                "customer_id": "20b097add4aea673e074d77fe1495434", # TODO:取得情報に差し替え
+                "carousel_id": "327765a3ec00962ccc050e91354dcc64",
+                }
+            }
+
+        app.log("POST {}".format(url), "INFO")
+        app.log(json.dumps(data), "INFO")
+        resp = requests.post(url, data=json.dumps(data), headers=headers)
+
+        if resp.status_code == 200 or resp.status_code == 404:
+            app.log(resp.text, "INFO")
+            resp_data = resp.json()
+            return resp_data["result"]
+        else:
+            app.log(resp.status_code, "WARNING")
+            return None
+
+
     def get_clients(self):
         """利用できるカードを取得する
         """
@@ -844,7 +915,42 @@ class MapApi():
             return None
 
 
-    def calc_point(self, sales):
+    def check_card(self):
+        """カードのチェック
+        @return "tel": 初回利用(次に電話番号入力画面を表示)
+                "price": 二回目以降の利用(次に会計金額入力画面を表示)
+                "failure": カード読み込み不正（選択された流通と読み込まれたカードが一致しない等）
+                 None: サーバエラーなど
+        """
+        url = "https://card-dot-my-shop-magee-stg.appspot.com/v1/start"
+        headers = {"Content-Type": "application/json"}
+
+        data = {
+            "terminal": {
+                "macaddr": "48:a9:e9:dc:e2:65", # context.macaddress, # TODO:取得情報に差し替え
+                "serial_no": "0123456789ABCDEF", # context.serialno,
+                },
+            "customer": {
+                "card_no": "CRC0S0 32840000000000200001", # TODO:取得情報に差し替え
+                "client_cd": context.selected_client,
+                "card_id": 1,
+                }
+            }
+
+        app.log("POST {}".format(url), "INFO")
+        app.log(json.dumps(data), "INFO")
+        resp = requests.post(url, data=json.dumps(data), headers=headers)
+
+        if resp.status_code == 200 or resp.status_code == 404:
+            app.log(resp.text, "INFO")
+            resp_data = resp.json()
+            return resp_data["result"]
+        else:
+            app.log(resp.status_code, "WARNING")
+            return None
+
+
+    def calc_point(self):
         """付与ポイント算出
         """
         url = "https://card-dot-my-shop-magee-stg.appspot.com/v1/calc"
@@ -857,7 +963,7 @@ class MapApi():
                 },
             "customer": {
                 "card_no": "CRC0S0 32840000000000200001", # TODO:取得情報に差し替え
-                "price": sales,
+                "price": context.price,
                 "client_cd": context.selected_client,
                 "card_id": 1,
                 }
@@ -879,14 +985,10 @@ class MapApi():
             return None
 
 
-    def check_card(self):
-        """カードのチェック
-        @return "tel": 初回利用(次に電話番号入力画面を表示)
-                "price": 二回目以降の利用(次に会計金額入力画面を表示)
-                "failure": カード読み込み不正（選択された流通と読み込まれたカードが一致しない等）
-                 None: サーバエラーなど
+    def add_point(self):
+        """ポイント付与＆電話番号登録
         """
-        url = "https://card-dot-my-shop-magee-stg.appspot.com/v1/start"
+        url = "https://card-dot-my-shop-magee-stg.appspot.com/v1/regist"
         headers = {"Content-Type": "application/json"}
 
         data = {
@@ -895,9 +997,41 @@ class MapApi():
                 "serial_no": "0123456789ABCDEF", # context.serialno,
                 },
             "customer": {
-                "card_no": "CRC0S0 32840000000000200001", # TODO:取得情報に差し替え
-                "client_cd": context.selected_client,
-                "card_id": 1,
+                "card_no": "CRC0S0 32840000000000200001", # context.card_no, # TODO:取得情報に差し替え
+                "price": context.price,
+                "point": context.point_num.get(),
+                "tel": context.tel,
+                }
+            }
+
+        app.log("POST {}".format(url), "INFO")
+        app.log(json.dumps(data), "INFO")
+        resp = requests.post(url, data=json.dumps(data), headers=headers)
+
+        if resp.status_code == 200 or resp.status_code == 404:
+            app.log(resp.text, "INFO")
+            resp_data = resp.json()
+            return resp_data["result"]
+        else:
+            app.log(resp.status_code, "WARNING")
+            return None
+
+
+    def cancel_point(self):
+        """ポイント付与キャンセル
+        """
+        url = "https://card-dot-my-shop-magee-stg.appspot.com/v1/cancel"
+        headers = {"Content-Type": "application/json"}
+
+        data = {
+            "terminal": {
+                "macaddr": "48:a9:e9:dc:e2:65", # context.macaddress, # TODO:取得情報に差し替え
+                "serial_no": "0123456789ABCDEF", # context.serialno,
+                },
+            "customer": {
+                "card_no": "CRC0S0 32840000000000200001", # context.card_no, # TODO:取得情報に差し替え
+                "price": context.price,
+                "point": context.point_num.get(),
                 }
             }
 
@@ -1101,13 +1235,22 @@ class Context():
         # 選択されたカード(流通)
         self.selected_client = None
 
+        # カード番号
+        self.card_no = None
+
+        # 電話番号
+        self.tel = None
+
+        # 会計金額
+        self.price = None
+
         # ソフトキーボード画面で"OK"を押した時に表示される画面
         self.after_entry = None
 
         """"以下、ウィジェットと連携している変数"""
 
         # スキャンされたカードの番号
-        self.scanned_card_no = tk.StringVar()
+        self.scanned_no = tk.StringVar()
 
         # ソフトキーボード画面に表示する文言
         self.entry_caption = tk.StringVar()
@@ -1135,11 +1278,20 @@ class Context():
         if not "selected_client" in excepts:
             self.selected_client = None
 
+        if not "card_no" in excepts:
+            self.card_no = None
+
+        if not "tel" in excepts:
+            self.tel = None
+
+        if not "price" in excepts:
+            self.price = None
+
         if not "after_entry" in excepts:
             self.after_entry = None
 
-        if not "scanned_card_no" in excepts:
-            self.scanned_card_no = None
+        if not "scanned_no" in excepts:
+            self.scanned_no = None
 
         if not "entry_caption" in excepts:
             self.entry_caption.set("")
