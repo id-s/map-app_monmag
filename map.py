@@ -508,7 +508,7 @@ class Policy1(tk.Frame):
         next_button.configure(style.primary_button)
         next_button.grid(column=0, row=0, sticky="nswe")
 
-        cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        cancel_button = tk.Button(actions, text="キャンセル", command=self.cancel_button_clicked)
         cancel_button.configure(style.default_button)
         cancel_button.grid(column=1, row=0, sticky="nswe")
 
@@ -516,6 +516,18 @@ class Policy1(tk.Frame):
     def next_button_clicked(self):
         app.play("button")
         app.show_frame("Policy2")
+
+
+    def cancel_button_clicked(self):
+        app.play("button")
+
+        # 電話番号入力キャンセルでもポイント付与は必要
+        result = api.add_point()
+        if (result == "success"):
+            app.frames["Finish"].show()
+        else:
+            app.showerror("エラー", "エラーが発生しました。")
+            app.back_menu()
 
 
 class Policy2(tk.Frame):
@@ -548,7 +560,7 @@ class Policy2(tk.Frame):
         next_button.configure(style.primary_button)
         next_button.grid(column=0, row=0, sticky="nswe")
 
-        cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        cancel_button = tk.Button(actions, text="キャンセル", command=self.cancel_button_clicked)
         cancel_button.configure(style.default_button)
         cancel_button.grid(column=1, row=0, sticky="nswe")
 
@@ -559,6 +571,18 @@ class Policy2(tk.Frame):
         context.entry_caption.set("電話番号入力")
         context.after_entry = "TelEntry"
         app.frames["TelEntry"].show_num_keys()
+
+
+    def cancel_button_clicked(self):
+        app.play("button")
+
+        # 電話番号入力キャンセルでもポイント付与は必要
+        result = api.add_point()
+        if (result == "success"):
+            app.frames["Finish"].show()
+        else:
+            app.showerror("エラー", "エラーが発生しました。")
+            app.back_menu()
 
 
 class TelEntry(tk.Frame):
@@ -589,7 +613,7 @@ class TelEntry(tk.Frame):
         next_button.configure(style.primary_button)
         next_button.grid(column=0, row=0, sticky="nswe")
 
-        cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        cancel_button = tk.Button(actions, text="キャンセル", command=self.cancel_button_clicked)
         cancel_button.configure(style.default_button)
         cancel_button.grid(column=1, row=0, sticky="nswe")
 
@@ -610,6 +634,18 @@ class TelEntry(tk.Frame):
             app.frames["Finish"].show()
         else:
             app.showerror("エラー", "エラーが発生しました。")
+
+
+    def cancel_button_clicked(self):
+        app.play("button")
+
+        # 電話番号入力キャンセルでもポイント付与は必要
+        result = api.add_point()
+        if (result == "success"):
+            app.frames["Finish"].show()
+        else:
+            app.showerror("エラー", "エラーが発生しました。")
+            app.back_menu()
 
 
     def show(self):
