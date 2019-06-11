@@ -1295,6 +1295,7 @@ class MapApi():
                 },
             "customer": {
                 "card_no": context.card_no,
+                "client_cd": context.selected_client,
                 "price": context.price,
                 "point": context.point_num.get(),
                 "tel": context.tel,
@@ -1332,6 +1333,7 @@ class MapApi():
                 },
             "customer": {
                 "card_no": context.card_no,
+                "client_cd": context.selected_client,
                 "price": context.price,
                 "point": context.point_num.get(),
                 }
