@@ -946,8 +946,8 @@ class WifiScan(tk.Frame):
         """QRコードで読み取った文字列をパースし、ssid,passwordを取得する
         """
         parsed_data = {}
-        lines = decoded_data.split("\r\n")
-        if len(lines) > 2:
+        lines = decoded_data.split("/")
+        if len(lines) > 1:
             parsed_data["ssid"] = lines[0]
             parsed_data["password"] = lines[1]
         return parsed_data
