@@ -986,7 +986,7 @@ class WifiScan(tk.Frame):
             scheme = Scheme.for_cell("wlan0", decoded_data["ssid"], target, decoded_data["password"])
             scheme.save()
 
-        scheme.activate()
+        scheme.activate() # アプリをsudoで動かさないと"Permission denied"になる
         return True
 
 

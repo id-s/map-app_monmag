@@ -34,6 +34,11 @@ https://github.com/jenskutilek/free-fonts/blob/master/Droid/Droid%20Sans%20Japan
 (env) $ APP_ENV=Mac python map.py
 ```
 
+上記以外に以下のオプションが利用可能
+
+ON_DEBUG: "True"とすると、デバッグレベルのログが出力される
+APP_MODE: "test"とすると、テストモードで起動する(設定より切り替え可能)
+
 
 ## 実行環境構築
 
@@ -51,3 +56,5 @@ $ sudo pip install -r requirements.txt
 
 さらに`sudo raspi-config`から、ロケール(ja_JP.UTF-8)を追加する。
 4 Localisation Options > I1 Change Locale > Ok > "ja_JP.UTF-8 UTF-8"まで移動し、スペースを押す > エンターを押す > Ok > None > Finish
+
+Wi-Fi設定を可能にするため、アプリの起動は`sudo python map.py`で行う必要がある。
