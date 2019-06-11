@@ -599,7 +599,7 @@ class TelEntry(tk.Frame):
     def show_num_keys(self, event = None):
         context.entry_caption.set("電話番号入力")
         context.after_entry = "TelEntry"
-        app.show_frame("NumKeys", False)
+        app.show_frame("NumKeys")
 
 
     def next_button_clicked(self):
@@ -657,7 +657,7 @@ class SalesEntry(tk.Frame):
     def show_num_keys(self, event = None):
         context.entry_caption.set("会計金額入力")
         context.after_entry = "SalesEntry"
-        app.show_frame("NumKeys", False)
+        app.show_frame("NumKeys")
 
 
     def next_button_clicked(self):
