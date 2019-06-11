@@ -422,16 +422,15 @@ class CardScan(tk.Frame):
         text_label.configure(style.default_label)
         text_label.pack(fill="x")
 
-        cardno_entry = tk.Entry(self, textvariable=context.scanned_no, show="*",
+        self.cardno_entry = tk.Entry(self, textvariable=context.scanned_no, show="*",
                                 background=style.base_color_S05,
                                 borderwidth=0, highlightthickness=0,
                                 insertbackground=style.base_color_S05, insertborderwidth=0,
                                 selectbackground=style.base_color_S05, selectborderwidth=0,
                                 )
-        cardno_entry.pack(fill="x")
-        cardno_entry.focus_set()
+        self.cardno_entry.pack(fill="x")
 
-        cardno_entry.bind("<Return>", self.card_scanned)
+        self.cardno_entry.bind("<Return>", self.card_scanned)
 
         actions = tk.Frame(self)
         actions.columnconfigure(0, weight=1)
@@ -490,6 +489,7 @@ class CardScan(tk.Frame):
 
 
     def show(self):
+        self.cardno_entry.focus_set()
         app.show_frame(self)
 
 
@@ -627,9 +627,9 @@ class TelEntry(tk.Frame):
         actions.columnconfigure(1, weight=1)
         actions.pack(side="bottom", fill="x")
 
-        next_button = tk.Button(actions, text="確定", command=self.next_button_clicked)
-        next_button.configure(style.primary_button)
-        next_button.grid(column=0, row=0, sticky="nswe")
+        self.next_button = tk.Button(actions, text="確定", command=self.next_button_clicked)
+        self.next_button.configure(style.primary_button)
+        self.next_button.grid(column=0, row=0, sticky="nswe")
 
         cancel_button = tk.Button(actions, text="キャンセル", command=self.cancel_button_clicked)
         cancel_button.configure(style.default_button)
@@ -668,6 +668,7 @@ class TelEntry(tk.Frame):
 
     def show(self):
         context.tel = context.entry_text.get()
+        self.next_button.focus_set()
         app.show_frame(self)
 
 
@@ -697,9 +698,9 @@ class SalesEntry(tk.Frame):
         actions.columnconfigure(1, weight=1)
         actions.pack(side="bottom", fill="x")
 
-        next_button = tk.Button(actions, textvariable=context.sales_entry_button_text, command=self.next_button_clicked)
-        next_button.configure(style.primary_button)
-        next_button.grid(column=0, row=0, sticky="nswe")
+        self.next_button = tk.Button(actions, textvariable=context.sales_entry_button_text, command=self.next_button_clicked)
+        self.next_button.configure(style.primary_button)
+        self.next_button.grid(column=0, row=0, sticky="nswe")
 
         cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
         cancel_button.configure(style.default_button)
@@ -744,6 +745,7 @@ class SalesEntry(tk.Frame):
         if point_num is None:
             point_num = "0"
         context.point_num.set(point_num)
+        self.next_button.focus_set()
         app.show_frame(self)
 
 
