@@ -945,12 +945,12 @@ class WifiScan(tk.Frame):
     def parse_decoded_data(self, decoded_data):
         """QRコードで読み取った文字列をパースし、ssid,passwordを取得する
         """
-        decoded_data = {}
+        parsed_data = {}
         lines = decoded_data.split("\r\n")
         if len(lines) > 2:
-            decoded_data["ssid"] = lines[0]
-            decoded_data["password"] = lines[1]
-        return decoded_data
+            parsed_data["ssid"] = lines[0]
+            parsed_data["password"] = lines[1]
+        return parsed_data
 
 
     def wifi_setting(self, decoded_data):
@@ -967,12 +967,12 @@ class WifiScan(tk.Frame):
 
     def after_scan(self, data):
         app.log("after_scan")
-        decoded_data = self.parse_decoded_data(data)
+        parsed_data = self.parse_decoded_data(data)
 
-        if decoded_data:
+        if parsed_data:
             app.play("success")
-            app.log(decoded_data, "INFO")
-            result = self.wifi_setting(decoded_data)
+            app.log(parsed_data, "INFO")
+            result = self.wifi_setting(parsed_data)
 
             if result:
                 self.on_scan = False
