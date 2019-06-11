@@ -462,11 +462,11 @@ class CardScan(tk.Frame):
 
         context.card_status = api.check_card()
         if context.card_status == "failure":
-            context.finish_message = "このカードはご利用できません。"
+            context.finish_message.set("このカードはご利用できません。")
             app.frames["Finish"].show()
             return
         elif context.card_status is None:
-            context.finish_message = "エラーが発生しました。"
+            context.finish_message.set("エラーが発生しました。")
             app.frames["Finish"].show()
             return
 
@@ -481,11 +481,11 @@ class CardScan(tk.Frame):
 
         context.card_status = api.check_card()
         if context.card_status == "failure":
-            context.finish_message = "このカードはご利用できません。"
+            context.finish_message.set("このカードはご利用できません。")
             app.frames["Finish"].show()
             return
         elif context.card_status is None:
-            context.finish_message = "エラーが発生しました。"
+            context.finish_message.set("エラーが発生しました。")
             app.frames["Finish"].show()
             return
 
