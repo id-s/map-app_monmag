@@ -464,9 +464,11 @@ class CardScan(tk.Frame):
         if context.card_status == "failure":
             context.finish_message = "このカードはご利用できません。"
             app.frames["Finish"].show()
+            return
         elif context.card_status is None:
             context.finish_message = "エラーが発生しました。"
             app.frames["Finish"].show()
+            return
 
         app.frames["SalesEntry"].show_num_keys()
 
@@ -481,9 +483,11 @@ class CardScan(tk.Frame):
         if context.card_status == "failure":
             context.finish_message = "このカードはご利用できません。"
             app.frames["Finish"].show()
+            return
         elif context.card_status is None:
             context.finish_message = "エラーが発生しました。"
             app.frames["Finish"].show()
+            return
 
         app.frames["SalesEntry"].show_num_keys()
 
@@ -1065,6 +1069,7 @@ class WifiScan(tk.Frame):
                 self.capture.release()
                 context.finish_message.set("WiFi設定が完了しました。")
                 app.frames["Finish"].show()
+                return
             else:
                 app.showerror("エラー", "WiFi設定に失敗しました。")
                 self.after(500, self.scan)
