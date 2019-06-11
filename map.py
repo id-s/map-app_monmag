@@ -455,7 +455,7 @@ class CardScan(tk.Frame):
         app.play("button")
 
         if context.app_mode == "test":
-            context.card_no = "CRC0S0 32840000000000200001"
+            context.card_no = "CRC0S0 32840000000000200001" # 下1桁を変えてもOK
         else:
             context.card_no = context.scanned_no.get()
 
