@@ -717,6 +717,10 @@ class SalesEntry(tk.Frame):
     def next_button_clicked(self):
         app.play("button")
 
+        if context.point_num.get() == "0":
+            app.showerror("エラー", "付与されるポイントが0で間違いなければ[キャンセル]を押してください。")
+            return
+
         context.entry_text.set("")
         if context.exec_name == "add_point":
             if context.card_status == "tel":
@@ -737,6 +741,8 @@ class SalesEntry(tk.Frame):
     def show(self):
         context.price = context.entry_text.get()
         point_num = api.calc_point()
+        if point_num is None:
+            point_num = "0"
         context.point_num.set(point_num)
         app.show_frame(self)
 
