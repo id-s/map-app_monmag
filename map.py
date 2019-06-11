@@ -12,6 +12,7 @@ import requests
 import subprocess
 import textwrap
 import time
+import traceback
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from PIL import Image, ImageTk
@@ -149,7 +150,7 @@ class CoupointScan(tk.Frame):
             self.after(100, self.scan)
 
         except Exception as e:
-            app.log(e, "ERROR")
+            app.log(traceback.format_exc(), "ERROR")
             self.capture.release()
             app.quit()
 
@@ -950,7 +951,7 @@ class WifiScan(tk.Frame):
             self.after(500, self.scan)
 
         except Exception as e:
-            app.log(e, "ERROR")
+            app.log(traceback.format_exc(), "ERROR")
             self.capture.release()
             app.quit()
 
@@ -1060,7 +1061,7 @@ class MapApi():
                 return False
 
         except Exception as e:
-            print(e)
+            app.log(traceback.format_exc(), "WARNING")
             return False
 
 
@@ -1098,7 +1099,7 @@ class MapApi():
                 return None
 
         except Exception as e:
-            print(e)
+            app.log(traceback.format_exc(), "WARNING")
             return None
 
 
@@ -1133,7 +1134,7 @@ class MapApi():
                 return None
 
         except Exception as e:
-            print(e)
+            app.log(traceback.format_exc(), "WARNING")
             return None
 
 
@@ -1168,7 +1169,7 @@ class MapApi():
                 return None
 
         except Exception as e:
-            print(e)
+            app.log(traceback.format_exc(), "WARNING")
             return None
 
 
@@ -1202,7 +1203,7 @@ class MapApi():
                 return None
 
         except Exception as e:
-            print(e)
+            app.log(traceback.format_exc(), "WARNING")
             return None
 
 
@@ -1241,7 +1242,7 @@ class MapApi():
                 return None
 
         except Exception as e:
-            print(e)
+            app.log(traceback.format_exc(), "WARNING")
             return None
 
 
@@ -1277,7 +1278,7 @@ class MapApi():
                 return None
 
         except Exception as e:
-            print(e)
+            app.log(traceback.format_exc(), "WARNING")
             return None
 
 
@@ -1314,7 +1315,7 @@ class MapApi():
                 return None
 
         except Exception as e:
-            print(e)
+            app.log(traceback.format_exc(), "WARNING")
             return None
 
 
@@ -1350,7 +1351,7 @@ class MapApi():
                 return None
 
         except Exception as e:
-            print(e)
+            app.log(traceback.format_exc(), "WARNING")
             return None
 
 
