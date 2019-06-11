@@ -17,6 +17,7 @@ from datetime import datetime
 from PIL import Image, ImageTk
 from pprint import pprint
 from pyzbar import pyzbar
+from wifi import Cell, Scheme
 
 APP_ENV = os.getenv("APP_ENV", "Monmag")
 APP_MODE = os.getenv("APP_MODE", "normal")
@@ -939,7 +940,7 @@ class WifiScan(tk.Frame):
             self.preview.create_image(style.preview_offset_x, style.preview_offset_y, image=self.image)
         app.log("Scan end")
 
-        self.after(100, self.scan)
+        self.after(500, self.scan)
 
 
     def parse_decoded_data(self, decoded_data):
@@ -954,14 +955,25 @@ class WifiScan(tk.Frame):
 
 
     def wifi_setting(self, decoded_data):
-        # FIXME:実装
+        target = None
         for cell in Cell.all("wlan0"):
-            app.log("ssid:{}, channel:{}, address:{}, mode:{}".format(cell.ssid, cell.channel, cell.address, cell.mode), "INFO")
+            app.log("ssid:{}, address:{}".format(cell.ssid, cell.address))
             if cell.encrypted:
                 app.log("encryption_type:{}".format(cell.encryption_type))
+            if cell.ssid == decoded_data["ssid"]:
+                target = cell
+                break
+        if target is None:
+            app.log("Not found ssid:{}".format(decoded_data["ssid"]), "WARNING")
+            return False
 
-        for scheme in Scheme.all():
-            app.log(scheme, "INFO")
+        scheme = Scheme.find("wlan0", decoded_data["ssid"])
+        if scheme is None:
+            app.log("Create scheme:{}".format(decoded_data["ssid"]), "INFO")
+            scheme = Scheme.for_cell("wlan0", decoded_data["ssid"], target, decoded_data["password"])
+            scheme.save()
+
+        scheme.activate()
         return True
 
 
@@ -971,7 +983,7 @@ class WifiScan(tk.Frame):
 
         if parsed_data:
             app.play("success")
-            app.log(parsed_data, "INFO")
+            app.log("Scanned:{}".format(parsed_data), "INFO")
             result = self.wifi_setting(parsed_data)
 
             if result:
