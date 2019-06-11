@@ -460,6 +460,15 @@ class CardScan(tk.Frame):
             context.card_no = context.scanned_no.get()
 
         app.log("Entered card:{}".format(context.card_no))
+
+        context.card_status = api.check_card()
+        if context.card_status == "failure":
+            context.finish_message = "このカードはご利用できません。"
+            app.frames["Finish"].show()
+        elif context.card_status is None:
+            context.finish_message = "エラーが発生しました。"
+            app.frames["Finish"].show()
+
         app.frames["SalesEntry"].show_num_keys()
 
 
@@ -468,6 +477,15 @@ class CardScan(tk.Frame):
 
         context.card_no = context.scanned_no.get()
         app.log("Scanned card:{}".format(context.card_no), "INFO")
+
+        context.card_status = api.check_card()
+        if context.card_status == "failure":
+            context.finish_message = "このカードはご利用できません。"
+            app.frames["Finish"].show()
+        elif context.card_status is None:
+            context.finish_message = "エラーが発生しました。"
+            app.frames["Finish"].show()
+
         app.frames["SalesEntry"].show_num_keys()
 
 
@@ -701,10 +719,9 @@ class SalesEntry(tk.Frame):
 
         context.entry_text.set("")
         if context.exec_name == "add_point":
-            result = api.check_card()
-            if result == "tel":
+            if context.card_status == "tel":
                 app.show_frame("Policy1")
-            elif result == "price":
+            elif context.card_status == "price":
                 result = api.add_point()
                 if (result == "success"):
                     app.frames["Finish"].show()
@@ -1594,6 +1611,9 @@ class Context():
         # カード番号
         self.card_no = None
 
+        # カードステータス
+        self.card_status = None
+
         # 電話番号
         self.tel = None
 
@@ -1648,6 +1668,9 @@ class Context():
 
         if not "card_no" in excepts:
             self.card_no = None
+
+        if not "card_status" in excepts:
+            self.card_status = None
 
         if not "tel" in excepts:
             self.tel = None
