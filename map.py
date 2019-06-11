@@ -796,7 +796,7 @@ class Setting(tk.Frame):
         switch_mode_button.pack(fill="x")
 
         if APP_ENV == "Monmag":
-            wifi_button = tk.Button(self, text="Wi-Fi設定")
+            wifi_button = tk.Button(self, text="Wi-Fi設定", command=self.wifi_button_clicked)
         else:
             wifi_button = tk.Button(self, text="Wi-Fi設定", state="disabled")
         wifi_button.configure(style.default_button)
@@ -819,6 +819,11 @@ class Setting(tk.Frame):
     def switch_mode_button_clicked(self):
         app.play("button")
         app.show_frame("SwitchMode")
+
+
+    def wifi_button_clicked(self):
+        app.play("button")
+        app.frames["WifiScan"].show()
 
 
 class SwitchMode(tk.Frame):
