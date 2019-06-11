@@ -126,26 +126,32 @@ class CoupointScan(tk.Frame):
             app.log("No capture", "WARNING")
             return
 
-        app.log("Scan start")
-        self.image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        if APP_ENV == "Monmag" and context.on_preview:
-            self.image = self.image.transpose(1,0,2)[::-1] # -90度回転、詳細は https://qiita.com/matsu_mh/items/54b09273aef79ae027bc 参照
-        self.decoded = pyzbar.decode(self.image)
-        if self.decoded:
-            for code in self.decoded:
-                app.log(code, "INFO")
-                self.after_scan(code.data)
-#                 self.preview.create_text(style.preview_offset_x, style.preview_offset_y, text=code.data, tag="code") ###
-                return
+        try:
+            app.log("Scan start")
+            self.image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            if APP_ENV == "Monmag" and context.on_preview:
+                self.image = self.image.transpose(1,0,2)[::-1] # -90度回転、詳細は https://qiita.com/matsu_mh/items/54b09273aef79ae027bc 参照
+            self.decoded = pyzbar.decode(self.image)
+            if self.decoded:
+                for code in self.decoded:
+                    app.log(code, "INFO")
+                    self.after_scan(code.data)
+    #                 self.preview.create_text(style.preview_offset_x, style.preview_offset_y, text=code.data, tag="code") ###
+                    return
 
-        if context.on_preview:
-            self.image = Image.fromarray(self.image)
-            self.image = ImageTk.PhotoImage(self.image)
-    #         app.log("w:{} x h:{}".format(self.image.width(), self.image.height())) ###
-            self.preview.create_image(style.preview_offset_x, style.preview_offset_y, image=self.image)
-        app.log("Scan end")
+            if context.on_preview:
+                self.image = Image.fromarray(self.image)
+                self.image = ImageTk.PhotoImage(self.image)
+        #         app.log("w:{} x h:{}".format(self.image.width(), self.image.height())) ###
+                self.preview.create_image(style.preview_offset_x, style.preview_offset_y, image=self.image)
+            app.log("Scan end")
 
-        self.after(100, self.scan)
+            self.after(100, self.scan)
+
+        except Exception as e:
+            app.log(e, "ERROR")
+            self.capture.release()
+            app.quit()
 
 
     def parse_decoded_data(self, decoded_data):
@@ -921,26 +927,32 @@ class WifiScan(tk.Frame):
             app.log("No capture", "WARNING")
             return
 
-        app.log("Scan start")
-        self.image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        if APP_ENV == "Monmag" and context.on_preview:
-            self.image = self.image.transpose(1,0,2)[::-1] # -90度回転、詳細は https://qiita.com/matsu_mh/items/54b09273aef79ae027bc 参照
-        self.decoded = pyzbar.decode(self.image)
-        if self.decoded:
-            for code in self.decoded:
-                app.log(code, "INFO")
-                self.after_scan(code.data)
-#                 self.preview.create_text(style.preview_offset_x, style.preview_offset_y, text=code.data, tag="code") ###
-                return
+        try:
+            app.log("Scan start")
+            self.image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            if APP_ENV == "Monmag" and context.on_preview:
+                self.image = self.image.transpose(1,0,2)[::-1] # -90度回転、詳細は https://qiita.com/matsu_mh/items/54b09273aef79ae027bc 参照
+            self.decoded = pyzbar.decode(self.image)
+            if self.decoded:
+                for code in self.decoded:
+                    app.log(code, "INFO")
+                    self.after_scan(code.data)
+    #                 self.preview.create_text(style.preview_offset_x, style.preview_offset_y, text=code.data, tag="code") ###
+                    return
 
-        if context.on_preview:
-            self.image = Image.fromarray(self.image)
-            self.image = ImageTk.PhotoImage(self.image)
-    #         app.log("w:{} x h:{}".format(self.image.width(), self.image.height())) ###
-            self.preview.create_image(style.preview_offset_x, style.preview_offset_y, image=self.image)
-        app.log("Scan end")
+            if context.on_preview:
+                self.image = Image.fromarray(self.image)
+                self.image = ImageTk.PhotoImage(self.image)
+        #         app.log("w:{} x h:{}".format(self.image.width(), self.image.height())) ###
+                self.preview.create_image(style.preview_offset_x, style.preview_offset_y, image=self.image)
+            app.log("Scan end")
 
-        self.after(500, self.scan)
+            self.after(500, self.scan)
+
+        except Exception as e:
+            app.log(e, "ERROR")
+            self.capture.release()
+            app.quit()
 
 
     def parse_decoded_data(self, decoded_data):
