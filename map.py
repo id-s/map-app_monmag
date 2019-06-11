@@ -795,7 +795,10 @@ class Setting(tk.Frame):
         switch_mode_button.configure(style.default_button)
         switch_mode_button.pack(fill="x")
 
-        wifi_button = tk.Button(self, text="Wi-Fi設定", state="disabled")
+        if APP_ENV == "Monmag":
+            wifi_button = tk.Button(self, text="Wi-Fi設定")
+        else:
+            wifi_button = tk.Button(self, text="Wi-Fi設定", state="disabled")
         wifi_button.configure(style.default_button)
         wifi_button.pack(fill="x")
 
@@ -871,6 +874,129 @@ class SwitchMode(tk.Frame):
 
         context.finish_message.set("「{}」モードへ変更しました。".format(self.get_mode_name()))
         app.frames["Finish"].show()
+
+
+class WifiScan(tk.Frame):
+    """WiFi設定
+    """
+
+    def __init__(self, parent):
+        tk.Frame.__init__(self, parent)
+
+        title_label = tk.Label(self, text="WiFi設定")
+        title_label.configure(style.title_label)
+        title_label.pack(fill="x")
+
+        text_label = tk.Label(self, text="QRコードをスキャンしてください。")
+        text_label.configure(style.default_label)
+        text_label.pack(fill="x")
+
+        if context.on_preview:
+            self.preview = tk.Canvas(self, width = style.preview_width, height = style.preview_height, bg=style.preview_background)
+            self.preview.pack()
+
+        cancel_button = tk.Button(self, text="キャンセル", command=self.back_menu)
+        cancel_button.configure(style.default_button)
+        cancel_button.pack(fill="x", side="bottom")
+
+
+    def start_scan(self, event = None):
+        app.log("start_scan")
+        self.on_scan = True
+        self.capture = cv2.VideoCapture(0)
+        self.after(100, self.scan)
+
+
+    def scan(self):
+        if not self.on_scan:
+            return
+        ret, frame = self.capture.read()
+        if not ret:
+            app.log("No capture", "WARNING")
+            return
+
+        app.log("Scan start")
+        self.image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        if APP_ENV == "Monmag" and context.on_preview:
+            self.image = self.image.transpose(1,0,2)[::-1] # -90度回転、詳細は https://qiita.com/matsu_mh/items/54b09273aef79ae027bc 参照
+        self.decoded = pyzbar.decode(self.image)
+        if self.decoded:
+            for code in self.decoded:
+                app.log(code, "INFO")
+                self.after_scan(code.data)
+#                 self.preview.create_text(style.preview_offset_x, style.preview_offset_y, text=code.data, tag="code") ###
+                return
+
+        if context.on_preview:
+            self.image = Image.fromarray(self.image)
+            self.image = ImageTk.PhotoImage(self.image)
+    #         app.log("w:{} x h:{}".format(self.image.width(), self.image.height())) ###
+            self.preview.create_image(style.preview_offset_x, style.preview_offset_y, image=self.image)
+        app.log("Scan end")
+
+        self.after(100, self.scan)
+
+
+    def parse_decoded_data(self, decoded_data):
+        """QRコードで読み取った文字列をパースし、ssid,passwordを取得する
+        """
+        decoded_data = {}
+        lines = decoded_data.split("\r\n")
+        if len(lines) > 2:
+            decoded_data["ssid"] = lines[0]
+            decoded_data["password"] = lines[1]
+        return decoded_data
+
+
+    def wifi_setting(self, decoded_data):
+        # FIXME:実装
+        for cell in Cell.all("wlan0"):
+            app.log("ssid:{}, channel:{}, address:{}, mode:{}".format(cell.ssid, cell.channel, cell.address, cell.mode), "INFO")
+            if cell.encrypted:
+                app.log("encryption_type:{}".format(cell.encryption_type))
+
+        for scheme in Scheme.all():
+            app.log(scheme, "INFO")
+        return True
+
+
+    def after_scan(self, data):
+        app.log("after_scan")
+        decoded_data = self.parse_decoded_data(data)
+
+        if decoded_data:
+            app.play("success")
+            app.log(decoded_data, "INFO")
+            result = self.wifi_setting(decoded_data)
+
+            if result:
+                self.on_scan = False
+                self.capture.release()
+                context.finish_message.set("WiFi設定が完了しました。")
+                app.frames["Finish"].show()
+            else:
+                app.showerror("エラー", "WiFi設定に失敗しました。")
+                self.after(500, self.scan)
+
+        else:
+            app.showerror("エラー", "WiFi設定が取得できませんでした。")
+            self.after(500, self.scan)
+
+
+    def show(self):
+        app.frames["WifiScan"].start_scan()
+        app.show_frame(self)
+
+
+    def back_menu(self):
+        app.log("back_menu")
+        app.play("button")
+
+        self.on_scan = False
+        if context.on_preview:
+            self.preview.delete("code")
+        self.capture.release()
+        app.show_frame("Menu")
 
 
 class MapApi():
@@ -1216,6 +1342,7 @@ class MapApp(tk.Tk):
                Finish, # 完了
                Setting, # 設定
                SwitchMode, # モード切り替え
+               WifiScan, # WiFi設定
                )
 
 

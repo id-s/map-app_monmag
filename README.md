@@ -45,6 +45,7 @@ $ sudo apt-get install libzbar0
 $ cd ~/Git
 $ git clone https://github.com/id-s/map-app_monmag.git
 $ cd map-app_monmag
+$ sudo WIFI_INSTALL_CLI=False pip install wifi
 $ sudo pip install -r requirements.txt
 ```
 
