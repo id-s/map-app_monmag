@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo apt-get install python-tk python-pil.imagetk
-sudo apt-get install libzbar0
-sudo WIFI_INSTALL_CLI=False pip install wifi
-sudo pip install -r requirements.txt
+sudo apt-get install python-tk python-pil.imagetk >> ~/logs/setup.log
+sudo apt-get install libzbar0 >> ~/logs/setup.log
+sudo WIFI_INSTALL_CLI=False pip install wifi >> ~/logs/setup.log
+sudo pip install -r requirements.txt >> ~/logs/setup.log
