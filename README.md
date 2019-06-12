@@ -45,13 +45,11 @@ APP_MODE: "test"とすると、テストモードで起動する(設定より切
 Monmagのターミナルにて以下を実行する。
 
 ```
-$ sudo apt-get install python-tk python-pil.imagetk
-$ sudo apt-get install libzbar0
-$ cd ~/Git
+$ sudo apt-get install git
 $ git clone https://github.com/id-s/map-app_monmag.git
 $ cd map-app_monmag
-$ sudo WIFI_INSTALL_CLI=False pip install wifi
-$ sudo pip install -r requirements.txt
+$ chmod a+x *.sh
+$ ./setup.sh
 ```
 
 さらに`sudo raspi-config`から、ロケール(ja_JP.UTF-8)を追加する。
