@@ -1074,7 +1074,7 @@ class WifiScan(tk.Frame):
 
             funcs = [
                 lambda: self.wifi_setting(parsed_data),
-                lambda: self.wifi_finish]
+                lambda: self.wifi_finish()]
             app.frames["Progress"].show(funcs)
 
         else:
