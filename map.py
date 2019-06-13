@@ -1058,7 +1058,7 @@ class WifiScan(tk.Frame):
 
     def wifi_finish(self):
         context.finish_message.set("WiFi設定が完了しました。")
-        app.frames["Finish"].show()
+        return True
 
 
     def after_scan(self, data):
@@ -1073,8 +1073,8 @@ class WifiScan(tk.Frame):
             self.capture.release()
 
             funcs = [
-                self.wifi_setting(parsed_data),
-                self.wifi_finish()]
+                lambda: self.wifi_setting(parsed_data),
+                lambda: self.wifi_finish]
             app.frames["Progress"].show(funcs)
 
         else:
