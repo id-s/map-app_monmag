@@ -3,6 +3,7 @@
 import Tkinter as tk
 import tkFont as font
 import tkMessageBox as messagebox
+import ttk
 
 import cv2
 import json
@@ -1055,6 +1056,11 @@ class WifiScan(tk.Frame):
         return True
 
 
+    def wifi_finish(self):
+        context.finish_message.set("WiFi設定が完了しました。")
+        app.frames["Finish"].show()
+
+
     def after_scan(self, data):
         app.log("after_scan")
         parsed_data = self.parse_decoded_data(data)
@@ -1062,17 +1068,14 @@ class WifiScan(tk.Frame):
         if parsed_data:
             app.play("success")
             app.log("Scanned:{}".format(parsed_data), "INFO")
-            result = self.wifi_setting(parsed_data)
 
-            if result:
-                self.on_scan = False
-                self.capture.release()
-                context.finish_message.set("WiFi設定が完了しました。")
-                app.frames["Finish"].show()
-                return
-            else:
-                app.showerror("エラー", "WiFi設定に失敗しました。")
-                self.after(500, self.scan)
+            self.on_scan = False
+            self.capture.release()
+
+            funcs = [
+                self.wifi_setting(parsed_data),
+                self.wifi_finish()]
+            app.frames["Progress"].show(funcs)
 
         else:
             app.showerror("エラー", "WiFi設定が取得できませんでした。")
@@ -1093,6 +1096,49 @@ class WifiScan(tk.Frame):
             self.preview.delete("code")
         self.capture.release()
         app.show_frame("Menu")
+
+
+class Progress(tk.Frame):
+    """進捗表示
+    """
+
+    def __init__(self, parent):
+        tk.Frame.__init__(self, parent)
+
+        title_label = tk.Label(self, text="進捗表示")
+        title_label.configure(style.title_label)
+        title_label.pack(fill="x")
+
+        self.bar = ttk.Progressbar(self, length=100, mode="determinate")
+        self.bar.pack()
+
+
+    def show(self, funcs):
+        """画面を表示する
+        @param funcs 画面表示中に行う処理(関数)を配列で渡す。
+                     処理結果がTrueの場合、次の処理へ進む。次の処理がなければ完了画面へ。
+                     処理結果がFalseもしくは例外がスローされると以降の処理はキャンセルされ、メニューへ戻る
+        """
+        bar_value = 0
+        self.bar.configure(maximum=len(funcs), value=bar_value)
+        app.show_frame(self)
+
+        try:
+            context.finish_message.set("処理が完了しました。")
+            for func in funcs:
+                bar_value += 1
+                self.bar.configure(value=bar_value)
+
+                result = func()
+                if not result:
+                    raise MapAppException("処理を中断します。")
+
+            app.frames["Finish"].show()
+
+        except Exception as e:
+            app.log(traceback.format_exc(), "WARNING")
+            app.showerror("エラー", e.message)
+            app.back_menu()
 
 
 class MapApi():
@@ -1441,6 +1487,7 @@ class MapApp(tk.Tk):
                Setting, # 設定
                SwitchMode, # モード切り替え
                WifiScan, # WiFi設定
+               Progress, # 進捗表示
                )
 
 
