@@ -438,17 +438,27 @@ class CardScan(tk.Frame):
         actions.columnconfigure(1, weight=1)
         actions.pack(fill="x", side="bottom")
 
-        cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
-        cancel_button.configure(style.default_button)
+        self.next_button = tk.Button(actions, text="(次へ)", command=self.next_button_clicked)
+        self.next_button.configure(style.primary_button)
 
+        self.cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        self.cancel_button.configure(style.default_button)
+
+        self.reset_buttons()
+
+
+    def reset_buttons(self):
         if context.app_mode == "test":
-            next_button = tk.Button(actions, text="(次へ)", command=self.next_button_clicked)
-            next_button.configure(style.primary_button)
-            next_button.grid(column=0, row=0, sticky="nswe")
-            cancel_button.grid(column=1, row=0, sticky="nswe")
+            self.cancel_button.pack_forget()
+
+            self.next_button.grid(column=0, row=0, sticky="nswe")
+            self.cancel_button.grid(column=1, row=0, sticky="nswe")
 
         else:
-            cancel_button.pack(fill="x", side="bottom")
+            self.next_button.grid_forget()
+            self.cancel_button.grid_forget()
+
+            self.cancel_button.pack(fill="x", side="bottom")
 
 
     def next_button_clicked(self):
@@ -948,8 +958,8 @@ class SwitchMode(tk.Frame):
         context.reset()
         self.text_label.configure(text=self.get_mode_text())
 
-        app.log(context.macaddress, "DEV") ###
         app.frames["CardSelect"].reset_buttons()
+        app.frames["CardScan"].reset_buttons()
 
         context.finish_message.set("「{}」モードへ変更しました。".format(self.get_mode_name()))
         app.frames["Finish"].show()
