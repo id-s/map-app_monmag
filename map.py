@@ -1122,18 +1122,20 @@ class Progress(tk.Frame):
         bar_value = 0
         self.bar.configure(maximum=len(funcs), value=bar_value)
         app.show_frame(self)
+        app.update()
 
         try:
             context.finish_message.set("処理が完了しました。")
             for func in funcs:
                 bar_value += 1
                 self.bar.configure(value=bar_value)
+                app.update()
 
                 result = func()
                 if not result:
                     raise MapAppException("処理を中断します。")
 
-            app.frames["Finish"].show()
+            self.after(500, app.frames["Finish"].show)
 
         except Exception as e:
             app.log(traceback.format_exc(), "WARNING")
