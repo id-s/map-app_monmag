@@ -1075,7 +1075,7 @@ class WifiScan(tk.Frame):
             funcs = [
                 lambda: self.wifi_setting(parsed_data),
                 lambda: self.wifi_finish()]
-            app.frames["Progress"].show(funcs)
+            app.frames["Progress"].show(funcs, "Wi-Fi設定中...")
 
         else:
             app.showerror("エラー", "Wi-Fi設定が取得できませんでした。")
@@ -1109,11 +1109,15 @@ class Progress(tk.Frame):
         title_label.configure(style.title_label)
         title_label.pack(fill="x")
 
-        self.bar = ttk.Progressbar(self, length=100, mode="determinate")
+        self.text_label = tk.Label(self)
+        self.text_label.configure(style.default_label)
+        self.text_label.pack(fill="x")
+
+        self.bar = ttk.Progressbar(self, length=400, mode="determinate")
         self.bar.pack()
 
 
-    def show(self, funcs):
+    def show(self, funcs, text=""):
         """画面を表示する
         @param funcs 画面表示中に行う処理(関数)を配列で渡す。
                      処理結果がTrueの場合、次の処理へ進む。次の処理がなければ完了画面へ。
@@ -1121,6 +1125,7 @@ class Progress(tk.Frame):
         """
         bar_value = 0
         self.bar.configure(maximum=len(funcs), value=bar_value)
+        self.text_label.configure(text=text)
         app.show_frame(self)
         app.update()
 
