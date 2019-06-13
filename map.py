@@ -956,13 +956,13 @@ class SwitchMode(tk.Frame):
 
 
 class WifiScan(tk.Frame):
-    """WiFi設定
+    """Wi-Fi設定
     """
 
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
 
-        title_label = tk.Label(self, text="WiFi設定")
+        title_label = tk.Label(self, text="Wi-Fi設定")
         title_label.configure(style.title_label)
         title_label.pack(fill="x")
 
@@ -1057,7 +1057,7 @@ class WifiScan(tk.Frame):
 
 
     def wifi_finish(self):
-        context.finish_message.set("WiFi設定が完了しました。")
+        context.finish_message.set("Wi-Fi設定が完了しました。")
         return True
 
 
@@ -1078,7 +1078,7 @@ class WifiScan(tk.Frame):
             app.frames["Progress"].show(funcs)
 
         else:
-            app.showerror("エラー", "WiFi設定が取得できませんでした。")
+            app.showerror("エラー", "Wi-Fi設定が取得できませんでした。")
             self.after(500, self.scan)
 
 
@@ -1486,7 +1486,7 @@ class MapApp(tk.Tk):
                Finish, # 完了
                Setting, # 設定
                SwitchMode, # モード切り替え
-               WifiScan, # WiFi設定
+               WifiScan, # Wi-Fi設定
                Progress, # 進捗表示
                )
 
