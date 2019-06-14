@@ -214,6 +214,19 @@ class CoupointShow(tk.Frame):
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
 
+        actions = tk.Frame(self)
+        actions.columnconfigure(0, weight=1)
+        actions.columnconfigure(1, weight=1)
+        actions.pack(fill="x", side="bottom")
+
+        next_button = tk.Button(actions, text="利用確定", command=self.use_coupoint)
+        next_button.configure(style.primary_button)
+        next_button.grid(column=0, row=0, sticky="nswe")
+
+        cancel_button = tk.Button(actions, text="キャンセル", command=self.cancel_button_clicked)
+        cancel_button.configure(style.default_button)
+        cancel_button.grid(column=1, row=0, sticky="nswe")
+
 
     def show_coupoint(self, coupoint):
 
@@ -255,10 +268,6 @@ class CoupointShow(tk.Frame):
 #         self.use_condition_text.configure(background="white")
         self.use_condition_text.pack(fill="x")
 
-        self.use_button = tk.Button(self, text="利用確定", command=self.use_coupoint)
-        self.use_button.configure(style.primary_button)
-        self.use_button.pack(fill="x", side="bottom")
-
 
     def clear_coupoint(self):
         self.title_label.destroy()
@@ -268,7 +277,6 @@ class CoupointShow(tk.Frame):
         self.description_text.destroy()
         self.use_condition_label.destroy()
         self.use_condition_text.destroy()
-        self.use_button.destroy()
 
 
     def use_coupoint(self):
@@ -277,6 +285,13 @@ class CoupointShow(tk.Frame):
         self.clear_coupoint()
         context.finish_message.set("MyShopポイントを付与しました。")
         app.frames["Finish"].show()
+
+
+    def cancel_button_clicked(self):
+        app.play("button")
+
+        self.clear_coupoint()
+        app.back_menu()
 
 
     def show(self):
