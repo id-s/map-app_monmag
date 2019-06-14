@@ -190,20 +190,18 @@ class CoupointScan(tk.Frame):
 
 
     def show(self):
-        context.exec_name = "coupoint"
         app.frames["CoupointScan"].start_scan()
         app.show_frame(self)
 
 
     def back_menu(self):
-        app.log("back_menu")
         app.play("button")
 
         self.on_scan = False
         if context.on_preview:
             self.preview.delete("code")
         self.capture.release()
-        context.exec_name = None
+        context.reset()
         app.show_frame("Menu")
 
 
@@ -219,9 +217,9 @@ class CoupointShow(tk.Frame):
         actions.columnconfigure(1, weight=1)
         actions.pack(fill="x", side="bottom")
 
-        next_button = tk.Button(actions, text="利用確定", command=self.use_coupoint)
-        next_button.configure(style.primary_button)
-        next_button.grid(column=0, row=0, sticky="nswe")
+        self.next_button = tk.Button(actions)
+        self.next_button.configure(style.primary_button)
+        self.next_button.grid(column=0, row=0, sticky="nswe")
 
         cancel_button = tk.Button(actions, text="キャンセル", command=self.cancel_button_clicked)
         cancel_button.configure(style.default_button)
@@ -270,6 +268,9 @@ class CoupointShow(tk.Frame):
 
 
     def clear_coupoint(self):
+        if not hasattr(self, "title_label"):
+            return
+
         self.title_label.destroy()
         self.use_term_label.destroy()
         self.use_term_text.destroy()
@@ -282,20 +283,44 @@ class CoupointShow(tk.Frame):
     def use_coupoint(self):
         app.play("button")
 
-        self.clear_coupoint()
-        context.finish_message.set("MyShopポイントを付与しました。")
-        app.frames["Finish"].show()
+        result = api.use_coupoint()
+        if result == "success":
+            context.finish_message.set("MyShopポイントを付与しました。")
+            app.frames["Finish"].show()
+        else:
+            app.showerror("エラー", "エラーが発生しました。")
+
+
+    def cancel_coupoint(self):
+        app.play("button")
+
+        result = api.cancel_coupoint()
+        if result == "success":
+            context.finish_message.set("付与したMyShopポイントを取消しました。")
+            app.frames["Finish"].show()
+        else:
+            app.showerror("エラー", "エラーが発生しました。")
 
 
     def cancel_button_clicked(self):
         app.play("button")
-
-        self.clear_coupoint()
         app.back_menu()
 
 
     def show(self):
-        coupoint = api.get_coupoint()
+        self.clear_coupoint()
+
+        result, coupoint = api.get_coupoint()
+        if result == "regist":
+            context.exec_name = "use_coupoint"
+            self.next_button.configure(text="利用確定", command=self.use_coupoint)
+        elif result == "cancel":
+            context.exec_name = "cancel_coupoint"
+            self.next_button.configure(text="利用キャンセル", command=self.cancel_coupoint)
+        else:
+            app.showerror("エラー", "エラーが発生しました。")
+            app.back_menu()
+
         self.show_coupoint(coupoint)
         app.show_frame(self)
 
@@ -1113,13 +1138,13 @@ class WifiScan(tk.Frame):
 
 
     def back_menu(self):
-        app.log("back_menu")
         app.play("button")
 
         self.on_scan = False
         if context.on_preview:
             self.preview.delete("code")
         self.capture.release()
+        context.reset()
         app.show_frame("Menu")
 
 
@@ -1234,17 +1259,14 @@ class MapApi():
             if resp.status_code == 200:
                 app.log(resp.text, "INFO")
                 resp_data = resp.json()
-                if resp_data["result"] == "regist":
-                    return resp_data["carousel"]
-                else:
-                    return None
+                return resp_data["result"], resp_data["carousel"]
             else:
                 app.log(resp.status_code, "WARNING")
-                return None
+                return None, None
 
         except Exception as e:
             app.log(traceback.format_exc(), "WARNING")
-            return None
+            return None, None
 
 
     def use_coupoint(self):
