@@ -58,3 +58,28 @@ $ ./setup.sh
 4 Localisation Options > I1 Change Locale > Ok > "ja_JP.UTF-8 UTF-8"まで移動し、スペースを押す > エンターを押す > Ok > None > Finish
 
 Wi-Fi設定を可能にするため、アプリの起動は`sudo python map.py`で行う必要がある。
+
+### 自動起動設定
+
+ID-Syncの自動起動を無効化する。
+
+```
+pi@raspberrypi:~/Git/map-app_monmag $ sudo vi /etc/init.d/monmag-startup.sh
+
+#!/bin/sh
+...
+### END INIT INFO
+
+exit 0 # TEST <<< 追加
+
+update_dir="/home/pi/Git/monmag-rpi-bin/"
+bin_dir="/home/pi/Git/monmag-rpi-bin/ui/"
+...
+
+pi@raspberrypi:~/Git/map-app_monmag $  vi ~/.config/lxsession/LXDE-pi/autostart
+
+...
+#@sh /home/pi/qrcode_startup.sh
+@sh /home/pi/Git/map-app_monmag/startup.sh
+```
+
