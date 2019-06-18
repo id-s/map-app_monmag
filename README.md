@@ -46,6 +46,8 @@ Monmagのターミナルにて以下を実行する。
 
 ```
 $ sudo apt-get install git
+$ mkdir Git
+$ cd Git
 $ git clone https://github.com/id-s/map-app_monmag.git
 $ cd map-app_monmag
 $ chmod a+x *.sh
