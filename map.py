@@ -996,6 +996,7 @@ class SwitchMode(tk.Frame):
 
         context.app_mode = mode
         context.reset()
+        api.reset()
         self.text_label.configure(text=self.get_mode_text())
 
         app.frames["CardSelect"].reset_buttons()
@@ -1200,10 +1201,40 @@ class Progress(tk.Frame):
 
 class MapApi():
 
+    def __init__(self):
+        self.reset()
+
+
+    def reset(self):
+        """実行モードに応じて設定を切り替える
+        """
+        if context.app_mode == "test":
+            self.check_coupoint_url  = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/check"
+            self.get_coupoint_url    = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/start"
+            self.use_coupoint_url    = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/regist"
+            self.cancel_coupoint_url = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/cancel"
+            self.get_clients_url     = "https://card-dot-my-shop-magee-stg.appspot.com/v1/check"
+            self.check_card_url      = "https://card-dot-my-shop-magee-stg.appspot.com/v1/start"
+            self.calc_point_url      = "https://card-dot-my-shop-magee-stg.appspot.com/v1/calc"
+            self.add_point_url       = "https://card-dot-my-shop-magee-stg.appspot.com/v1/regist"
+            self.cancel_point_url    = "https://card-dot-my-shop-magee-stg.appspot.com/v1/cancel"
+
+        else:
+            # TODO: 本番URLに置き換える
+            self.check_coupoint_url  = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/check"
+            self.get_coupoint_url    = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/start"
+            self.use_coupoint_url    = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/regist"
+            self.cancel_coupoint_url = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/cancel"
+            self.get_clients_url     = "https://card-dot-my-shop-magee-stg.appspot.com/v1/check"
+            self.check_card_url      = "https://card-dot-my-shop-magee-stg.appspot.com/v1/start"
+            self.calc_point_url      = "https://card-dot-my-shop-magee-stg.appspot.com/v1/calc"
+            self.add_point_url       = "https://card-dot-my-shop-magee-stg.appspot.com/v1/regist"
+            self.cancel_point_url    = "https://card-dot-my-shop-magee-stg.appspot.com/v1/cancel"
+
+
     def check_coupoint(self):
         """クーポイント実施チェック
         """
-        url = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/check"
         headers = {"Content-Type": "application/json"}
 
         data = {
@@ -1213,10 +1244,10 @@ class MapApi():
                 }
             }
 
-        app.log("POST {}".format(url), "INFO")
+        app.log("POST {}".format(self.check_coupoint_url), "INFO")
         app.log(json.dumps(data), "INFO")
         try:
-            resp = requests.post(url, data=json.dumps(data), headers=headers)
+            resp = requests.post(self.check_coupoint_url, data=json.dumps(data), headers=headers)
 
             if resp.status_code == 200:
                 app.log(resp.text, "INFO")
@@ -1237,7 +1268,6 @@ class MapApi():
     def get_coupoint(self):
         """クーポイントの詳細を取得する
         """
-        url = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/start"
         headers = {"Content-Type": "application/json"}
 
         data = {
@@ -1251,10 +1281,10 @@ class MapApi():
                 }
             }
 
-        app.log("POST {}".format(url), "INFO")
+        app.log("POST {}".format(self.get_coupoint_url), "INFO")
         app.log(json.dumps(data), "INFO")
         try:
-            resp = requests.post(url, data=json.dumps(data), headers=headers)
+            resp = requests.post(self.get_coupoint_url, data=json.dumps(data), headers=headers)
 
             if resp.status_code == 200:
                 app.log(resp.text, "INFO")
@@ -1272,7 +1302,6 @@ class MapApi():
     def use_coupoint(self):
         """クーポイントを利用する
         """
-        url = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/regist"
         headers = {"Content-Type": "application/json"}
 
         data = {
@@ -1286,10 +1315,10 @@ class MapApi():
                 }
             }
 
-        app.log("POST {}".format(url), "INFO")
+        app.log("POST {}".format(self.use_coupoint_url), "INFO")
         app.log(json.dumps(data), "INFO")
         try:
-            resp = requests.post(url, data=json.dumps(data), headers=headers)
+            resp = requests.post(self.use_coupoint_url, data=json.dumps(data), headers=headers)
 
             if resp.status_code == 200 or resp.status_code == 404:
                 app.log(resp.text, "INFO")
@@ -1307,7 +1336,6 @@ class MapApi():
     def cancel_coupoint(self):
         """クーポイントを利用キャンセルする
         """
-        url = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/cancel"
         headers = {"Content-Type": "application/json"}
 
         data = {
@@ -1321,10 +1349,10 @@ class MapApi():
                 }
             }
 
-        app.log("POST {}".format(url), "INFO")
+        app.log("POST {}".format(self.cancel_coupoint_url), "INFO")
         app.log(json.dumps(data), "INFO")
         try:
-            resp = requests.post(url, data=json.dumps(data), headers=headers)
+            resp = requests.post(self.cancel_coupoint_url, data=json.dumps(data), headers=headers)
 
             if resp.status_code == 200 or resp.status_code == 404:
                 app.log(resp.text, "INFO")
@@ -1342,7 +1370,6 @@ class MapApi():
     def get_clients(self):
         """利用できるカードを取得する
         """
-        url = "https://card-dot-my-shop-magee-stg.appspot.com/v1/check"
         headers = {"Content-Type": "application/json"}
 
         data = {
@@ -1352,10 +1379,10 @@ class MapApi():
                 }
             }
 
-        app.log("POST {}".format(url), "INFO")
+        app.log("POST {}".format(self.get_clients_url), "INFO")
         app.log(json.dumps(data), "INFO")
         try:
-            resp = requests.post(url, data=json.dumps(data), headers=headers)
+            resp = requests.post(self.get_clients_url, data=json.dumps(data), headers=headers)
 
             if resp.status_code == 200:
                 app.log(resp.text, "INFO")
@@ -1380,7 +1407,6 @@ class MapApi():
                 "failure": カード読み込み不正（選択された流通と読み込まれたカードが一致しない等）
                  None: サーバエラーなど
         """
-        url = "https://card-dot-my-shop-magee-stg.appspot.com/v1/start"
         headers = {"Content-Type": "application/json"}
 
         data = {
@@ -1394,10 +1420,10 @@ class MapApi():
                 }
             }
 
-        app.log("POST {}".format(url), "INFO")
+        app.log("POST {}".format(self.check_card_url), "INFO")
         app.log(json.dumps(data), "INFO")
         try:
-            resp = requests.post(url, data=json.dumps(data), headers=headers)
+            resp = requests.post(self.check_card_url, data=json.dumps(data), headers=headers)
 
             if resp.status_code == 200 or resp.status_code == 404:
                 app.log(resp.text, "INFO")
@@ -1415,7 +1441,6 @@ class MapApi():
     def calc_point(self):
         """付与ポイント算出
         """
-        url = "https://card-dot-my-shop-magee-stg.appspot.com/v1/calc"
         headers = {"Content-Type": "application/json"}
 
         data = {
@@ -1430,10 +1455,10 @@ class MapApi():
                 }
             }
 
-        app.log("POST {}".format(url), "INFO")
+        app.log("POST {}".format(self.calc_point_url), "INFO")
         app.log(json.dumps(data), "INFO")
         try:
-            resp = requests.post(url, data=json.dumps(data), headers=headers)
+            resp = requests.post(self.calc_point_url, data=json.dumps(data), headers=headers)
 
             if resp.status_code == 200:
                 app.log(resp.text, "INFO")
@@ -1451,7 +1476,6 @@ class MapApi():
     def add_point(self):
         """ポイント付与＆電話番号登録
         """
-        url = "https://card-dot-my-shop-magee-stg.appspot.com/v1/regist"
         headers = {"Content-Type": "application/json"}
 
         data = {
@@ -1468,10 +1492,10 @@ class MapApi():
                 }
             }
 
-        app.log("POST {}".format(url), "INFO")
+        app.log("POST {}".format(self.add_point_url), "INFO")
         app.log(json.dumps(data), "INFO")
         try:
-            resp = requests.post(url, data=json.dumps(data), headers=headers)
+            resp = requests.post(self.add_point_url, data=json.dumps(data), headers=headers)
 
             if resp.status_code == 200 or resp.status_code == 404:
                 app.log(resp.text, "INFO")
@@ -1489,7 +1513,6 @@ class MapApi():
     def cancel_point(self):
         """ポイント付与キャンセル
         """
-        url = "https://card-dot-my-shop-magee-stg.appspot.com/v1/cancel"
         headers = {"Content-Type": "application/json"}
 
         data = {
@@ -1505,10 +1528,10 @@ class MapApi():
                 }
             }
 
-        app.log("POST {}".format(url), "INFO")
+        app.log("POST {}".format(self.cancel_point_url), "INFO")
         app.log(json.dumps(data), "INFO")
         try:
-            resp = requests.post(url, data=json.dumps(data), headers=headers)
+            resp = requests.post(self.cancel_point_url, data=json.dumps(data), headers=headers)
 
             if resp.status_code == 200 or resp.status_code == 404:
                 app.log(resp.text, "INFO")
