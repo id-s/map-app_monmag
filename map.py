@@ -803,7 +803,11 @@ class SalesEntry(tk.Frame):
         context.price = context.entry_text.get()
         point_num = api.calc_point()
         if point_num is None:
+            app.showerror("エラー", "エラーが発生しました。")
+            self.next_button.configure(state="disabled")
             point_num = "0"
+        else:
+            self.next_button.configure(state="normal")
         context.point_num.set(point_num)
         self.next_button.focus_set()
         app.show_frame(self)
