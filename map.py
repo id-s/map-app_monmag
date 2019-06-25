@@ -605,7 +605,6 @@ class Policy1(tk.Frame):
             app.frames["Finish"].show()
         else:
             app.showerror("エラー", "エラーが発生しました。")
-            app.back_menu()
 
 
 class Policy2(tk.Frame):
@@ -661,7 +660,6 @@ class Policy2(tk.Frame):
             app.frames["Finish"].show()
         else:
             app.showerror("エラー", "エラーが発生しました。")
-            app.back_menu()
 
 
 class TelEntry(tk.Frame):
@@ -724,7 +722,6 @@ class TelEntry(tk.Frame):
             app.frames["Finish"].show()
         else:
             app.showerror("エラー", "エラーが発生しました。")
-            app.back_menu()
 
 
     def show(self):
