@@ -647,6 +647,7 @@ class Policy2(tk.Frame):
         app.play("button")
 
         context.entry_caption.set("電話番号入力")
+        context.entry_text.set("")
         context.after_entry = "TelEntry"
         app.frames["TelEntry"].show_num_keys()
 
@@ -782,7 +783,6 @@ class SalesEntry(tk.Frame):
             app.showerror("エラー", "付与されるポイントが0で間違いなければ[キャンセル]を押してください。")
             return
 
-        context.entry_text.set("")
         if context.exec_name == "add_point":
             if context.card_status == "tel":
                 app.show_frame("Policy1")
