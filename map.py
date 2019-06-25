@@ -391,7 +391,7 @@ class CardSelect(tk.Frame):
     def add_buttons(self):
         clients = api.get_clients()
         if not clients:
-            return
+            return False
 
         for client in clients:
             resp = requests.get(client["img_url"], stream=True)
@@ -411,12 +411,14 @@ class CardSelect(tk.Frame):
 
             self.card_buttons.append(button)
 
+        return True
+
 
     def reset_buttons(self):
         for button in self.card_buttons:
             button.destroy()
 
-        self.add_buttons()
+        return self.add_buttons()
 
 
     def select_card(self, client_cd):
@@ -500,6 +502,8 @@ class CardScan(tk.Frame):
             self.cancel_button.grid_forget()
 
             self.cancel_button.pack(fill="x", side="bottom")
+
+        return True
 
 
     def next_button_clicked(self):
@@ -1000,9 +1004,15 @@ class SwitchMode(tk.Frame):
         api.reset()
         self.text_label.configure(text=self.get_mode_text())
 
-        app.frames["CardSelect"].reset_buttons()
-        app.frames["CardScan"].reset_buttons()
+        success = app.frames["CardSelect"].reset_buttons()
+        if not success:
+            app.showerror("エラー", "カード情報の取得に失敗しました。")
 
+        success = app.frames["CardScan"].reset_buttons()
+        if not success:
+            app.showerror("エラー", "カードスキャン画面の更新に失敗しました。")
+
+        app.log("Swith mode -> {}".format(context.app_mode), "INFO")
         context.finish_message.set("「{}」モードへ変更しました。".format(self.get_mode_name()))
         app.frames["Finish"].show()
 
@@ -1209,6 +1219,8 @@ class MapApi():
     def reset(self):
         """実行モードに応じて設定を切り替える
         """
+        app.log("Reset api", "INFO")
+
         if context.app_mode == "test":
             self.check_coupoint_url  = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/check"
             self.get_coupoint_url    = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/start"
@@ -1783,6 +1795,9 @@ class Context():
 
 
     def reset(self, excepts=[]):
+        if not excepts:
+            app.log("Reset all context", "INFO")
+
         if not "serialno" in excepts:
             self.serialno = self._get_serialno()
 
