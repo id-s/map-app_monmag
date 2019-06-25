@@ -320,6 +320,7 @@ class CoupointShow(tk.Frame):
         else:
             app.showerror("エラー", "エラーが発生しました。")
             app.back_menu()
+            return
 
         self.show_coupoint(coupoint)
         app.show_frame(self)
