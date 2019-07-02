@@ -54,9 +54,6 @@ $ chmod a+x *.sh
 $ ./setup.sh
 ```
 
-さらに`sudo raspi-config`から、ロケール(ja_JP.UTF-8)を追加する。
-4 Localisation Options > I1 Change Locale > Ok > "ja_JP.UTF-8 UTF-8"まで移動し、スペースを押す > エンターを押す > Ok > None > Finish
-
 Wi-Fi設定を可能にするため、アプリの起動は`sudo python map.py`で行う必要がある。
 
 ### 自動起動設定
