@@ -1026,7 +1026,7 @@ class RemoteConnect(tk.Frame):
 
 
     def remote_connect(self):
-        app.attributes('-fullscreen', False) # 全画面・タイトルバー非表示解除
+        app.set_fullscreen(False)
 
         command = "ngrok tcp -region jp --remote-addr={} 5900".format(context.ngrok_reserved_address)
         Util.exec_command(command)
@@ -1037,6 +1037,8 @@ class RemoteConnect(tk.Frame):
 
 
     def remote_error(self):
+        app.set_fullscreen(True)
+
         context.finish_message.set("接続に失敗しました。")
         return True
 
@@ -1669,14 +1671,18 @@ class MapApp(tk.Tk):
                )
 
 
+    def set_fullscreen(self, fullscreen=True):
+        if APP_ENV == "Monmag":
+            if not ON_DEBUG:
+                self.attributes('-fullscreen', fullscreen) # 全画面・タイトルバー非表示
+        else:
+            self.geometry("{}x{}".format(WINDOW_WIDTH, WINDOW_HEIGHT))
+
+
     def build(self):
         self.title("MAP")
 
-        if APP_ENV == "Monmag":
-            if not ON_DEBUG:
-                self.attributes('-fullscreen', True) # 全画面・タイトルバー非表示
-        else:
-            self.geometry("{}x{}".format(WINDOW_WIDTH, WINDOW_HEIGHT))
+        self.set_fullscreen()
 
         # プレビューのタイムラグが問題になるようなら、下記フラグをFalseにする
         context.on_preview = True
