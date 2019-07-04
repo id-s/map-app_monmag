@@ -1027,6 +1027,7 @@ class RemoteConnect(tk.Frame):
 
     def remote_connect(self):
         app.set_fullscreen(False)
+        app.update()
 
         command = "ngrok tcp -region jp --remote-addr={} 5900".format(context.ngrok_reserved_address)
         Util.exec_command(command)
