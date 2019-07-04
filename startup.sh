@@ -16,7 +16,7 @@ sudo pip install -r requirements.txt >> $log_file
 
 
 # ngrok
-ngrok authtoken $ngrok_authtoken >> $log_file
+sudo ngrok authtoken $ngrok_authtoken >> $log_file
 
 
 sudo python map.py >> $log_file
