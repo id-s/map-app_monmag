@@ -54,7 +54,7 @@ class Menu(tk.Frame):
         menu2_button.configure(style.default_button)
         menu2_button.pack(fill="x")
 
-        menu3_button = tk.Button(self, text="設定",command=self.menu3_button_clicked)
+        menu3_button = tk.Button(self, text="システム",command=self.menu3_button_clicked)
         menu3_button.configure(style.default_button)
         menu3_button.pack(fill="x", side="bottom")
 
@@ -84,7 +84,7 @@ class Menu(tk.Frame):
 
     def menu3_button_clicked(self):
         app.play("button")
-        app.show_frame("Setting")
+        app.show_frame("SystemMenu")
 
 
 class CoupointScan(tk.Frame):
@@ -892,7 +892,8 @@ class Finish(tk.Frame):
         title_label.configure(style.title_label)
         title_label.pack(fill="x")
 
-        message_label = tk.Label(self, textvariable=context.finish_message)
+        message_label = tk.Label(self, textvariable=context.finish_message,
+                                 wraplength=(WINDOW_WIDTH - style.padding * 2), justify="left", height=2, padx=style.padding)
         message_label.configure(style.default_label)
         message_label.pack(fill="x")
 
@@ -906,14 +907,14 @@ class Finish(tk.Frame):
         self.after(duration * 1000, lambda: app.show_frame("Menu", False))
 
 
-class Setting(tk.Frame):
-    """設定
+class SystemMenu(tk.Frame):
+    """システムメニュー
     """
 
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
 
-        title_label = tk.Label(self, text="設定")
+        title_label = tk.Label(self, text="システム")
         title_label.configure(style.title_label)
         title_label.pack(fill="x")
 
@@ -921,20 +922,9 @@ class Setting(tk.Frame):
         cancel_point_button.configure(style.default_button)
         cancel_point_button.pack(fill="x")
 
-        switch_mode_button = tk.Button(self, text="モード切り替え", command=self.switch_mode_button_clicked)
-        switch_mode_button.configure(style.default_button)
-        switch_mode_button.pack(fill="x")
-
-        if APP_ENV == "Monmag":
-            wifi_button = tk.Button(self, text="Wi-Fi設定", command=self.wifi_button_clicked)
-        else:
-            wifi_button = tk.Button(self, text="Wi-Fi設定", state="disabled")
-        wifi_button.configure(style.default_button)
-        wifi_button.pack(fill="x")
-
-        quit_button = tk.Button(self, text="アプリ終了", command=app.quit)
-        quit_button.configure(style.default_button)
-        quit_button.pack(fill="x")
+        setting_button = tk.Button(self, text="設定", command=self.setting_button_clicked)
+        setting_button.configure(style.default_button)
+        setting_button.pack(fill="x")
 
         cancel_button = tk.Button(self, text="キャンセル", command=app.back_menu)
         cancel_button.configure(style.default_button)
@@ -946,14 +936,109 @@ class Setting(tk.Frame):
         app.frames["CardSelect"].show("cancel")
 
 
-    def switch_mode_button_clicked(self):
+    def setting_button_clicked(self):
         app.play("button")
-        app.show_frame("SwitchMode")
+        app.show_frame("Setting")
+
+
+class Setting(tk.Frame):
+    """設定
+    """
+
+    def __init__(self, parent):
+        tk.Frame.__init__(self, parent)
+
+        title_label = tk.Label(self, text="設定")
+        title_label.configure(style.title_label)
+        title_label.pack(fill="x")
+
+        if APP_ENV == "Monmag":
+            wifi_button = tk.Button(self, text="Wi-Fi設定", command=self.wifi_button_clicked)
+        else:
+            wifi_button = tk.Button(self, text="Wi-Fi設定", state="disabled")
+        wifi_button.configure(style.default_button)
+        wifi_button.pack(fill="x")
+
+        switch_mode_button = tk.Button(self, text="モード切り替え", command=self.switch_mode_button_clicked)
+        switch_mode_button.configure(style.default_button)
+        switch_mode_button.pack(fill="x")
+
+        quit_button = tk.Button(self, text="アプリ終了", command=app.quit)
+        quit_button.configure(style.default_button)
+        quit_button.pack(fill="x")
+
+        remote_connect_button = tk.Button(self, text="リモート接続", command=self.remote_connect_button_clicked)
+        remote_connect_button.configure(style.default_button)
+        remote_connect_button.pack(fill="x")
+
+        cancel_button = tk.Button(self, text="キャンセル", command=app.back_menu)
+        cancel_button.configure(style.default_button)
+        cancel_button.pack(fill="x", side="bottom")
 
 
     def wifi_button_clicked(self):
         app.play("button")
         app.frames["WifiScan"].show()
+
+
+    def switch_mode_button_clicked(self):
+        app.play("button")
+        app.show_frame("SwitchMode")
+
+
+    def remote_connect_button_clicked(self):
+        app.play("button")
+        app.show_frame("RemoteConnect")
+
+
+class RemoteConnect(tk.Frame):
+    """リモート接続
+    """
+
+    def __init__(self, parent):
+        tk.Frame.__init__(self, parent)
+
+        title_label = tk.Label(self, text="リモート接続")
+        title_label.configure(style.title_label)
+        title_label.pack(fill="x")
+
+        text_label = tk.Label(self, text="調査のため、Mageeからのリモート接続を受け入れます。(調査中は本端末をご利用いただけません)",
+                              wraplength=(WINDOW_WIDTH - style.padding * 2), justify="left", height=3, padx=style.padding)
+        text_label.configure(style.default_label)
+        text_label.pack(fill="x")
+
+        connect_button = tk.Button(self, text="接続する", command=self.connect_button_clicked)
+        connect_button.configure(style.default_button)
+        connect_button.pack(fill="x")
+
+        cancel_button = tk.Button(self, text="キャンセル", command=app.back_menu)
+        cancel_button.configure(style.default_button)
+        cancel_button.pack(fill="x", side="bottom")
+
+
+    def connect_button_clicked(self):
+        app.play("button")
+
+        funcs = [
+            lambda: self.remote_connect(),
+            lambda: self.remote_error()]
+        app.frames["Progress"].show(funcs, "リモート接続中...")
+
+
+    def remote_connect(self):
+        app.attributes('-fullscreen', False) # 全画面・タイトルバー非表示解除
+
+        command = "ngrok tcp -region jp --remote-addr={} 5900".format(context.ngrok_reserved_address)
+        Util.exec_command(command)
+        # ngrok接続中はこれ以上先へ進まない
+        # 切断は端末の再起動を想定
+
+        return True
+
+
+    def remote_error(self):
+        context.finish_message.set("接続に失敗しました。")
+        return True
 
 
 class SwitchMode(tk.Frame):
@@ -1575,7 +1660,9 @@ class MapApp(tk.Tk):
                SalesEntry, # 会計金額入力
                NumKeys, # ソフトキーボード
                Finish, # 完了
+               SystemMenu, # システムメニュー
                Setting, # 設定
+               RemoteConnect, # リモート接続
                SwitchMode, # モード切り替え
                WifiScan, # Wi-Fi設定
                Progress, # 進捗表示
@@ -1744,6 +1831,9 @@ class Context():
         # 端末のMACアドレス
         self.macaddress = self._get_macaddress()
 
+        # ngrokでリモート接続するために予約しているアドレス
+        self.ngrok_reserved_address = self._get_ngrok_reserved_address()
+
         # 実行中の処理名
         self.exec_name = None
 
@@ -1804,6 +1894,9 @@ class Context():
 
         if not "macaddress" in excepts:
             self.macaddress = self._get_macaddress()
+
+        if not "macaddress" in excepts:
+            self.ngrok_reserved_address = self._get_ngrok_reserved_address()
 
         if not "exec_name" in excepts:
             self.exec_name = None
@@ -1881,6 +1974,29 @@ class Context():
         file.close()
 
         return macaddress
+
+
+    def _get_ngrok_reserved_address(self):
+        file = open("ngrok_reserved_address", "r")
+        ngrok_reserved_address = str.strip(file.readline())
+        file.close()
+
+        return ngrok_reserved_address
+
+
+class Util():
+
+    @staticmethod
+    def exec_command(command):
+        """Linuxコマンドを実行する
+        """
+        app.log("Exec command: {}".format(command), "INFO")
+        p = subprocess.Popen(command, shell=True)
+        stdout, stderr = p.communicate()
+        if stdout:
+            app.log(stdout, "INFO")
+        if stderr:
+            app.log(stderr, "WARNING")
 
 
 class MapAppException(Exception):
