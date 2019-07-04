@@ -17,9 +17,11 @@ sudo apt-get install -y libzbar0 >> $log_file
 sudo WIFI_INSTALL_CLI=False pip install wifi >> $log_file
 sudo pip install -r requirements.txt >> $log_file
 
-wget $ngrok_download_url >> $log_file
-sudo unzip $ngrok_download_file -d /usr/local/bin >> $log_file
-ngrok version >> $log_file
+if [ -z `ngrok version | grep version` ]; then
+  wget $ngrok_download_url >> $log_file
+  sudo unzip $ngrok_download_file -d /usr/local/bin >> $log_file
+  ngrok version >> $log_file
+fi
 
 
 # module
