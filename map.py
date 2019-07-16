@@ -458,7 +458,7 @@ class CardScan(tk.Frame):
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
 
-        title_label = tk.Label(self, text="")
+        title_label = tk.Label(self, text="カードスキャン")
         title_label.configure(style.title_label)
         title_label.pack(fill="x")
 
@@ -481,16 +481,24 @@ class CardScan(tk.Frame):
         actions.columnconfigure(1, weight=1)
         actions.pack(fill="x", side="bottom")
 
-        self.next_button = tk.Button(actions, text="(次へ)", command=self.next_button_clicked)
+        self.next_button = tk.Button(actions, text="番号入力", command=self.entry_button_clicked)
         self.next_button.configure(style.primary_button)
 
         self.cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
         self.cancel_button.configure(style.default_button)
 
-        self.reset_buttons()
+#         self.reset_buttons()
+        self.next_button.grid(column=0, row=0, sticky="nswe")
+        self.cancel_button.grid(column=1, row=0, sticky="nswe")
 
+
+    def entry_button_clicked(self):
+        app.play("button")
+        app.frames["CardEntry"].show_num_keys()
 
     def reset_buttons(self):
+        """@deprecated 手入力機能追加により、本機能は不要となりました。
+        """
         if context.app_mode == "test":
             self.cancel_button.pack_forget()
 
@@ -507,6 +515,8 @@ class CardScan(tk.Frame):
 
 
     def next_button_clicked(self):
+        """@deprecated 手入力機能追加により、本機能は無効となりました。
+        """
         app.play("button")
 
         if context.app_mode == "test":
@@ -550,6 +560,66 @@ class CardScan(tk.Frame):
 
     def show(self):
         self.cardno_entry.focus_set()
+        app.show_frame(self)
+
+
+class CardEntry(tk.Frame):
+    """カード番号入力
+    """
+
+    def __init__(self, parent):
+        tk.Frame.__init__(self, parent)
+
+        title_label = tk.Label(self, text="カード番号入力")
+        title_label.configure(style.title_label)
+        title_label.pack(fill="x")
+
+        card_entry = tk.Entry(self, textvariable=context.entry_text, font=style.default_font)
+        card_entry.pack(fill="x")
+
+        text_label = tk.Label(self, text="上記カードにポイントを付与します。",
+                              wraplength=(WINDOW_WIDTH - style.padding * 2), justify="left", height=2, padx=style.padding)
+        text_label.configure(style.default_label)
+        text_label.pack(fill="x")
+
+        actions = tk.Frame(self)
+        actions.columnconfigure(0, weight=1)
+        actions.columnconfigure(1, weight=1)
+        actions.pack(side="bottom", fill="x")
+
+        self.next_button = tk.Button(actions, text="確定", command=self.next_button_clicked)
+        self.next_button.configure(style.primary_button)
+        self.next_button.grid(column=0, row=0, sticky="nswe")
+
+        cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        cancel_button.configure(style.default_button)
+        cancel_button.grid(column=1, row=0, sticky="nswe")
+
+        card_entry.bind("<FocusIn>", self.show_num_keys)
+
+
+    def show_num_keys(self, event = None):
+        context.entry_caption.set("カード番号入力")
+        context.after_entry = "CardEntry"
+        app.show_frame("NumKeys")
+
+
+    def next_button_clicked(self):
+        app.play("button")
+
+        if (context.card_no): # TODO:ここで番号のチェックを行う？
+            context.entry_caption.set("会計金額入力")
+            context.entry_text.set("")
+            context.after_entry = "SalesEntry"
+            app.show_frame("NumKeys")
+
+        else:
+            app.showerror("エラー", "カード番号を入力してください。")
+
+
+    def show(self):
+        context.card_no = context.entry_text.get()
+        self.next_button.focus_set()
         app.show_frame(self)
 
 
@@ -1097,9 +1167,9 @@ class SwitchMode(tk.Frame):
         if not success:
             app.showerror("エラー", "カード情報の取得に失敗しました。")
 
-        success = app.frames["CardScan"].reset_buttons()
-        if not success:
-            app.showerror("エラー", "カードスキャン画面の更新に失敗しました。")
+#         success = app.frames["CardScan"].reset_buttons()
+#         if not success:
+#             app.showerror("エラー", "カードスキャン画面の更新に失敗しました。")
 
         app.log("Swith mode -> {}".format(context.app_mode), "INFO")
         context.finish_message.set("「{}」モードへ変更しました。".format(self.get_mode_name()))
@@ -1657,6 +1727,7 @@ class MapApp(tk.Tk):
                CmdSelect, # 流通ポイント処理選択
                CardSelect, # カード選択
                CardScan, # カードスキャン
+               CardEntry, # カード番号入力
                Policy1, # ポリシー表示1
                Policy2, # ポリシー表示2
                TelEntry, # 電話番号入力
