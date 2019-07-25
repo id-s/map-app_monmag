@@ -496,6 +496,7 @@ class CardScan(tk.Frame):
         app.play("button")
         app.frames["CardEntry"].show_num_keys()
 
+
     def reset_buttons(self):
         """@deprecated 手入力機能追加により、本機能は不要となりました。
         """
@@ -607,7 +608,17 @@ class CardEntry(tk.Frame):
     def next_button_clicked(self):
         app.play("button")
 
-        if (context.card_no): # TODO:ここで番号のチェックを行う？
+        context.card_status = api.check_card()
+        if context.card_status == "failure":
+            context.finish_message.set("このカードはご利用できません。")
+            app.frames["Finish"].show()
+            return
+        elif context.card_status is None:
+            context.finish_message.set("エラーが発生しました。")
+            app.frames["Finish"].show()
+            return
+
+        if (context.card_no):
             context.entry_caption.set("会計金額入力")
             context.entry_text.set("")
             context.after_entry = "SalesEntry"
