@@ -1403,16 +1403,15 @@ class MapApi():
             self.cancel_point_url    = "https://card-dot-my-shop-magee-stg.appspot.com/v1/cancel"
 
         else:
-            # TODO: 本番URLに置き換える
-            self.check_coupoint_url  = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/check"
-            self.get_coupoint_url    = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/start"
-            self.use_coupoint_url    = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/regist"
-            self.cancel_coupoint_url = "https://qr-dot-my-shop-magee-stg.appspot.com/v1/cancel"
-            self.get_clients_url     = "https://card-dot-my-shop-magee-stg.appspot.com/v1/check"
-            self.check_card_url      = "https://card-dot-my-shop-magee-stg.appspot.com/v1/start"
-            self.calc_point_url      = "https://card-dot-my-shop-magee-stg.appspot.com/v1/calc"
-            self.add_point_url       = "https://card-dot-my-shop-magee-stg.appspot.com/v1/regist"
-            self.cancel_point_url    = "https://card-dot-my-shop-magee-stg.appspot.com/v1/cancel"
+            self.check_coupoint_url  = "https://qr-dot-my-shop-magee.appspot.com/v1/check"
+            self.get_coupoint_url    = "https://qr-dot-my-shop-magee.appspot.com/v1/start"
+            self.use_coupoint_url    = "https://qr-dot-my-shop-magee.appspot.com/v1/regist"
+            self.cancel_coupoint_url = "https://qr-dot-my-shop-magee.appspot.com/v1/cancel"
+            self.get_clients_url     = "https://card-dot-my-shop-magee.appspot.com/v1/check"
+            self.check_card_url      = "https://card-dot-my-shop-magee.appspot.com/v1/start"
+            self.calc_point_url      = "https://card-dot-my-shop-magee.appspot.com/v1/calc"
+            self.add_point_url       = "https://card-dot-my-shop-magee.appspot.com/v1/regist"
+            self.cancel_point_url    = "https://card-dot-my-shop-magee.appspot.com/v1/cancel"
 
 
     def check_coupoint(self):
