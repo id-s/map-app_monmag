@@ -1767,7 +1767,7 @@ class MapApp(tk.Tk):
         self.set_fullscreen()
 
         # プレビューのタイムラグが問題になるようなら、下記フラグをFalseにする
-        context.on_preview = True
+        context.on_preview = False # プレビュー非表示
 
         self.client_images = [] # 画像への参照をキープするために必須
 
