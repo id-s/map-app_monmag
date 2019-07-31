@@ -1989,8 +1989,7 @@ class Context():
         if not "exec_name" in excepts:
             self.exec_name = None
 
-        if not "on_preview" in excepts:
-            self.on_preview = True
+        # on_preview はアプリ作動中にリセットされないものとする
 
         if not "customer_id" in excepts:
             self.customer_id = None
