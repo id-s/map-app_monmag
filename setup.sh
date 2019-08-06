@@ -8,7 +8,8 @@ ngrok_download_url=https://bin.equinox.io/c/4VmDzA7iaHb/$ngrok_download_file
 
 
 # locale
-sudo locale-gen ja_JP.UTF-8
+sudo sed -i -e 's/^# ja_JP.UTF-8/ja_JP.UTF-8/' /etc/locale.gen
+sudo locale-gen
 
 
 # install
