@@ -8,6 +8,7 @@ ngrok_authtoken=6cmuFXybMEhdbwYV7e5i1_5yZA1EDSTLfxGqTUTphdj
 
 
 cd ~/Git/map-app_monmag
+echo "[START UP] `date`" >> $log_file
 
 
 # update
