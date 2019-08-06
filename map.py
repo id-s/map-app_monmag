@@ -646,10 +646,10 @@ class Policy1(tk.Frame):
         title_label.pack(fill="x")
 
         text = """
-            お得なクーポン満載「MyShop」への入会案内メッセージを携帯電話にお送りしますか？
+            ポイント付与通知・お得なクーポン満載「MyShop」への入会案内メッセージを携帯電話にお送りしますか？
 
             事業者名：マギー株式会社
-            個人情報保護管理者：○○本部長 XXX-XXX-XXXX
+            個人情報保護管理者：代表取締役社長 098-951-0915
 
             入力された情報は、本目的のみに利用いたします。
             """
@@ -702,7 +702,7 @@ class Policy2(tk.Frame):
         text = """
             （続き）
             入力された情報の第三者提供は行いません。本事業の運用業務を他社に委託する場合があります。
-            情報のご提供は任意です。ご提供いただけない場合、MyShopサービスへの入会案内メッセージはお送りいたしません。
+            情報のご提供は任意です。ご提供いただけない場合、ポイント付与通知・MyShopサービスへの入会案内メッセージはお送りいたしません。
             """
         text_label = tk.Label(self, text=textwrap.dedent(text), font=style.body_font,
                               wraplength=(WINDOW_WIDTH - style.padding * 2), justify="left", height=8, padx=style.padding)
