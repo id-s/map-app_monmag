@@ -42,11 +42,11 @@ APP_MODE: "test"とすると、テストモードで起動する(設定より切
 
 ## 実行環境構築
 
-Monmagのターミナルにて以下を実行する。
+TODO: 自動起動設定をsetup.shに組み込めないか？
+
+Monmagにssh接続し、以下を実行する。
 
 ```
-$ sudo apt-get install git
-$ mkdir Git
 $ cd Git
 $ git clone https://github.com/id-s/map-app_monmag.git
 $ cd map-app_monmag
@@ -58,7 +58,7 @@ Wi-Fi設定を可能にするため、アプリの起動は`sudo python map.py`�
 
 ### 自動起動設定
 
-ID-Syncの自動起動を無効化する。
+ID-Syncの自動起動を無効化し、MAPが自動起動するように修正する。
 
 ```
 pi@raspberrypi:~/Git/map-app_monmag $ sudo vi /etc/init.d/monmag-startup.sh
@@ -67,16 +67,17 @@ pi@raspberrypi:~/Git/map-app_monmag $ sudo vi /etc/init.d/monmag-startup.sh
 ...
 ### END INIT INFO
 
-exit 0 # TEST <<< 追加
+exit 0 # MAP ONLY <<< 追加
 
 update_dir="/home/pi/Git/monmag-rpi-bin/"
 bin_dir="/home/pi/Git/monmag-rpi-bin/ui/"
 ...
 
-pi@raspberrypi:~/Git/map-app_monmag $  vi ~/.config/lxsession/LXDE-pi/autostart
+
+pi@raspberrypi:~/Git/map-app_monmag $ vi ~/.config/lxsession/LXDE-pi/autostart
 
 ...
-#@sh /home/pi/qrcode_startup.sh
-@sh /home/pi/Git/map-app_monmag/startup.sh
+#@sh /home/pi/qrcode_startup.sh            <<< 修正
+@sh /home/pi/Git/map-app_monmag/startup.sh <<< 修正
 ```
 
