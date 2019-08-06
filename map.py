@@ -884,6 +884,8 @@ class SalesEntry(tk.Frame):
             app.showerror("エラー", "エラーが発生しました。")
             self.next_button.configure(state="disabled")
             point_num = "0"
+        elif point_num == 0:
+            self.next_button.configure(state="disabled")
         else:
             self.next_button.configure(state="normal")
         context.point_num.set(point_num)
