@@ -162,8 +162,8 @@ class CoupointScan(tk.Frame):
         """
         lines = decoded_data.split("\r\n")
         if context.app_mode == "test":
-            context.customer_id = "20b097add4aea673e074d77fe1495434"
-            context.carousel_id = "327765a3ec00962ccc050e91354dcc64"
+            context.customer_id = "20b097add4aea673e074d77fe1495434" # customer_id:100319
+            context.carousel_id = "c56e7e7d0be1fd3eb72f25a7748b1109" # carousel_id:212
             return True
 
         elif (len(lines) == 4 and lines[0] == "MyShop"):
