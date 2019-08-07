@@ -1277,6 +1277,7 @@ class WifiScan(tk.Frame):
                 target = cell
                 break
         if target is None:
+            # TODO: #10044 ステルスSSID対応
             app.log("Not found ssid:{}".format(decoded_data["ssid"]), "WARNING")
             return False
 
