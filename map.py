@@ -252,16 +252,13 @@ class CoupointShow(tk.Frame):
     #         self.description_text.configure(background="white")
             self.description_text.pack(fill="x")
 
-            use_condition_height = 3
+            use_condition_height = 4
 
         else:
-            use_condition_height = 5
+            use_condition_height = 6
 
-        self.use_condition_label = tk.Label(self, text="[利用条件]", font=style.header_font, anchor="w")
-        self.use_condition_label.configure(style.default_label)
-        self.use_condition_label.pack(fill="x")
-
-        self.use_condition_text = tk.Label(self, text=coupoint["use_condition"], font=style.body_font, justify="left", height=use_condition_height)
+        self.use_condition_text = tk.Label(self, text=u"[利用条件]\n" + coupoint["use_condition"], font=style.body_font,
+                                           wraplength=(WINDOW_WIDTH - style.padding * 2), justify="left", height=use_condition_height, padx=style.padding)
         self.use_condition_text.configure(style.default_label)
 #         self.use_condition_text.configure(background="white")
         self.use_condition_text.pack(fill="x")
@@ -276,7 +273,6 @@ class CoupointShow(tk.Frame):
         self.use_term_text.destroy()
         self.description_label.destroy()
         self.description_text.destroy()
-        self.use_condition_label.destroy()
         self.use_condition_text.destroy()
 
 
