@@ -574,10 +574,10 @@ class CardEntry(tk.Frame):
         card_entry = tk.Entry(self, textvariable=context.entry_text, font=style.default_font)
         card_entry.pack(fill="x")
 
-        text_label = tk.Label(self, text="上記カードにポイントを付与します。",
-                              wraplength=(WINDOW_WIDTH - style.padding * 2), justify="left", height=2, padx=style.padding)
-        text_label.configure(style.default_label)
-        text_label.pack(fill="x")
+        self.text_label = tk.Label(self, text="上記カードにポイントを付与します。",
+                                   wraplength=(WINDOW_WIDTH - style.padding * 2), justify="left", height=2, padx=style.padding)
+        self.text_label.configure(style.default_label)
+        self.text_label.pack(fill="x")
 
         actions = tk.Frame(self)
         actions.columnconfigure(0, weight=1)
@@ -615,10 +615,19 @@ class CardEntry(tk.Frame):
             return
 
         if (context.card_no):
-            context.entry_caption.set("会計金額入力")
-            context.entry_text.set("")
-            context.after_entry = "SalesEntry"
-            app.show_frame("NumKeys")
+            if context.exec_name == "add_pooint":
+                context.entry_caption.set("会計金額入力")
+                context.entry_text.set("")
+                context.after_entry = "SalesEntry"
+                app.show_frame("NumKeys")
+                return
+
+            elif context.exec_name == "cancel_point":
+                app.frames["HistorySelect"].show()
+                return
+
+            else:
+                app.log("Illegal exec_name: {}".format(context.exec_name), "WARNING")
 
         else:
             app.showerror("エラー", "カード番号を入力してください。")
@@ -626,6 +635,10 @@ class CardEntry(tk.Frame):
 
     def show(self):
         context.card_no = context.entry_text.get()
+        if context.exec_name == "add_point":
+            self.text_label.configure(text="上記カードにポイントを付与します。")
+        elif context.exec_name == "cancel_point":
+            self.text_label.configure(text="上記カードに付与されたポイントをキャンセルします。")
         self.next_button.focus_set()
         app.show_frame(self)
 
@@ -869,21 +882,31 @@ class SalesEntry(tk.Frame):
                 app.showerror("エラー", "エラーが発生しました。")
 
         elif context.exec_name == "cancel_point":
-            app.frames["Finish"].show()
+            result = api.cancel_point()
+            if (result == "success"):
+                app.frames["Finish"].show()
+            else:
+                app.showerror("エラー", "エラーが発生しました。")
 
 
     def show(self):
-        context.price = context.entry_text.get()
-        point_num = api.calc_point()
-        if point_num is None:
-            app.showerror("エラー", "エラーが発生しました。")
-            self.next_button.configure(state="disabled")
-            point_num = "0"
-        elif point_num == 0:
-            self.next_button.configure(state="disabled")
-        else:
-            self.next_button.configure(state="normal")
-        context.point_num.set(point_num)
+        if context.exec_name == "add_point":
+            context.price = context.entry_text.get()
+            point_num = api.calc_point()
+            if point_num is None:
+                app.showerror("エラー", "エラーが発生しました。")
+                self.next_button.configure(state="disabled")
+                point_num = "0"
+            elif point_num == 0:
+                self.next_button.configure(state="disabled")
+            else:
+                self.next_button.configure(state="normal")
+            context.point_num.set(point_num)
+
+        elif context.exec_name == "cancel_point":
+            # 処理は全てHistorySelect.select_history()で済み
+            pass
+
         self.next_button.focus_set()
         app.show_frame(self)
 
@@ -957,6 +980,69 @@ class NumKeys(tk.Frame):
     def button_ok_clicked(self):
         app.play("button")
         app.frames[context.after_entry].show()
+
+
+class HistorySelect(tk.Frame):
+    """履歴選択
+    """
+
+    def __init__(self, parent):
+        tk.Frame.__init__(self, parent)
+
+        title_label = tk.Label(self, text="履歴選択")
+        title_label.configure(style.title_label)
+        title_label.pack(fill="x")
+
+        self.history_buttons = []
+
+        cancel_button = tk.Button(self, text="キャンセル", command=app.back_menu)
+        cancel_button.configure(style.default_button)
+        cancel_button.pack(fill="x", side="bottom")
+
+
+    def add_buttons(self):
+        histories = api.get_history()
+        if not histories:
+            return False
+
+        for history in histories:
+            button_label = "{} {}pt".format(history["scan_date"], history["point"])
+            button = tk.Button(self, text=button_label, compound="left",
+                               command=self.select_history(history["scan_card_history_id"], history["price"], history["point"]))
+            button.configure(style.default_button)
+            button.pack(fill="x")
+
+            self.history_buttons.append(button)
+
+        return True
+
+
+    def reset_buttons(self):
+        for button in self.history_buttons:
+            button.destroy()
+
+        return self.add_buttons()
+
+
+    def select_history(self, scan_card_history_id, price, point):
+        """履歴選択時の処理
+        """
+        def func():
+            app.play("button")
+
+            app.log("Select scan_card_history_id:{}".format(scan_card_history_id))
+            context.scan_card_history_id = scan_card_history_id
+            context.entry_text.set(price)
+            context.price = price
+            context.point_num.set(point)
+            app.frames["SalesEntry"].show()
+
+        return func
+
+
+    def show(self):
+        self.reset_buttons()
+        app.show_frame(self)
 
 
 class Finish(tk.Frame):
@@ -1399,6 +1485,7 @@ class MapApi():
             self.calc_point_url      = "https://card-dot-my-shop-magee-stg.appspot.com/v1/calc"
             self.add_point_url       = "https://card-dot-my-shop-magee-stg.appspot.com/v1/regist"
             self.cancel_point_url    = "https://card-dot-my-shop-magee-stg.appspot.com/v1/cancel"
+            self.get_history_url     = "https://card-dot-my-shop-magee-stg.appspot.com/v1/history"
 
         else:
             self.check_coupoint_url  = "https://qr-dot-my-shop-magee.appspot.com/v1/check"
@@ -1410,6 +1497,7 @@ class MapApi():
             self.calc_point_url      = "https://card-dot-my-shop-magee.appspot.com/v1/calc"
             self.add_point_url       = "https://card-dot-my-shop-magee.appspot.com/v1/regist"
             self.cancel_point_url    = "https://card-dot-my-shop-magee.appspot.com/v1/cancel"
+            self.get_history_url     = "https://card-dot-my-shop-magee.appspot.com/v1/history"
 
 
     def check_coupoint(self):
@@ -1703,8 +1791,7 @@ class MapApi():
             "customer": {
                 "card_no": context.card_no,
                 "client_cd": context.selected_client,
-                "price": context.price,
-                "point": context.point_num.get(),
+                "scan_card_history_id": context.scan_card_history_id,
                 }
             }
 
@@ -1717,6 +1804,40 @@ class MapApi():
                 app.log(resp.text, "INFO")
                 resp_data = resp.json()
                 return resp_data["result"]
+            else:
+                app.log(resp.status_code, "WARNING")
+                return None
+
+        except Exception as e:
+            app.log(traceback.format_exc(), "WARNING")
+            return None
+
+
+    def get_history(self):
+        """ポイント付与履歴取得
+        """
+        headers = {"Content-Type": "application/json"}
+
+        data = {
+            "terminal": {
+                "macaddr": context.macaddress,
+                "serial_no": context.serialno,
+                },
+            "customer": {
+                "card_no": context.card_no,
+                "client_cd": context.selected_client,
+                }
+            }
+
+        app.log("POST {}".format(self.get_history_url), "INFO")
+        app.log(json.dumps(data), "INFO")
+        try:
+            resp = requests.post(self.get_history_url, data=json.dumps(data), headers=headers)
+
+            if resp.status_code == 200:
+                app.log(resp.text, "INFO")
+                resp_data = resp.json()
+                return resp_data["scan_card_histories"]
             else:
                 app.log(resp.status_code, "WARNING")
                 return None
@@ -1741,6 +1862,7 @@ class MapApp(tk.Tk):
                TelEntry, # 電話番号入力
                SalesEntry, # 会計金額入力
                NumKeys, # ソフトキーボード
+               HistorySelect, # 履歴選択
                Finish, # 完了
                SystemMenu, # システムメニュー
                Setting, # 設定
@@ -1932,6 +2054,9 @@ class Context():
         # クーポイントID
         self.carousel_id = None
 
+        # 選択された履歴ID
+        self.scan_card_history_id = None
+
         # 選択されたカード(流通)
         self.selected_client = None
 
@@ -1994,6 +2119,9 @@ class Context():
 
         if not "carousel_id" in excepts:
             self.carousel_id = None
+
+        if not "scan_card_history_id" in excepts:
+            self.scan_card_history_id = None
 
         if not "selected_client" in excepts:
             self.selected_client = None
