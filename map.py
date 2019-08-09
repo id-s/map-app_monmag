@@ -25,6 +25,8 @@ APP_ENV = os.getenv("APP_ENV", "Monmag")
 APP_MODE = os.getenv("APP_MODE", "normal")
 ON_DEBUG = os.getenv("ON_DEBUG", False)
 
+GOOGLE_TRACKING_ID = "UA-114507936-1" # MyShop
+
 locale.setlocale(locale.LC_TIME, 'ja_JP.UTF-8')
 
 WINDOW_WIDTH = 480
@@ -1464,6 +1466,35 @@ class Progress(tk.Frame):
             app.back_menu()
 
 
+class Measurement():
+    """Google Measurement Protocol(Google Analytics)
+    """
+
+    def __init__(self, client_id):
+        self.endpoint = "https://www.google-analytics.com/collect"
+        self.common_payload = {
+            "v": 1,
+            "tid": GOOGLE_TRACKING_ID,
+            "cid": client_id,
+            }
+
+    def report(self, data):
+        payload = dict(self.common_payload, **data)
+        app.log("Measurement Protocol payload: {}".format(payload))
+        try:
+            resp = requests.post(self.endpoint, data=payload)
+            app.log(resp)
+
+        except Exception as e:
+            app.log(traceback.format_exc(), "WARNING")
+
+
+    def report_event(self, category, action, options = {}):
+        payload = {"t":"event", "ec":category, "ea":action}
+        data = dict(payload, **options)
+        self.report(data)
+
+
 class MapApi():
 
     def __init__(self):
@@ -2220,8 +2251,10 @@ if __name__ == "__main__":
     app = MapApp()
     style = Style(app)
     context = Context()
+    measurement = Measurement(context.serialno)
     api = MapApi()
 
+    measurement.report_event("MAP", "app-start")
     app.build()
     app.mainloop()
 
