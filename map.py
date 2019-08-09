@@ -9,6 +9,7 @@ import cv2
 import json
 import locale
 import os
+import re
 import requests
 import subprocess
 import textwrap
@@ -26,6 +27,8 @@ APP_MODE = os.getenv("APP_MODE", "normal")
 ON_DEBUG = os.getenv("ON_DEBUG", False)
 
 GOOGLE_TRACKING_ID = "UA-114507936-1" # MyShop
+GOOGLE_TRACKING_HOST = "map.my-shop.fun" # ビューを分けるための擬似的なホスト名
+USER_AGENT = "Magee/Monmag" # MonmagのUser-Agent
 
 locale.setlocale(locale.LC_TIME, 'ja_JP.UTF-8')
 
@@ -1476,13 +1479,15 @@ class Measurement():
             "v": 1,
             "tid": GOOGLE_TRACKING_ID,
             "cid": client_id,
+            "ds": "term",
             }
 
     def report(self, data):
         payload = dict(self.common_payload, **data)
         app.log("Measurement Protocol payload: {}".format(payload))
         try:
-            resp = requests.post(self.endpoint, data=payload)
+            headers = {"User-Agent": USER_AGENT} # 必須
+            resp = requests.post(self.endpoint, data=payload, headers=headers)
             app.log(resp)
 
         except Exception as e:
@@ -1491,6 +1496,12 @@ class Measurement():
 
     def report_event(self, category, action, options = {}):
         payload = {"t":"event", "ec":category, "ea":action}
+        data = dict(payload, **options)
+        self.report(data)
+
+
+    def report_pageview(self, screen_name, options = {}):
+        payload = {"t":"pageview", "dh":GOOGLE_TRACKING_HOST, "dp":Util.conv_path(screen_name), "dt":screen_name}
         data = dict(payload, **options)
         self.report(data)
 
@@ -1950,11 +1961,13 @@ class MapApp(tk.Tk):
         if isinstance(screen, tk.Frame):
             check_show = False
             screen = screen.__class__.__name__
-        app.log("Show {}".format(screen))
 
         frame = self.frames[screen]
         if check_show and hasattr(frame, "show"):
             raise MapAppException("'{}' should use `show()`".format(screen))
+
+        app.log("Show {}".format(screen))
+        measurement.report_pageview(screen)
         frame.tkraise()
 
 
@@ -2241,6 +2254,22 @@ class Util():
             app.log(stdout, "INFO")
         if stderr:
             app.log(stderr, "WARNING")
+
+
+    @staticmethod
+    def conv_snakecase(name):
+        """スネークケース(snake_case)に変換する
+        @see http://hatakazu.hatenablog.com/entry/2013/02/16/135911
+        """
+        return re.sub("([A-Z])",lambda x:"_" + x.group(1).lower(),name)
+
+
+    @staticmethod
+    def conv_path(name):
+        """大文字を"/"に変換することで、パスっぽい文字列に変換する
+        例) HogePiyo -> /hoge/piyo
+        """
+        return re.sub("([A-Z])",lambda x:"/" + x.group(1).lower(),name)
 
 
 class MapAppException(Exception):
