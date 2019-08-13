@@ -1632,6 +1632,8 @@ class MapApi():
 
             if resp.status_code == 200 or resp.status_code == 404:
                 app.log(resp.text, "INFO")
+                if resp.status_code == 200:
+                    measurement.report_event("MAP", "use-coupoint")
                 resp_data = resp.json()
                 return resp_data["result"]
             else:
@@ -1666,6 +1668,8 @@ class MapApi():
 
             if resp.status_code == 200 or resp.status_code == 404:
                 app.log(resp.text, "INFO")
+                if resp.status_code == 200:
+                    measurement.report_event("MAP", "cancel-coupoint")
                 resp_data = resp.json()
                 return resp_data["result"]
             else:
@@ -1809,6 +1813,8 @@ class MapApi():
 
             if resp.status_code == 200 or resp.status_code == 404:
                 app.log(resp.text, "INFO")
+                if resp.status_code == 200:
+                    measurement.report_event("MAP", "add-point")
                 resp_data = resp.json()
                 return resp_data["result"]
             else:
@@ -1844,6 +1850,8 @@ class MapApi():
 
             if resp.status_code == 200 or resp.status_code == 404:
                 app.log(resp.text, "INFO")
+                if resp.status_code == 200:
+                    measurement.report_event("MAP", "cancel-point")
                 resp_data = resp.json()
                 return resp_data["result"]
             else:
