@@ -620,7 +620,7 @@ class CardEntry(tk.Frame):
             return
 
         if (context.card_no):
-            if context.exec_name == "add_pooint":
+            if context.exec_name == "add_point":
                 context.entry_caption.set("会計金額入力")
                 context.entry_text.set("")
                 context.after_entry = "SalesEntry"
