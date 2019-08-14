@@ -566,13 +566,13 @@ class CardScan(tk.Frame):
 
 
 class CardEntry(tk.Frame):
-    """カード番号入力
+    """カード番号確認
     """
 
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
 
-        title_label = tk.Label(self, text="カード番号入力")
+        title_label = tk.Label(self, text="カード番号確認")
         title_label.configure(style.title_label)
         title_label.pack(fill="x")
 
@@ -757,13 +757,13 @@ class Policy2(tk.Frame):
 
 
 class TelEntry(tk.Frame):
-    """電話番号入力
+    """電話番号確認
     """
 
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
 
-        title_label = tk.Label(self, text="電話番号入力")
+        title_label = tk.Label(self, text="電話番号確認")
         title_label.configure(style.title_label)
         title_label.pack(fill="x")
 
@@ -825,13 +825,13 @@ class TelEntry(tk.Frame):
 
 
 class SalesEntry(tk.Frame):
-    """会計金額入力
+    """会計金額確認
     """
 
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
 
-        title_label = tk.Label(self, text="会計金額入力")
+        title_label = tk.Label(self, text="会計金額確認")
         title_label.configure(style.title_label)
         title_label.pack(fill="x")
 
@@ -1906,11 +1906,11 @@ class MapApp(tk.Tk):
                CmdSelect, # 流通ポイント処理選択
                CardSelect, # カード選択
                CardScan, # カードスキャン
-               CardEntry, # カード番号入力
+               CardEntry, # カード番号確認
                Policy1, # ポリシー表示1
                Policy2, # ポリシー表示2
-               TelEntry, # 電話番号入力
-               SalesEntry, # 会計金額入力
+               TelEntry, # 電話番号確認
+               SalesEntry, # 会計金額確認
                NumKeys, # ソフトキーボード
                HistorySelect, # 履歴選択
                Finish, # 完了
