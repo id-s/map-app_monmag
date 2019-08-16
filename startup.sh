@@ -8,17 +8,17 @@ ngrok_authtoken=6cmuFXybMEhdbwYV7e5i1_5yZA1EDSTLfxGqTUTphdj
 
 
 cd ~/Git/map-app_monmag
-echo "[START UP] `date`" >> $log_file
+echo "[START UP] `date`" 1>> $log_file 2>&1
 
 
 # update
-git pull >> $log_file
-sudo pip install -r requirements.txt >> $log_file
+git pull 1>> $log_file 2>&1
+sudo pip install -r requirements.txt 1>> $log_file 2>&1
 
 
 # ngrok
-sudo ngrok authtoken $ngrok_authtoken >> $log_file
+sudo ngrok authtoken $ngrok_authtoken 1>> $log_file 2>&1
 
 
-sudo python map.py >> $log_file
+sudo python map.py 1>> $log_file 2>&1
 

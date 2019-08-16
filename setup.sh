@@ -13,17 +13,17 @@ sudo locale-gen
 
 
 # install
-sudo apt-get install -y python-tk python-pil.imagetk >> $log_file
-sudo apt-get install -y libzbar0 >> $log_file
-sudo WIFI_INSTALL_CLI=False pip install wifi >> $log_file
-sudo pip install -r requirements.txt >> $log_file
+sudo apt-get install -y python-tk python-pil.imagetk 1>> $log_file 2>&1
+sudo apt-get install -y libzbar0 1>> $log_file 2>&1
+sudo WIFI_INSTALL_CLI=False pip install wifi 1>> $log_file 2>&1
+sudo pip install -r requirements.txt 1>> $log_file 2>&1
 
 sudo systemctl enable vncserver-x11-serviced.service
 
 if [ -z "`ngrok version | grep version`" ]; then
-  wget $ngrok_download_url >> $log_file
-  sudo unzip $ngrok_download_file -d /usr/local/bin >> $log_file
-  ngrok version >> $log_file
+  wget $ngrok_download_url 1>> $log_file 2>&1
+  sudo unzip $ngrok_download_file -d /usr/local/bin 1>> $log_file 2>&1
+  ngrok version 1>> $log_file 2>&1
 fi
 
 
