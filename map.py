@@ -38,6 +38,8 @@ WINDOW_HEIGHT = 320
 IMAGE_DIR = "images"
 SOUND_DIR = "sounds"
 
+WPA_SUPPLICANT_FILE = "/etc/wpa_supplicant/wpa_supplicant.conf"
+
 
 class Menu(tk.Frame):
     """メニュー画面
@@ -1353,6 +1355,14 @@ class WifiScan(tk.Frame):
         return parsed_data
 
 
+    def ap_setting(self, decoded_data):
+        command = "grep \"{}\" {}".format(decoded_data["ssid"], WPA_SUPPLICANT_FILE)
+        result = Util.exec_command(command)
+        if result == "":
+            Util.append_wpa_supplicant(decoded_data["ssid"], decoded_data["passphrase"])
+        return True
+
+
     def wifi_setting(self, decoded_data):
         target = None
         for cell in Cell.all("wlan0"):
@@ -1363,7 +1373,6 @@ class WifiScan(tk.Frame):
                 target = cell
                 break
         if target is None:
-            # TODO: #10044 ステルスSSID対応
             app.log("Not found ssid:{}".format(decoded_data["ssid"]), "WARNING")
             return False
 
@@ -1394,6 +1403,7 @@ class WifiScan(tk.Frame):
             self.capture.release()
 
             funcs = [
+                lambda: self.ap_setting(parsed_data),
                 lambda: self.wifi_setting(parsed_data),
                 lambda: self.wifi_finish()]
             app.frames["Progress"].show(funcs, "Wi-Fi設定中...")
@@ -2258,10 +2268,31 @@ class Util():
         app.log("Exec command: {}".format(command), "INFO")
         p = subprocess.Popen(command, shell=True)
         stdout, stderr = p.communicate()
-        if stdout:
-            app.log(stdout, "INFO")
         if stderr:
             app.log(stderr, "WARNING")
+            raise MapAppException(stderr)
+        if stdout:
+            app.log(stdout, "INFO")
+            return stdout
+
+
+    @staticmethod
+    def append_wpa_supplicant(ssid, passphrase, scan_ssid = 1):
+        """ /etc/wpa_supplicant/wpa_supplicant.conf にAP情報を追加する
+        """
+        command = "wpa_passphrase \"{}\" \"{}\"".format(ssid, passphrase)
+        content = Util.exec_command(command)
+
+        scan_ssid_section = ""
+        if scan_ssid == 1:
+            scan_ssid_section = "scan_ssid=1\n"
+        content = content.replace("psk=", "{}psk=".format(scan_ssid_section))
+        app.log("Append ssid:{} to wpa_supplicant.conf".format(ssid), "INFO")
+        app.log(content)
+
+        command = "echo -e \"\n{}\" tee -a {}".format(content, WPA_SUPPLICANT_FILE)
+        result = Util.exec_command(command)
+        app.log(result)
 
 
     @staticmethod
