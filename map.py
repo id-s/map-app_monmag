@@ -2282,15 +2282,17 @@ class Util():
         """
         command = "wpa_passphrase \"{}\" \"{}\"".format(ssid, passphrase)
         content = Util.exec_command(command)
+        # "#psk="の行を削除する
+        content = re.sub('^.*#psk=.*$', '')
 
         scan_ssid_section = ""
         if scan_ssid == 1:
-            scan_ssid_section = "scan_ssid=1\n"
+            scan_ssid_section = "scan_ssid=1\n        "
         content = content.replace("psk=", "{}psk=".format(scan_ssid_section))
         app.log("Append ssid:{} to wpa_supplicant.conf".format(ssid), "INFO")
         app.log(content)
 
-        command = "echo -e \"\n{}\" tee -a {}".format(content, WPA_SUPPLICANT_FILE)
+        command = "echo \"\n{}\" | tee -a {}".format(content, WPA_SUPPLICANT_FILE)
         result = Util.exec_command(command)
         app.log(result)
 
