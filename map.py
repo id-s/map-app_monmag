@@ -2283,7 +2283,7 @@ class Util():
         command = "wpa_passphrase \"{}\" \"{}\"".format(ssid, passphrase)
         content = Util.exec_command(command)
         # "#psk="の行を削除する
-        content = re.sub('^.*#psk=.*$', '', content)
+        content = re.sub('\n.*#psk=.*\n', '\n', content)
 
         scan_ssid_section = ""
         if scan_ssid == 1:
