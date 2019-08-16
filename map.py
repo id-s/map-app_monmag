@@ -1358,8 +1358,8 @@ class WifiScan(tk.Frame):
     def ap_setting(self, decoded_data):
         command = "grep \"{}\" {}".format(decoded_data["ssid"], WPA_SUPPLICANT_FILE)
         result = Util.exec_command(command)
-        if result == "":
-            Util.append_wpa_supplicant(decoded_data["ssid"], decoded_data["passphrase"])
+        if result is None:
+            Util.append_wpa_supplicant(decoded_data["ssid"], decoded_data["password"])
         return True
 
 
