@@ -18,6 +18,7 @@ import traceback
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from PIL import Image, ImageTk
+from pipes import quote
 from pprint import pprint
 from pyzbar import pyzbar
 from wifi import Cell, Scheme
@@ -2282,16 +2283,16 @@ class Util():
         """
         indent = " " * 8
         content = "network={\n"
-        content += indent + "ssid=\"{}\"".format(ssid)
+        content += indent + "ssid=\"{}\"\n".format(ssid)
         if (passphrase is None) or (passphrase == ""):
-            content += indent + "key_mgmt=NONE"
+            content += indent + "key_mgmt=NONE\n"
         else:
-            content += indent + "psk=\"{}\"".format(passphrase)
-            content += indent + "key_mgmt=WPA-PSK"
-        content += "}"
+            content += indent + "psk=\"{}\"\n".format(passphrase)
+            content += indent + "key_mgmt=WPA-PSK\n"
+        content += "}\n\n"
         app.log(content)
 
-        command = "echo \"\n{}\" | tee -a {}".format(content, WPA_SUPPLICANT_FILE)
+        command = "echo {} | tee -a {}".format(quote(content), WPA_SUPPLICANT_FILE)
         result = Util.exec_command(command)
         app.log(result)
 
