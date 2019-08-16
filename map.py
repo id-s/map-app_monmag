@@ -2280,16 +2280,15 @@ class Util():
     def append_wpa_supplicant(ssid, passphrase, scan_ssid = 1):
         """ /etc/wpa_supplicant/wpa_supplicant.conf にAP情報を追加する
         """
-        command = "wpa_passphrase \"{}\" \"{}\"".format(ssid, passphrase)
-        content = Util.exec_command(command)
-        # "#psk="の行を削除する
-        content = re.sub('\n.*#psk=.*\n', '\n', content)
-
-        scan_ssid_section = ""
-        if scan_ssid == 1:
-            scan_ssid_section = "scan_ssid=1\n        "
-        content = content.replace("psk=", "{}psk=".format(scan_ssid_section))
-        app.log("Append ssid:{} to wpa_supplicant.conf".format(ssid), "INFO")
+        indent = " " * 8
+        content = "network={\n"
+        content += indent + "ssid=\"{}\"".format(ssid)
+        if (passphrase is None) or (passphrase == ""):
+            content += indent + "key_mgmt=NONE"
+        else:
+            content += indent + "psk=\"{}\"".format(passphrase)
+            content += indent + "key_mgmt=WPA-PSK"
+        content += "}"
         app.log(content)
 
         command = "echo \"\n{}\" | tee -a {}".format(content, WPA_SUPPLICANT_FILE)
