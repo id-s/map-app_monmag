@@ -1358,7 +1358,7 @@ class WifiScan(tk.Frame):
     def ap_setting(self, decoded_data):
         command = "grep \"{}\" {}".format(decoded_data["ssid"], WPA_SUPPLICANT_FILE)
         result = Util.exec_command(command)
-        if result is None:
+        if (result is None) or (result == ""):
             Util.append_wpa_supplicant(decoded_data["ssid"], decoded_data["password"])
         return True
 
@@ -2266,7 +2266,7 @@ class Util():
         """Linuxコマンドを実行する
         """
         app.log("Exec command: {}".format(command), "INFO")
-        p = subprocess.Popen(command, shell=True)
+        p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = p.communicate()
         if stderr:
             app.log(stderr, "WARNING")
