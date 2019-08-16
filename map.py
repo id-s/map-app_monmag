@@ -1350,9 +1350,12 @@ class WifiScan(tk.Frame):
         """
         parsed_data = {}
         lines = decoded_data.split("/")
-        if len(lines) > 1:
+        if len(lines) > 0:
             parsed_data["ssid"] = lines[0]
+        if len(lines) > 1:
             parsed_data["password"] = lines[1]
+        else:
+            parsed_data["password"] = None
         return parsed_data
 
 
