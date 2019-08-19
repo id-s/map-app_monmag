@@ -20,5 +20,6 @@ sudo pip install -r requirements.txt 1>> $log_file 2>&1
 sudo ngrok authtoken $ngrok_authtoken 1>> $log_file 2>&1
 
 
-sudo python map.py 1>> $log_file 2>&1
+#sudo python map.py 1>> $log_file 2>&1
+sudo APP_MODE=test python map.py 1>> $log_file 2>&1
 
