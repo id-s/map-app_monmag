@@ -39,7 +39,7 @@ fi
 # startup
 if [ -z "`grep MAP /etc/init.d/monmag-startup.sh`" ]; then
   script_before="update_dir="
-  script_before="exit 0 # -> MAP\n\nupdate_dir="
+  script_after="exit 0 # -> MAP\n\nupdate_dir="
   sudo sed -i -e "s|$script_before|$script_after|" /etc/init.d/monmag-startup.sh
 fi
 
