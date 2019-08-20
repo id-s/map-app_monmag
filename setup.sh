@@ -20,7 +20,7 @@ sudo pip install -r requirements.txt 1>> $log_file 2>&1
 
 #sudo systemctl enable vncserver-x11-serviced.service
 
-if [ -n "`ngrok | grep "command not found"`" ]; then
+if [ ! -e /usr/local/bin/ngrok ]; then
   wget $ngrok_download_url 1>> $log_file 2>&1
   sudo unzip $ngrok_download_file -d /usr/local/bin 1>> $log_file 2>&1
   ngrok version 1>> $log_file 2>&1
