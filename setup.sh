@@ -35,3 +35,17 @@ if [ -z `grep bcm2835-v4l2 /etc/modules` ]; then
   echo "bcm2835-v4l2" | sudo tee -a /etc/modules
 fi
 
+
+# startup
+if [ -z `grep MAP /etc/init.d/monmag-startup.sh` ]; then
+  script_before="update_dir="
+  script_before="exit 0 # -> MAP\n\nupdate_dir="
+  sudo sed -i -e "s|$script_before|$script_after|" /etc/init.d/monmag-startup.sh
+fi
+
+if [ -z `grep MAP ~/.config/lxsession/LXDE-pi/autostart` ]; then
+  script_before="@sh /home/pi/qrcode_startup.sh"
+  script_after="@sh /home/pi/Git/map-app_monmag/startup.sh # MAP\n#@sh /home/pi/qrcode_startup.sh"
+  sed -i -e "s|$script_before|$script_after|" ~/.config/lxsession/LXDE-pi/autostart
+fi
+
