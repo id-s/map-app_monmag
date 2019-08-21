@@ -560,7 +560,14 @@ class CardScan(tk.Frame):
             app.frames["Finish"].show()
             return
 
-        app.frames["SalesEntry"].show_num_keys()
+        if context.exec_name == "add_point":
+            app.frames["SalesEntry"].show_num_keys()
+            return
+        elif context.exec_name == "cancel_point":
+            app.frames["HistorySelect"].show()
+            return
+        else:
+            app.log("Illegal exec_name: {}".format(context.exec_name), "WARNING")
 
 
     def show(self):
