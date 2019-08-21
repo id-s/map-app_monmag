@@ -18,7 +18,7 @@ sudo apt-get install -y libzbar0 1>> $log_file 2>&1
 sudo WIFI_INSTALL_CLI=False pip install wifi 1>> $log_file 2>&1
 sudo pip install -r requirements.txt 1>> $log_file 2>&1
 
-#sudo systemctl enable vncserver-x11-serviced.service
+sudo systemctl enable vncserver-x11-serviced.service
 
 if [ ! -e /usr/local/bin/ngrok ]; then
   wget $ngrok_download_url 1>> $log_file 2>&1
