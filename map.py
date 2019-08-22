@@ -920,7 +920,7 @@ class SalesEntry(tk.Frame):
 
         elif context.exec_name == "cancel_point":
             # 処理は全てHistorySelect.select_history()で済み
-            pass
+            self.next_button.configure(state="normal")
 
         self.next_button.focus_set()
         app.show_frame(self)
