@@ -658,6 +658,62 @@ class CardEntry(tk.Frame):
         app.show_frame(self)
 
 
+class DeviceSelect(tk.Frame):
+    """機器選択
+    """
+
+    def __init__(self, parent):
+        tk.Frame.__init__(self, parent)
+
+        title_label = tk.Label(self, text="機器選択")
+        title_label.configure(style.title_label)
+        title_label.pack(fill="x")
+
+        text_label = tk.Label(self, text="ご利用の携帯電話を選択してください。")
+        text_label.configure(style.default_label)
+        text_label.pack(fill="x")
+
+        iphone_select_button = tk.Button(self, text="スマートフォン(iPhone)", command=lambda: self.select_button_clicked(1))
+        iphone_select_button.configure(style.default_button)
+        iphone_select_button.pack(fill="x")
+
+        android_select_button = tk.Button(self, text="スマートフォン(iPhone以外)", command=lambda: self.select_button_clicked(2))
+        android_select_button.configure(style.default_button)
+        android_select_button.pack(fill="x")
+
+        other_select_button = tk.Button(self, text="スマートフォン以外", command=lambda: self.select_button_clicked(0))
+        other_select_button.configure(style.default_button)
+        other_select_button.pack(fill="x")
+
+        none_select_button = tk.Button(self, text="持っていない", command=self.cancel_button_clicked)
+        none_select_button.configure(style.default_button)
+        none_select_button.pack(fill="x")
+
+        cancel_button = tk.Button(self, text="キャンセル", command=self.cancel_button_clicked)
+        cancel_button.configure(style.default_button)
+        cancel_button.pack(fill="x", side="bottom")
+
+
+    def select_button_clicked(self, device_type):
+        app.play("button")
+
+        context.device_type = device_type
+        app.show_frame("Policy1")
+
+
+    def cancel_button_clicked(self):
+        app.play("button")
+
+        context.device_type = -1
+
+        # キャンセルでもポイント付与は必要
+        result = api.add_point()
+        if (result == "success"):
+            app.frames["Finish"].show()
+        else:
+            app.showerror("エラー", "エラーが発生しました。")
+
+
 class Policy1(tk.Frame):
     """ポリシー表示1
     """
@@ -884,7 +940,7 @@ class SalesEntry(tk.Frame):
 
         if context.exec_name == "add_point":
             if context.card_status == "tel":
-                app.show_frame("Policy1")
+                app.show_frame("DeviceSelect")
             elif context.card_status == "price":
                 result = api.add_point()
                 if (result == "success"):
@@ -1826,6 +1882,8 @@ class MapApi():
                 "tel": context.tel,
                 }
             }
+        if context.device_type is not None: # `if context.device_type`だけだと 0 がFalseと判定されるので
+            data["customer"]["device_type"] = context.device_type
 
         app.log("POST {}".format(self.add_point_url), "INFO")
         app.log(json.dumps(data), "INFO")
@@ -1928,6 +1986,7 @@ class MapApp(tk.Tk):
                CardSelect, # カード選択
                CardScan, # カードスキャン
                CardEntry, # カード番号確認
+               DeviceSelect, # 機器選択
                Policy1, # ポリシー表示1
                Policy2, # ポリシー表示2
                TelEntry, # 電話番号確認
@@ -2142,6 +2201,9 @@ class Context():
         # 電話番号
         self.tel = None
 
+        # 携帯電話種別
+        self.device_type = None
+
         # 会計金額
         self.price = None
 
@@ -2207,6 +2269,9 @@ class Context():
 
         if not "tel" in excepts:
             self.tel = None
+
+        if not "device_type" in excepts:
+            self.device_type = None
 
         if not "price" in excepts:
             self.price = None
