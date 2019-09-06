@@ -845,8 +845,8 @@ class SalesEntry(tk.Frame):
         title_label.configure(style.title_label)
         title_label.pack(fill="x")
 
-        sales_entry = tk.Entry(self, textvariable=context.entry_text, font=style.default_font)
-        sales_entry.pack(fill="x")
+        self.sales_entry = tk.Entry(self, textvariable=context.entry_text, font=style.default_font)
+        self.sales_entry.pack(fill="x")
 
         point_label = tk.Label(self, text="ポイント")
         point_label.configure(style.default_label)
@@ -867,8 +867,6 @@ class SalesEntry(tk.Frame):
         cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
         cancel_button.configure(style.default_button)
         cancel_button.grid(column=1, row=0, sticky="nswe")
-
-        sales_entry.bind("<FocusIn>", self.show_num_keys)
 
 
     def show_num_keys(self, event = None):
@@ -917,10 +915,12 @@ class SalesEntry(tk.Frame):
             else:
                 self.next_button.configure(state="normal")
             context.point_num.set(point_num)
+            self.sales_entry.bind("<FocusIn>", self.show_num_keys)
 
         elif context.exec_name == "cancel_point":
             # 処理は全てHistorySelect.select_history()で済み
             self.next_button.configure(state="normal")
+            self.sales_entry.unbind("<FocusIn>")
 
         self.next_button.focus_set()
         app.show_frame(self)
