@@ -294,6 +294,7 @@ class CoupointShow(tk.Frame):
             app.frames["Finish"].show()
         else:
             app.showerror("エラー", "エラーが発生しました。")
+            self.cancel_button.configure(state="normal")
 
 
     def cancel_coupoint(self):
@@ -306,6 +307,7 @@ class CoupointShow(tk.Frame):
             app.frames["Finish"].show()
         else:
             app.showerror("エラー", "エラーが発生しました。")
+            self.cancel_button.configure(state="normal")
 
 
     def cancel_button_clicked(self):
@@ -620,6 +622,8 @@ class CardEntry(tk.Frame):
         else:
             app.showerror("エラー", "カード番号を入力してください。")
 
+        self.cancel_button.configure(state="normal")
+
 
     def cancel_button_clicked(self):
         self.next_button.configure(state="disabled")
@@ -748,6 +752,7 @@ class Policy1(tk.Frame):
             app.frames["Finish"].show()
         else:
             app.showerror("エラー", "エラーが発生しました。")
+            self.next_button.configure(state="normal")
 
 
     def show(self):
@@ -812,6 +817,7 @@ class Policy2(tk.Frame):
             app.frames["Finish"].show()
         else:
             app.showerror("エラー", "エラーが発生しました。")
+            self.next_button.configure(state="normal")
 
 
     def show(self):
@@ -870,6 +876,7 @@ class TelEntry(tk.Frame):
             app.frames["Finish"].show()
         else:
             app.showerror("エラー", "エラーが発生しました。")
+            self.cancel_button.configure(state="normal")
 
 
     def cancel_button_clicked(self):
@@ -882,6 +889,7 @@ class TelEntry(tk.Frame):
             app.frames["Finish"].show()
         else:
             app.showerror("エラー", "エラーが発生しました。")
+            self.next_button.configure(state="normal")
 
 
     def show(self):
@@ -940,6 +948,7 @@ class SalesEntry(tk.Frame):
 
         if context.point_num.get() == "0":
             app.showerror("エラー", "付与されるポイントが0で間違いなければ[キャンセル]を押してください。")
+            self.cancel_button.configure(state="normal")
             return
 
         if context.exec_name == "add_point":
@@ -960,6 +969,8 @@ class SalesEntry(tk.Frame):
                 app.frames["Finish"].show()
             else:
                 app.showerror("エラー", "エラーが発生しました。")
+
+        self.cancel_button.configure(state="normal")
 
 
     def cancel_button_clicked(self):
