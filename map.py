@@ -536,11 +536,11 @@ class CardScan(tk.Frame):
 
 
     def cancel_button_clicked(self):
-        self.next_button_button.configure(state="disabled")
+        self.next_button.configure(state="disabled")
         app.back_menu()
 
     def show(self):
-        self.next_button_button.configure(state="normal")
+        self.next_button.configure(state="normal")
         self.cancel_button.configure(state="normal")
 
         self.cardno_entry.focus_set()
