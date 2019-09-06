@@ -229,9 +229,9 @@ class CoupointShow(tk.Frame):
         self.next_button.configure(style.primary_button)
         self.next_button.grid(column=0, row=0, sticky="nswe")
 
-        cancel_button = tk.Button(actions, text="キャンセル", command=self.cancel_button_clicked)
-        cancel_button.configure(style.default_button)
-        cancel_button.grid(column=1, row=0, sticky="nswe")
+        self.cancel_button = tk.Button(actions, text="キャンセル", command=self.cancel_button_clicked)
+        self.cancel_button.configure(style.default_button)
+        self.cancel_button.grid(column=1, row=0, sticky="nswe")
 
 
     def show_coupoint(self, coupoint):
@@ -285,6 +285,7 @@ class CoupointShow(tk.Frame):
 
 
     def use_coupoint(self):
+        self.cancel_button.configure(state="disabled")
         app.play("button")
 
         result = api.use_coupoint()
@@ -296,6 +297,7 @@ class CoupointShow(tk.Frame):
 
 
     def cancel_coupoint(self):
+        self.cancel_button.configure(state="disabled")
         app.play("button")
 
         result = api.cancel_coupoint()
@@ -312,6 +314,7 @@ class CoupointShow(tk.Frame):
 
 
     def show(self):
+        self.cancel_button.configure(state="normal")
         self.clear_coupoint()
 
         result, coupoint = api.get_coupoint()
@@ -497,7 +500,9 @@ class CardScan(tk.Frame):
 
 
     def entry_button_clicked(self):
+        self.cancel_button.configure(state="disabled")
         app.play("button")
+
         app.frames["CardEntry"].show_num_keys()
 
 
@@ -545,6 +550,7 @@ class CardScan(tk.Frame):
 
 
     def card_scanned(self, event):
+        self.cancel_button.configure(state="disabled")
         app.play("success")
 
         context.card_no = context.scanned_no.get()
@@ -571,6 +577,7 @@ class CardScan(tk.Frame):
 
 
     def show(self):
+        self.cancel_button.configure(state="normal")
         self.cardno_entry.focus_set()
         app.show_frame(self)
 
@@ -603,9 +610,9 @@ class CardEntry(tk.Frame):
         self.next_button.configure(style.primary_button)
         self.next_button.grid(column=0, row=0, sticky="nswe")
 
-        cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
-        cancel_button.configure(style.default_button)
-        cancel_button.grid(column=1, row=0, sticky="nswe")
+        self.cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        self.cancel_button.configure(style.default_button)
+        self.cancel_button.grid(column=1, row=0, sticky="nswe")
 
         card_entry.bind("<FocusIn>", self.show_num_keys)
 
@@ -617,6 +624,7 @@ class CardEntry(tk.Frame):
 
 
     def next_button_clicked(self):
+        self.cancel_button.configure(state="disabled")
         app.play("button")
 
         context.card_status = api.check_card()
@@ -649,6 +657,7 @@ class CardEntry(tk.Frame):
 
 
     def show(self):
+        self.cancel_button.configure(state="normal")
         context.card_no = context.entry_text.get()
         if context.exec_name == "add_point":
             self.text_label.configure(text="上記カードにポイントを付与します。")
@@ -698,7 +707,7 @@ class DeviceSelect(tk.Frame):
         app.play("button")
 
         context.device_type = device_type
-        app.show_frame("Policy1")
+        app.frames["Policy1"].show()
 
 
     def cancel_button_clicked(self):
@@ -741,21 +750,24 @@ class Policy1(tk.Frame):
         actions.columnconfigure(1, weight=1)
         actions.pack(fill="x", side="bottom")
 
-        next_button = tk.Button(actions, text="次へ", command=self.next_button_clicked)
-        next_button.configure(style.primary_button)
-        next_button.grid(column=0, row=0, sticky="nswe")
+        self.next_button = tk.Button(actions, text="次へ", command=self.next_button_clicked)
+        self.next_button.configure(style.primary_button)
+        self.next_button.grid(column=0, row=0, sticky="nswe")
 
-        cancel_button = tk.Button(actions, text="キャンセル", command=self.cancel_button_clicked)
-        cancel_button.configure(style.default_button)
-        cancel_button.grid(column=1, row=0, sticky="nswe")
+        self.cancel_button = tk.Button(actions, text="キャンセル", command=self.cancel_button_clicked)
+        self.cancel_button.configure(style.default_button)
+        self.cancel_button.grid(column=1, row=0, sticky="nswe")
 
 
     def next_button_clicked(self):
+        self.cancel_button.configure(state="disabled")
         app.play("button")
+
         app.show_frame("Policy2")
 
 
     def cancel_button_clicked(self):
+        self.next_button.configure(state="disabled")
         app.play("button")
 
         # 電話番号入力キャンセルでもポイント付与は必要
@@ -764,6 +776,12 @@ class Policy1(tk.Frame):
             app.frames["Finish"].show()
         else:
             app.showerror("エラー", "エラーが発生しました。")
+
+
+    def show(self):
+        self.next_button.configure(state="normal")
+        self.cancel_button.configure(state="normal")
+        app.show_frame(self)
 
 
 class Policy2(tk.Frame):
@@ -793,16 +811,17 @@ class Policy2(tk.Frame):
         actions.columnconfigure(1, weight=1)
         actions.pack(fill="x", side="bottom")
 
-        next_button = tk.Button(actions, text="同意する", command=self.next_button_clicked)
-        next_button.configure(style.primary_button)
-        next_button.grid(column=0, row=0, sticky="nswe")
+        self.next_button = tk.Button(actions, text="同意する", command=self.next_button_clicked)
+        self.next_button.configure(style.primary_button)
+        self.next_button.grid(column=0, row=0, sticky="nswe")
 
-        cancel_button = tk.Button(actions, text="キャンセル", command=self.cancel_button_clicked)
-        cancel_button.configure(style.default_button)
-        cancel_button.grid(column=1, row=0, sticky="nswe")
+        self.cancel_button = tk.Button(actions, text="キャンセル", command=self.cancel_button_clicked)
+        self.cancel_button.configure(style.default_button)
+        self.cancel_button.grid(column=1, row=0, sticky="nswe")
 
 
     def next_button_clicked(self):
+        self.cancel_button.configure(state="disabled")
         app.play("button")
 
         context.entry_caption.set("電話番号入力")
@@ -812,6 +831,7 @@ class Policy2(tk.Frame):
 
 
     def cancel_button_clicked(self):
+        self.next_button.configure(state="disabled")
         app.play("button")
 
         # 電話番号入力キャンセルでもポイント付与は必要
@@ -820,6 +840,12 @@ class Policy2(tk.Frame):
             app.frames["Finish"].show()
         else:
             app.showerror("エラー", "エラーが発生しました。")
+
+
+    def show(self):
+        self.next_button.configure(state="normal")
+        self.cancel_button.configure(state="normal")
+        app.show_frame(self)
 
 
 class TelEntry(tk.Frame):
@@ -850,9 +876,9 @@ class TelEntry(tk.Frame):
         self.next_button.configure(style.primary_button)
         self.next_button.grid(column=0, row=0, sticky="nswe")
 
-        cancel_button = tk.Button(actions, text="キャンセル", command=self.cancel_button_clicked)
-        cancel_button.configure(style.default_button)
-        cancel_button.grid(column=1, row=0, sticky="nswe")
+        self.cancel_button = tk.Button(actions, text="キャンセル", command=self.cancel_button_clicked)
+        self.cancel_button.configure(style.default_button)
+        self.cancel_button.grid(column=1, row=0, sticky="nswe")
 
         tel_entry.bind("<FocusIn>", self.show_num_keys)
 
@@ -864,6 +890,7 @@ class TelEntry(tk.Frame):
 
 
     def next_button_clicked(self):
+        self.cancel_button.configure(state="disabled")
         app.play("button")
 
         result = api.add_point()
@@ -874,6 +901,7 @@ class TelEntry(tk.Frame):
 
 
     def cancel_button_clicked(self):
+        self.next_button.configure(state="disabled")
         app.play("button")
 
         # 電話番号入力キャンセルでもポイント付与は必要
@@ -885,6 +913,9 @@ class TelEntry(tk.Frame):
 
 
     def show(self):
+        self.next_button.configure(state="normal")
+        self.cancel_button.configure(state="normal")
+
         context.tel = context.entry_text.get()
         self.next_button.focus_set()
         app.show_frame(self)
@@ -920,9 +951,9 @@ class SalesEntry(tk.Frame):
         self.next_button.configure(style.primary_button)
         self.next_button.grid(column=0, row=0, sticky="nswe")
 
-        cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
-        cancel_button.configure(style.default_button)
-        cancel_button.grid(column=1, row=0, sticky="nswe")
+        self.cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        self.cancel_button.configure(style.default_button)
+        self.cancel_button.grid(column=1, row=0, sticky="nswe")
 
 
     def show_num_keys(self, event = None):
@@ -932,6 +963,7 @@ class SalesEntry(tk.Frame):
 
 
     def next_button_clicked(self):
+        self.cancel_button.configure(state="disabled")
         app.play("button")
 
         if context.point_num.get() == "0":
@@ -959,6 +991,8 @@ class SalesEntry(tk.Frame):
 
 
     def show(self):
+        self.cancel_button.configure(state="normal")
+
         if context.exec_name == "add_point":
             context.price = context.entry_text.get()
             point_num = api.calc_point()
