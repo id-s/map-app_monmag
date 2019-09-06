@@ -735,7 +735,7 @@ class Policy1(tk.Frame):
         self.cancel_button.configure(state="disabled")
         app.play("button")
 
-        app.show_frame("Policy2")
+        app.frames["Policy2"].show()
 
 
     def cancel_button_clicked(self):
