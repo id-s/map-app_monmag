@@ -309,11 +309,13 @@ class CoupointShow(tk.Frame):
 
 
     def cancel_button_clicked(self):
+        self.next_button.configure(state="disabled")
         app.play("button")
         app.back_menu()
 
 
     def show(self):
+        self.next_button.configure(state="normal")
         self.cancel_button.configure(state="normal")
         self.clear_coupoint()
 
@@ -491,7 +493,7 @@ class CardScan(tk.Frame):
         self.next_button = tk.Button(actions, text="番号入力", command=self.entry_button_clicked)
         self.next_button.configure(style.primary_button)
 
-        self.cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        self.cancel_button = tk.Button(actions, text="キャンセル", command=self.cancel_button_clicked)
         self.cancel_button.configure(style.default_button)
 
 #         self.reset_buttons()
@@ -576,8 +578,14 @@ class CardScan(tk.Frame):
             app.log("Illegal exec_name: {}".format(context.exec_name), "WARNING")
 
 
+    def cancel_button_clicked(self):
+        self.entry_button.configure(state="disabled")
+        app.back_menu()
+
     def show(self):
+        self.entry_button.configure(state="normal")
         self.cancel_button.configure(state="normal")
+
         self.cardno_entry.focus_set()
         app.show_frame(self)
 
@@ -610,7 +618,7 @@ class CardEntry(tk.Frame):
         self.next_button.configure(style.primary_button)
         self.next_button.grid(column=0, row=0, sticky="nswe")
 
-        self.cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        self.cancel_button = tk.Button(actions, text="キャンセル", command=self.cancel_button_clicked)
         self.cancel_button.configure(style.default_button)
         self.cancel_button.grid(column=1, row=0, sticky="nswe")
 
@@ -656,8 +664,15 @@ class CardEntry(tk.Frame):
             app.showerror("エラー", "カード番号を入力してください。")
 
 
+    def cancel_button_clicked(self):
+        self.next_button.configure(state="disabled")
+        app.back_menu()
+
+
     def show(self):
+        self.next_button.configure(state="normal")
         self.cancel_button.configure(state="normal")
+
         context.card_no = context.entry_text.get()
         if context.exec_name == "add_point":
             self.text_label.configure(text="上記カードにポイントを付与します。")
@@ -951,7 +966,7 @@ class SalesEntry(tk.Frame):
         self.next_button.configure(style.primary_button)
         self.next_button.grid(column=0, row=0, sticky="nswe")
 
-        self.cancel_button = tk.Button(actions, text="キャンセル", command=app.back_menu)
+        self.cancel_button = tk.Button(actions, text="キャンセル", command=self.cancel_button_clicked)
         self.cancel_button.configure(style.default_button)
         self.cancel_button.grid(column=1, row=0, sticky="nswe")
 
@@ -990,7 +1005,13 @@ class SalesEntry(tk.Frame):
                 app.showerror("エラー", "エラーが発生しました。")
 
 
+    def cancel_button_clicked(self):
+        self.next_button.configure(state="disabled")
+        app.back_menu()
+
+
     def show(self):
+        self.next_button.configure(state="normal")
         self.cancel_button.configure(state="normal")
 
         if context.exec_name == "add_point":
