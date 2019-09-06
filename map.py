@@ -490,7 +490,7 @@ class CardScan(tk.Frame):
         actions.columnconfigure(1, weight=1)
         actions.pack(fill="x", side="bottom")
 
-        self.next_button = tk.Button(actions, text="番号入力", command=self.entry_button_clicked)
+        self.next_button = tk.Button(actions, text="番号入力", command=self.next_button_clicked)
         self.next_button.configure(style.primary_button)
 
         self.cancel_button = tk.Button(actions, text="キャンセル", command=self.cancel_button_clicked)
@@ -501,54 +501,11 @@ class CardScan(tk.Frame):
         self.cancel_button.grid(column=1, row=0, sticky="nswe")
 
 
-    def entry_button_clicked(self):
+    def next_button_clicked(self):
         self.cancel_button.configure(state="disabled")
         app.play("button")
 
         app.frames["CardEntry"].show_num_keys()
-
-
-    def reset_buttons(self):
-        """@deprecated 手入力機能追加により、本機能は不要となりました。
-        """
-        if context.app_mode == "test":
-            self.cancel_button.pack_forget()
-
-            self.next_button.grid(column=0, row=0, sticky="nswe")
-            self.cancel_button.grid(column=1, row=0, sticky="nswe")
-
-        else:
-            self.next_button.grid_forget()
-            self.cancel_button.grid_forget()
-
-            self.cancel_button.pack(fill="x", side="bottom")
-
-        return True
-
-
-    def next_button_clicked(self):
-        """@deprecated 手入力機能追加により、本機能は無効となりました。
-        """
-        app.play("button")
-
-        if context.app_mode == "test":
-            context.card_no = "CRC0S0 32840000000000200001" # 下1桁を変えてもOK
-        else:
-            context.card_no = context.scanned_no.get()
-
-        app.log("Entered card:{}".format(context.card_no))
-
-        context.card_status = api.check_card()
-        if context.card_status == "failure":
-            context.finish_message.set("このカードはご利用できません。")
-            app.frames["Finish"].show()
-            return
-        elif context.card_status is None:
-            context.finish_message.set("エラーが発生しました。")
-            app.frames["Finish"].show()
-            return
-
-        app.frames["SalesEntry"].show_num_keys()
 
 
     def card_scanned(self, event):
@@ -579,11 +536,11 @@ class CardScan(tk.Frame):
 
 
     def cancel_button_clicked(self):
-        self.entry_button.configure(state="disabled")
+        self.next_button_button.configure(state="disabled")
         app.back_menu()
 
     def show(self):
-        self.entry_button.configure(state="normal")
+        self.next_button_button.configure(state="normal")
         self.cancel_button.configure(state="normal")
 
         self.cardno_entry.focus_set()
