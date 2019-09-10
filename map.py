@@ -285,7 +285,7 @@ class CoupointShow(tk.Frame):
 
 
     def use_coupoint(self):
-        self.cancel_button.configure(state="disabled")
+        self.lock_buttons()
         app.play("button")
 
         result = api.use_coupoint()
@@ -294,11 +294,11 @@ class CoupointShow(tk.Frame):
             app.frames["Finish"].show()
         else:
             app.showerror("エラー", "エラーが発生しました。")
-            self.cancel_button.configure(state="normal")
+            self.unlock_buttons()
 
 
     def cancel_coupoint(self):
-        self.cancel_button.configure(state="disabled")
+        self.lock_buttons()
         app.play("button")
 
         result = api.cancel_coupoint()
@@ -307,18 +307,29 @@ class CoupointShow(tk.Frame):
             app.frames["Finish"].show()
         else:
             app.showerror("エラー", "エラーが発生しました。")
-            self.cancel_button.configure(state="normal")
+            self.unlock_buttons()
 
 
     def cancel_button_clicked(self):
-        self.next_button.configure(state="disabled")
+        self.lock_buttons()
         app.play("button")
         app.back_menu()
 
 
-    def show(self):
+    def lock_buttons(self):
+        self.next_button.configure(state="disabled")
+        self.cancel_button.configure(state="disabled")
+        app.update()
+
+
+    def unlock_buttons(self):
         self.next_button.configure(state="normal")
         self.cancel_button.configure(state="normal")
+        app.update()
+
+
+    def show(self):
+        self.unlock_buttons()
         self.clear_coupoint()
 
         result, coupoint = api.get_coupoint()
@@ -504,14 +515,14 @@ class CardScan(tk.Frame):
 
 
     def next_button_clicked(self):
-        self.cancel_button.configure(state="disabled")
+        self.lock_buttons()
         app.play("button")
 
         app.frames["CardEntry"].show_num_keys()
 
 
     def card_scanned(self, event):
-        self.cancel_button.configure(state="disabled")
+        self.lock_buttons
         app.play("success")
 
         context.card_no = context.scanned_no.get()
@@ -538,12 +549,24 @@ class CardScan(tk.Frame):
 
 
     def cancel_button_clicked(self):
-        self.next_button.configure(state="disabled")
+        self.lock_buttons()
         app.back_menu()
 
-    def show(self):
+
+    def lock_buttons(self):
+        self.next_button.configure(state="disabled")
+        self.cancel_button.configure(state="disabled")
+        app.update()
+
+
+    def unlock_buttons(self):
         self.next_button.configure(state="normal")
         self.cancel_button.configure(state="normal")
+        app.update()
+
+
+    def show(self):
+        self.unlock_buttons()
 
         self.cardno_entry.focus_set()
         app.show_frame(self)
@@ -591,7 +614,7 @@ class CardEntry(tk.Frame):
 
 
     def next_button_clicked(self):
-        self.cancel_button.configure(state="disabled")
+        self.lock_buttons()
         app.play("button")
 
         context.card_status = api.check_card()
@@ -622,17 +645,28 @@ class CardEntry(tk.Frame):
         else:
             app.showerror("エラー", "カード番号を入力してください。")
 
-        self.cancel_button.configure(state="normal")
+        self.unlock_buttons()
 
 
     def cancel_button_clicked(self):
-        self.next_button.configure(state="disabled")
+        self.lock_buttons()
         app.back_menu()
 
 
-    def show(self):
+    def lock_buttons(self):
+        self.next_button.configure(state="disabled")
+        self.cancel_button.configure(state="disabled")
+        app.update()
+
+
+    def unlock_buttons(self):
         self.next_button.configure(state="normal")
         self.cancel_button.configure(state="normal")
+        app.update()
+
+
+    def show(self):
+        self.unlock_buttons()
 
         context.card_no = context.entry_text.get()
         if context.exec_name == "add_point":
@@ -736,14 +770,14 @@ class Policy1(tk.Frame):
 
 
     def next_button_clicked(self):
-        self.cancel_button.configure(state="disabled")
+        self.lock_buttons()
         app.play("button")
 
         app.frames["Policy2"].show()
 
 
     def cancel_button_clicked(self):
-        self.next_button.configure(state="disabled")
+        self.lock_buttons()
         app.play("button")
 
         # 電話番号入力キャンセルでもポイント付与は必要
@@ -752,12 +786,23 @@ class Policy1(tk.Frame):
             app.frames["Finish"].show()
         else:
             app.showerror("エラー", "エラーが発生しました。")
-            self.next_button.configure(state="normal")
+            self.unlock_buttons()
+
+
+    def lock_buttons(self):
+        self.next_button.configure(state="disabled")
+        self.cancel_button.configure(state="disabled")
+        app.update()
+
+
+    def unlock_buttons(self):
+        self.next_button.configure(state="normal")
+        self.cancel_button.configure(state="normal")
+        app.update()
 
 
     def show(self):
-        self.next_button.configure(state="normal")
-        self.cancel_button.configure(state="normal")
+        self.unlock_buttons()
         app.show_frame(self)
 
 
@@ -798,7 +843,7 @@ class Policy2(tk.Frame):
 
 
     def next_button_clicked(self):
-        self.cancel_button.configure(state="disabled")
+        self.lock_buttons()
         app.play("button")
 
         context.entry_caption.set("電話番号入力")
@@ -808,7 +853,7 @@ class Policy2(tk.Frame):
 
 
     def cancel_button_clicked(self):
-        self.next_button.configure(state="disabled")
+        self.lock_buttons()
         app.play("button")
 
         # 電話番号入力キャンセルでもポイント付与は必要
@@ -817,7 +862,19 @@ class Policy2(tk.Frame):
             app.frames["Finish"].show()
         else:
             app.showerror("エラー", "エラーが発生しました。")
-            self.next_button.configure(state="normal")
+            self.unlock_buttons()
+
+
+    def lock_buttons(self):
+        self.next_button.configure(state="disabled")
+        self.cancel_button.configure(state="disabled")
+        app.update()
+
+
+    def unlock_buttons(self):
+        self.next_button.configure(state="normal")
+        self.cancel_button.configure(state="normal")
+        app.update()
 
 
     def show(self):
@@ -868,7 +925,7 @@ class TelEntry(tk.Frame):
 
 
     def next_button_clicked(self):
-        self.cancel_button.configure(state="disabled")
+        self.lock_buttons()
         app.play("button")
 
         result = api.add_point()
@@ -876,11 +933,11 @@ class TelEntry(tk.Frame):
             app.frames["Finish"].show()
         else:
             app.showerror("エラー", "エラーが発生しました。")
-            self.cancel_button.configure(state="normal")
+            self.unlock_buttons()
 
 
     def cancel_button_clicked(self):
-        self.next_button.configure(state="disabled")
+        self.lock_buttons()
         app.play("button")
 
         # 電話番号入力キャンセルでもポイント付与は必要
@@ -889,12 +946,23 @@ class TelEntry(tk.Frame):
             app.frames["Finish"].show()
         else:
             app.showerror("エラー", "エラーが発生しました。")
-            self.next_button.configure(state="normal")
+            self.unlock_buttons()
+
+
+    def lock_buttons(self):
+        self.next_button.configure(state="disabled")
+        self.cancel_button.configure(state="disabled")
+        app.update()
+
+
+    def unlock_buttons(self):
+        self.next_button.configure(state="normal")
+        self.cancel_button.configure(state="normal")
+        app.update()
 
 
     def show(self):
-        self.next_button.configure(state="normal")
-        self.cancel_button.configure(state="normal")
+        self.unlock_buttons()
 
         context.tel = context.entry_text.get()
         self.next_button.focus_set()
@@ -943,12 +1011,12 @@ class SalesEntry(tk.Frame):
 
 
     def next_button_clicked(self):
-        self.cancel_button.configure(state="disabled")
+        self.lock_buttons()
         app.play("button")
 
         if context.point_num.get() == "0":
             app.showerror("エラー", "付与されるポイントが0で間違いなければ[キャンセル]を押してください。")
-            self.cancel_button.configure(state="normal")
+            self.unlock_buttons()
             return
 
         if context.exec_name == "add_point":
@@ -970,17 +1038,28 @@ class SalesEntry(tk.Frame):
             else:
                 app.showerror("エラー", "エラーが発生しました。")
 
-        self.cancel_button.configure(state="normal")
+        self.unlock_buttons()
 
 
     def cancel_button_clicked(self):
-        self.next_button.configure(state="disabled")
+        self.lock_buttons()
         app.back_menu()
 
 
-    def show(self):
+    def lock_buttons(self):
+        self.next_button.configure(state="disabled")
+        self.cancel_button.configure(state="disabled")
+        app.update()
+
+
+    def unlock_buttons(self):
         self.next_button.configure(state="normal")
         self.cancel_button.configure(state="normal")
+        app.update()
+
+
+    def show(self):
+        self.unlock_buttons()
 
         if context.exec_name == "add_point":
             context.price = context.entry_text.get()
@@ -998,7 +1077,6 @@ class SalesEntry(tk.Frame):
 
         elif context.exec_name == "cancel_point":
             # 処理は全てHistorySelect.select_history()で済み
-            self.next_button.configure(state="normal")
             self.sales_entry.unbind("<FocusIn>")
 
         self.next_button.focus_set()
