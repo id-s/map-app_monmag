@@ -692,28 +692,29 @@ class DeviceSelect(tk.Frame):
         text_label.configure(style.default_label)
         text_label.pack(fill="x")
 
-        iphone_select_button = tk.Button(self, text="スマートフォン(iPhone)", command=lambda: self.select_button_clicked(1))
-        iphone_select_button.configure(style.default_button)
-        iphone_select_button.pack(fill="x")
+        self.iphone_select_button = tk.Button(self, text="スマートフォン(iPhone)", command=lambda: self.select_button_clicked(1))
+        self.iphone_select_button.configure(style.default_button)
+        self.iphone_select_button.pack(fill="x")
 
-        android_select_button = tk.Button(self, text="スマートフォン(iPhone以外)", command=lambda: self.select_button_clicked(2))
-        android_select_button.configure(style.default_button)
-        android_select_button.pack(fill="x")
+        self.android_select_button = tk.Button(self, text="スマートフォン(iPhone以外)", command=lambda: self.select_button_clicked(2))
+        self.android_select_button.configure(style.default_button)
+        self.android_select_button.pack(fill="x")
 
-        other_select_button = tk.Button(self, text="スマートフォン以外", command=lambda: self.select_button_clicked(0))
-        other_select_button.configure(style.default_button)
-        other_select_button.pack(fill="x")
+        self.other_select_button = tk.Button(self, text="スマートフォン以外", command=lambda: self.select_button_clicked(0))
+        self.other_select_button.configure(style.default_button)
+        self.other_select_button.pack(fill="x")
 
-        none_select_button = tk.Button(self, text="持っていない", command=self.cancel_button_clicked)
-        none_select_button.configure(style.default_button)
-        none_select_button.pack(fill="x")
+        self.none_select_button = tk.Button(self, text="持っていない", command=self.cancel_button_clicked)
+        self.none_select_button.configure(style.default_button)
+        self.none_select_button.pack(fill="x")
 
-        cancel_button = tk.Button(self, text="キャンセル", command=self.cancel_button_clicked)
-        cancel_button.configure(style.default_button)
-        cancel_button.pack(fill="x", side="bottom")
+        self.cancel_button = tk.Button(self, text="キャンセル", command=self.cancel_button_clicked)
+        self.cancel_button.configure(style.default_button)
+        self.cancel_button.pack(fill="x", side="bottom")
 
 
     def select_button_clicked(self, device_type):
+        self.lock_buttons()
         app.play("button")
 
         context.device_type = device_type
@@ -721,6 +722,7 @@ class DeviceSelect(tk.Frame):
 
 
     def cancel_button_clicked(self):
+        self.lock_buttons()
         app.play("button")
 
         context.device_type = -1
@@ -731,6 +733,30 @@ class DeviceSelect(tk.Frame):
             app.frames["Finish"].show()
         else:
             app.showerror("エラー", "エラーが発生しました。")
+            self.unlock_buttons()
+
+
+    def lock_buttons(self):
+        self.iphone_select_button.configure(state="disabled")
+        self.android_select_button.configure(state="disabled")
+        self.other_select_button.configure(state="disabled")
+        self.none_select_button.configure(state="disabled")
+        self.cancel_button.configure(state="disabled")
+        app.update()
+
+
+    def unlock_buttons(self):
+        self.iphone_select_button.configure(state="normal")
+        self.android_select_button.configure(state="normal")
+        self.other_select_button.configure(state="normal")
+        self.none_select_button.configure(state="normal")
+        self.cancel_button.configure(state="normal")
+        app.update()
+
+
+    def show(self):
+        self.unlock_buttons()
+        app.show_frame(self)
 
 
 class Policy1(tk.Frame):
@@ -1021,7 +1047,7 @@ class SalesEntry(tk.Frame):
 
         if context.exec_name == "add_point":
             if context.card_status == "tel":
-                app.show_frame("DeviceSelect")
+                app.frames["DeviceSelect"].show()
             elif context.card_status == "price":
                 result = api.add_point()
                 if (result == "success"):
