@@ -21,7 +21,7 @@ sudo ngrok authtoken $ngrok_authtoken 1>> $log_file 2>&1
 
 
 # delete old logs
-for file in `find logs/ -mtime +35
+for file in `find logs/ -mtime +35`
 do
   if [[ $file =~ logs/app_ ]] ; then
     echo "Delete $file" >> $log_file
