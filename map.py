@@ -2221,8 +2221,8 @@ class MapApp(tk.Tk):
     def log(self, content, level="DEBUG"):
         """ログ出力
         """
-        if (not ON_DEBUG) and level == "DEBUG":
-            return
+#         if (not ON_DEBUG) and level == "DEBUG":
+#             return
         print("{} [{}] {}".format(datetime.now(), level, content))
 
 
