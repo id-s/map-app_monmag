@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # setting
 ymd=`date +"%Y%m%d"`
@@ -23,7 +23,7 @@ sudo ngrok authtoken $ngrok_authtoken 1>> $log_file 2>&1
 # delete old logs
 for file in `find logs/ -mtime +35`
 do
-  if [[ $file =~ logs/app_ ]] ; then
+  if [ -n `echo $file | grep "logs/app_"` ] ; then
     echo "Delete $file" >> $log_file
     rm $file 1>> $log_file 2>&1
   fi
