@@ -58,12 +58,14 @@ python+pip+virtualenvで構築できます。※他の方法もあるかもし�
  $ .\env\Scripts\activate
 (env) $ pip install -r requirements.txt
 (env) $ pip install opencv-python
-(env) $ APP_ENV=Mac
 ⑧map.pyの微修正
  ・locale.setlocale(locale.LC_TIME, 'ja_JP.UTF-8')
  でエラーがでる場合コメントアウト
  ・mqtt.xmlを持っていない場合 APP_MODEを"normal"=>"test"に変更
  APP_MODE = os.getenv("APP_MODE", "test")
+ ・APP_ENVを"Monmag"=>"Win"に変更
+ APP_ENV = os.getenv("APP_ENV", "Win")
+ 
 ⑨map.py実行
  python map.py
 
