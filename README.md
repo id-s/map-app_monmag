@@ -41,33 +41,49 @@ APP_MODE: "test"とすると、テストモードで起動する(設定より切
 
 ★Windowsの場合
 python+pip+virtualenvで構築できます。※他の方法もあるかもしれません。
+
 手順
+
 ①pythonのインストール
+
 ②環境変数の確認、設定
  コマンドプロンプトorPowerShellで以下のコマンドを実行
  Ver情報が出力たら、環境変数の設定OK
+ ```
  $ python -V
 　Python 2.7.9
+ ```
 ③pipでvirtualenvをインストール
+ ```
  $ pip install virtualenv
+ ```
 ④gitからmap-app_monmagをダウンロード(またはclone)
+
 ⑤map-app_monmagディレクトリに移動
+
 ⑥仮想環境の構築
+ ```
  $ virtualenv -p python.exeのフルパス env
+ ```
 ⑦仮想環境の切り替え
+ ```
  $ .\env\Scripts\activate
 (env) $ pip install -r requirements.txt
 (env) $ pip install opencv-python
+ ```
 ⑧map.pyの微修正
+ ```
  ・locale.setlocale(locale.LC_TIME, 'ja_JP.UTF-8')
  でエラーがでる場合コメントアウト
  ・mqtt.xmlを持っていない場合 APP_MODEを"normal"=>"test"に変更
  APP_MODE = os.getenv("APP_MODE", "test")
  ・APP_ENVを"Monmag"=>"Win"に変更
  APP_ENV = os.getenv("APP_ENV", "Win")
- 
+ ```
 ⑨map.py実行
+ ```
  python map.py
+ ```
 
 ## 実行環境構築
 
