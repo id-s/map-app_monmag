@@ -7,10 +7,15 @@
 [前提]
 * pyenv, virtualenvがインストールされていること
 
-Macの場合(Windowsでも同様の手順が必要かもしれません。未確認)
+Macの場合
 
 ```
 $ brew install zbar
+```
+Windowsの場合
+```
+$ pip install pyzbar
+$ pip install wifi
 ```
 
 ```
@@ -28,8 +33,10 @@ opencvをrequirements.txtに入れていないのは、Monmag側ではすでに(
 これが開発PCにインストールされていない場合は以下よりダウンロードしてインストールしてください。
 https://github.com/jenskutilek/free-fonts/blob/master/Droid/Droid%20Sans%20Japanese/DroidSansJapanese.ttf
 
-アプリの起動は下記コマンドにて(APP_ENVの値は"Monmag"以外なら何でもOK)。
-
+アプリの起動は下記コマンドにて。
+>APP_ENVの値は実行環境によって異なります。  
+>Macの場合 APP_ENV=Mac  
+>Windowsの場合 APP_ENV=Win
 ```
 (env) $ APP_ENV=Mac python map.py
 ```

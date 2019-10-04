@@ -1,3 +1,4 @@
 Pillow==2.6.1
 pyzbar==0.1.8
 requests==2.4.3
+wifi==0.3.8
