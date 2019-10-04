@@ -31,8 +31,7 @@ GOOGLE_TRACKING_ID = "UA-114507936-1" # MyShop
 GOOGLE_TRACKING_HOST = "map.my-shop.fun" # ビューを分けるための擬似的なホスト名
 USER_AGENT = "Magee/Monmag" # MonmagのUser-Agent
 
-# Winの開発環境用に修正
-if os.getenv("APP_ENV") == "Win":
+if APP_ENV == "Win":
     locale.setlocale(locale.LC_TIME, 'jpn')
 else:
     locale.setlocale(locale.LC_TIME, 'ja_JP.UTF-8')
