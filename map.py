@@ -777,7 +777,7 @@ class Policy1(tk.Frame):
             ポイント付与通知・お得なクーポン満載「MyShop」への入会案内メッセージを携帯電話にお送りしますか？
 
             事業者名：マギー株式会社
-            個人情報保護管理者：代表取締役社長 098-951-0915
+            個人情報保護管理者：代表取締役社長 098-850-8508
             """
         text_label = tk.Label(self, text=textwrap.dedent(text), font=style.body_font,
                               wraplength=(WINDOW_WIDTH - style.padding * 2), justify="left", height=8, padx=style.padding)
